@@ -724,6 +724,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         mMiniLauncher = (MiniLauncher) dragLayer.findViewById(R.id.mini_content);
         mMiniLauncher.setLauncher(this);
         mMiniLauncher.setOnLongClickListener(this);
+        mMiniLauncher.setDragger(dragLayer);
         dragLayer.addDragListener(mMiniLauncher);
         
         //ADW: Action Buttons (LAB/RAB)

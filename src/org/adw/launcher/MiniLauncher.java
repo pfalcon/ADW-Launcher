@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -35,11 +36,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class MiniLauncher extends ViewGroup implements View.OnLongClickListener, DropTarget, DragController.DragListener {
+public class MiniLauncher extends ViewGroup implements View.OnLongClickListener, DropTarget, DragController.DragListener,DragSource {
     private static final int HORIZONTAL=1;
     private static final int VERTICAL=0;
 	private Launcher mLauncher;
-    private View mDeleteView;
+    //private View mDeleteView;
     private int mOrientation=HORIZONTAL;
     private int mNumCells=4;
     private int mCellWidth=20;
@@ -58,6 +59,7 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
     private int mTouchSlop;
     private int mScrollingSpeed=600;
     private boolean mScrollAllowed=false;
+    private DragController mDragger;
     public MiniLauncher(Context context) {
         super(context);
     }
@@ -201,64 +203,50 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
     }
 
 	public boolean onLongClick(View v) {
-		mDeleteView=v;
-		new AlertDialog.Builder(getContext())
-			  .setTitle("Confirm")
-		      .setMessage("Confirm delete item?")
-		      .setPositiveButton("Yes", deleteShortcut)
-			  .setNegativeButton("No", cancelDelete)
-		      .show();
-		return true;
+        if (!v.isInTouchMode()) {
+            return false;
+        }
+		//ADW Delete the item and reposition the remaining ones
+		//FIRS DELETE deleteView
+		ItemInfo item=(ItemInfo) v.getTag();
+        final LauncherModel model = Launcher.getModel();
+        if (item instanceof LauncherAppWidgetInfo) {
+            model.removeDesktopAppWidget((LauncherAppWidgetInfo) item);
+        } else {
+            model.removeDesktopItem(item);
+        }
+        if (item instanceof UserFolderInfo) {
+            final UserFolderInfo userFolderInfo = (UserFolderInfo)item;
+            LauncherModel.deleteUserFolderContentsFromDatabase(mLauncher, userFolderInfo);
+            model.removeUserFolder(userFolderInfo);
+        } else if (item instanceof LauncherAppWidgetInfo) {
+            final LauncherAppWidgetInfo launcherAppWidgetInfo = (LauncherAppWidgetInfo) item;
+            final LauncherAppWidgetHost appWidgetHost = mLauncher.getAppWidgetHost();
+            if (appWidgetHost != null) {
+                appWidgetHost.deleteAppWidgetId(launcherAppWidgetInfo.appWidgetId);
+            }
+        }
+        LauncherModel.deleteItemFromDatabase(mLauncher, item);
+		//Now we need to update database (and position) for remainint items
+		final int count=getChildCount();
+		for(int i=0;i<count;i++){
+			final View cell=getChildAt(i);
+			final ItemInfo info = (ItemInfo) cell.getTag();
+            if(info.cellX>item.cellX){
+            	info.cellX-=1;
+            	cell.setTag(info);
+                LauncherModel.moveItemInDatabase(mLauncher, info,
+                        LauncherSettings.Favorites.CONTAINER_DOCKBAR, -1, info.cellX, -1);
+            }
+        }
+		requestLayout();
+
+        mDragger.startDrag(v, this, item, DragController.DRAG_ACTION_COPY);
+        detachViewFromParent(v);
+        removeView(v);
+        return true;
 	}
 	
-	DialogInterface.OnClickListener deleteShortcut =
-		new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				//ADW Delete the item and reposition the remaining ones
-				//FIRS DELETE deleteView
-				ItemInfo item=(ItemInfo) mDeleteView.getTag();
-		        final LauncherModel model = Launcher.getModel();
-	            if (item instanceof LauncherAppWidgetInfo) {
-	                model.removeDesktopAppWidget((LauncherAppWidgetInfo) item);
-	            } else {
-	                model.removeDesktopItem(item);
-	            }
-		        if (item instanceof UserFolderInfo) {
-		            final UserFolderInfo userFolderInfo = (UserFolderInfo)item;
-		            LauncherModel.deleteUserFolderContentsFromDatabase(mLauncher, userFolderInfo);
-		            model.removeUserFolder(userFolderInfo);
-		        } else if (item instanceof LauncherAppWidgetInfo) {
-		            final LauncherAppWidgetInfo launcherAppWidgetInfo = (LauncherAppWidgetInfo) item;
-		            final LauncherAppWidgetHost appWidgetHost = mLauncher.getAppWidgetHost();
-		            if (appWidgetHost != null) {
-		                appWidgetHost.deleteAppWidgetId(launcherAppWidgetInfo.appWidgetId);
-		            }
-		        }
-		        LauncherModel.deleteItemFromDatabase(mLauncher, item);
-		        detachViewFromParent(mDeleteView);
-		        removeView(mDeleteView);
-				//Now we need to update database (and position) for remainint items
-				final int count=getChildCount();
-				for(int i=0;i<count;i++){
-					final View cell=getChildAt(i);
-					final ItemInfo info = (ItemInfo) cell.getTag();
-	                if(info.cellX>item.cellX){
-	                	info.cellX-=1;
-	                	cell.setTag(info);
-		                LauncherModel.moveItemInDatabase(mLauncher, info,
-		                        LauncherSettings.Favorites.CONTAINER_DOCKBAR, -1, info.cellX, -1);
-	                }
-                }
-				requestLayout();
-				mDeleteView=null;
-			}
-	};
-
-	DialogInterface.OnClickListener cancelDelete =
-		new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-			}
-	};
 	
     void setLauncher(Launcher launcher) {
         mLauncher = launcher;
@@ -468,4 +456,9 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
         }
 	}
 
+	public void onDropCompleted(View target, boolean success) {
+	}
+	public void setDragger(DragController dragger) {
+		mDragger=dragger;
+	}
 }
