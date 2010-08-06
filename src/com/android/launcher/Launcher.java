@@ -2710,6 +2710,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			mWorkspace.setSpeed(AlmostNexusSettingsHelper.getDesktopSpeed(this));
 			mWorkspace.setBounceAmount(AlmostNexusSettingsHelper.getDesktopBounce(this));
 			mWorkspace.setDefaultScreen(AlmostNexusSettingsHelper.getDefaultScreen(this));
+			mWorkspace.setWallpaperScroll(AlmostNexusSettingsHelper.getWallpaperScrolling(this));
 		}
 		int animationSpeed=AlmostNexusSettingsHelper.getZoomSpeed(this);
         if(mAllAppsGrid!=null){

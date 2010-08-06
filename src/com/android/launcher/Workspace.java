@@ -172,6 +172,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	//And as those devices can perform pretty well without cache... let's add an option... one more...
 	private boolean mDesktopCache=true;
     private boolean mTouchedScrollableWidget = false;
+	private boolean mWallpaperScroll=true;
 	
     /**
      * Used to inflate the Workspace from XML.
@@ -460,9 +461,14 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     }
 
     private void updateWallpaperOffset() {
-        updateWallpaperOffset(getChildAt(getChildCount() - 1).getRight() - (mRight - mLeft));
+    	if(mWallpaperScroll){
+    		updateWallpaperOffset(getChildAt(getChildCount() - 1).getRight() - (getRight() - getLeft()));
+    	}
     }
-
+    private void centerWallpaperOffset(){
+		mWallpaperManager.setWallpaperOffsetSteps(0.5f, 0 );
+		mWallpaperManager.setWallpaperOffsets(getWindowToken(), 0.5f, 0);
+    }
     private void updateWallpaperOffset(int scrollRange) {
     	//ADW: we set a condition to not move wallpaper beyond the "bounce" zone
     	if(getScrollX()>0 && getScrollX()<getChildAt(getChildCount() - 1).getLeft()){
@@ -533,7 +539,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         	}
         	//if(getChildCount()==1)x=getScrollX();
         	//ADW lets center the wallpaper when there's only one screen...
-        	if(getChildCount()==1)x=(getScrollX()-(mWallpaperWidth/2)+(getRight()/2));
+        	if(!mWallpaperScroll || getChildCount()==1)x=(getScrollX()-(mWallpaperWidth/2)+(getRight()/2));
     		canvas.drawBitmap(mWallpaperDrawable.getBitmap(), x, (getBottom() - mWallpaperHeight) / 2, mPaint);
         }
         if(!mSensemode){
@@ -659,7 +665,12 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             }
         }
         //ADW:updateWallpaperoffset
-        if(lwpSupport)updateWallpaperOffset();
+        if(lwpSupport){
+        	if(mWallpaperScroll)
+        		updateWallpaperOffset();
+        	else
+        		centerWallpaperOffset();
+        }
     }
 
     @Override
@@ -1813,5 +1824,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	public void setDefaultScreen(int defaultScreen) {
 		mDefaultScreen=defaultScreen;
 	}
-	
+	public void setWallpaperScroll(boolean scroll){
+		mWallpaperScroll=scroll;
+		postInvalidate();
+	}
 }
