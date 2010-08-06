@@ -171,6 +171,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	//And as those devices can perform pretty well without cache... let's add an option... one more...
 	private boolean mDesktopCache=true;
     private boolean mTouchedScrollableWidget = false;
+	private boolean mWallpaperScroll=true;
 	
     /**
      * Used to inflate the Workspace from XML.
@@ -512,7 +513,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     	if(getScrollX()>getChildAt(getChildCount() - 1).getRight() - (getRight() - getLeft())){
     		x=(getScrollX()-mWallpaperWidth+(getRight()-getLeft()));
     	}
-	if(getChildCount()==1)x=x=(getScrollX()-(mWallpaperWidth/2)+(getRight()/2));
+	if(!mWallpaperScroll || getChildCount()==1)x=x=(getScrollX()-(mWallpaperWidth/2)+(getRight()/2));
 	canvas.drawBitmap(mWallpaper, x, (getBottom() - mWallpaperHeight) / 2, mPaint);
         if(!mSensemode){
 			// If the all apps drawer is open and the drawing region for the workspace
@@ -1789,5 +1790,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	public void setDefaultScreen(int defaultScreen) {
 		mDefaultScreen=defaultScreen;
 	}
-	
+	public void setWallpaperScroll(boolean scroll){
+		mWallpaperScroll=scroll;
+		postInvalidate();
+	}
 }
