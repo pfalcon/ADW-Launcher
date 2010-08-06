@@ -11,6 +11,10 @@
 			android:defaultValue="false"
 			android:summary="@string/pref_summary_hide_statusbar"
 			android:key="hideStatusbar" />
+		<CheckBoxPreference android:title="@string/pref_title_wallpaper_scrolling"
+			android:defaultValue="true"
+			android:summary="@string/pref_summary_wallpaper_scrolling"
+			android:key="wallpaper_scrolling" />
 		<PreferenceCategory
             android:title="@string/pref_title_screens_preferencecategory">
 			<org.adw.launcher.DialogSeekBarPreference

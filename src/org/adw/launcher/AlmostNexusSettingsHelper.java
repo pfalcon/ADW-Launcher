@@ -329,5 +329,10 @@ public final class AlmostNexusSettingsHelper {
 		int newD = Integer.valueOf(sp.getString("homeOrientation", context.getResources().getString(R.string.config_orientation_default)));
 		return newD;
 	}
+	public static boolean getWallpaperScrolling(Context context) {
+		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+		boolean newD = sp.getBoolean("wallpaper_scrolling", true);
+		return newD;
+	}
 	
 }

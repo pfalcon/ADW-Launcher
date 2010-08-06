@@ -306,4 +306,7 @@
 	<string name="pref_themes_apply_theme">Aplicar tema!</string>
 	<string name="pref_themes_get_themes">Obtener temas!</string>
 
+    <string name="pref_title_wallpaper_scrolling">Desplazar wallpaper</string>
+    <string name="pref_summary_wallpaper_scrolling">Mover el wallpaper junto con el escritorio</string>
+
 </resources>
