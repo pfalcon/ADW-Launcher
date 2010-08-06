@@ -541,7 +541,6 @@ public class CellLayout extends WidgetCellLayout {
         if(AlmostNexusSettingsHelper.getDesktopIndicator(getContext()) && AlmostNexusSettingsHelper.getDesktopIndicatorType(getContext())==DesktopIndicator.INDICATOR_TYPE_PAGER){
         	topExtra=mPaginatorPadding;
         }
-        android.util.Log.d("CELLLAYOUT","onMeasure!!! portrait="+mPortrait);
         if(mPortrait){
         	mLongAxisCells=mRows;
         	mShortAxisCells=mColumns;

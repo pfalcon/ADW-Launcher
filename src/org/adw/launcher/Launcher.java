@@ -307,7 +307,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private Typeface themeFont=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	d("LAUNCHER","ONCREATE");
 		mMessWithPersistence=AlmostNexusSettingsHelper.getSystemPersistent(this);
 		if(mMessWithPersistence){
 	        changeOrientation(AlmostNexusSettingsHelper.getDesktopOrientation(this),true);
