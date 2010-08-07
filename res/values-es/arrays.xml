@@ -22,4 +22,9 @@
                 <item>Vertical</item>
                 <item>Horizontal</item>
        </string-array>       
+       <string-array name="screen_cache_entries">
+                <item>Baja calidad</item>
+                <item>Automático</item>
+                <item>Desactivado</item>
+       </string-array>
 </resources>

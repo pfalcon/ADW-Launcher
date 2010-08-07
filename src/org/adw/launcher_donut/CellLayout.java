@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
@@ -66,9 +67,10 @@ public class CellLayout extends WidgetCellLayout {
     private boolean mLastDownOnOccupiedCell = false;
     
     //ADW: We'll have fixed rows/columns
-    private int mRows;
-    private int mColumns;
-    private int mPaginatorPadding;
+	private int mRows;
+	private int mColumns;
+	private int mPaginatorPadding;
+	private int mDesktopCacheType=2;
     public CellLayout(Context context) {
         this(context, null);
     }
@@ -111,6 +113,7 @@ public class CellLayout extends WidgetCellLayout {
                 mOccupied = new boolean[mLongAxisCells][mShortAxisCells];
             }
         }*/
+        mDesktopCacheType=AlmostNexusSettingsHelper.getScreenCache(context);
     }
 
     @Override
@@ -657,15 +660,19 @@ public class CellLayout extends WidgetCellLayout {
 
     @Override
     protected void setChildrenDrawingCacheEnabled(boolean enabled) {
-        final int count = getChildCount();
-        for (int i = 0; i < count; i++) {
-            final View view = getChildAt(i);
-            view.setDrawingCacheEnabled(enabled);
-            //reduce cache quality to reduce memory usage
-            view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
-            // Update the drawing caches
-            view.buildDrawingCache(true);
-        }
+    	if(mDesktopCacheType!=AlmostNexusSettingsHelper.CACHE_DISABLED){
+	    	final int count = getChildCount();
+	        for (int i = 0; i < count; i++) {
+	            final View view = getChildAt(i);
+        		if(mDesktopCacheType==AlmostNexusSettingsHelper.CACHE_LOW)
+        			view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
+        		else
+        			view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
+	            view.setDrawingCacheEnabled(enabled);
+	            // Update the drawing caches
+	            view.buildDrawingCache(true);
+	        }
+    	}
     }
 
     @Override
