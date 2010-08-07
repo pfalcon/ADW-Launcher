@@ -72,7 +72,7 @@ public class CellLayout extends WidgetCellLayout {
 	private int mRows;
 	private int mColumns;
 	private int mPaginatorPadding;
-	private int mDesktopCacheType=2;
+	private int mDesktopCacheType=AlmostNexusSettingsHelper.CACHE_LOW;
     public CellLayout(Context context) {
         this(context, null);
     }

@@ -170,8 +170,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	//On those devices, a drawing cache of a 4x4widget can be really big 
 	//cause of their screen sizes, so the bitmaps are... huge...
 	//And as those devices can perform pretty well without cache... let's add an option... one more...
-    private boolean mTouchedScrollableWidget = false;
-	private int mDesktopCacheType=2;
+    	private boolean mTouchedScrollableWidget = false;
+	private int mDesktopCacheType=AlmostNexusSettingsHelper.CACHE_LOW;
 	private boolean mWallpaperScroll=true;
 	
     /**
