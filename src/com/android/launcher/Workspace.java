@@ -170,8 +170,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	//On those devices, a drawing cache of a 4x4widget can be really big 
 	//cause of their screen sizes, so the bitmaps are... huge...
 	//And as those devices can perform pretty well without cache... let's add an option... one more...
-	private boolean mDesktopCache=true;
     private boolean mTouchedScrollableWidget = false;
+	private int mDesktopCacheType=2;
 	private boolean mWallpaperScroll=true;
 	
     /**
@@ -220,7 +220,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         multiTouchController = new MultiTouchController<Object>(this, false);
         mDesktopRows=AlmostNexusSettingsHelper.getDesktopRows(getContext());
         mDesktopColumns=AlmostNexusSettingsHelper.getDesktopColumns(getContext());
-        mDesktopCache=AlmostNexusSettingsHelper.getDesktopCache(getContext());
+        mDesktopCacheType=AlmostNexusSettingsHelper.getScreenCache(getContext());
     }
 
     @Override
@@ -878,14 +878,17 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
          */
         return mTouchState != TOUCH_STATE_REST;
     }
-    void enableChildrenCache() {
-        if(mDesktopCache){
+	void enableChildrenCache() {
+        if(mDesktopCacheType!=AlmostNexusSettingsHelper.CACHE_DISABLED){
 	    	final int count = getChildCount();
 	        for (int i = 0; i < count; i++) {
 	        	//ADW: create cache only for current screen/previous/next.
 	        	if(i>=mCurrentScreen-1 || i<=mCurrentScreen+1){
 	        		final CellLayout layout = (CellLayout) getChildAt(i);
-	        		layout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
+	        		if(mDesktopCacheType==AlmostNexusSettingsHelper.CACHE_LOW)
+	        			layout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
+	        		else
+	        			layout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 	        		layout.setChildrenDrawnWithCacheEnabled(true);
 	        		layout.setChildrenDrawingCacheEnabled(true);
 	        	}
@@ -894,7 +897,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     }
 
     void clearChildrenCache() {
-        if(mDesktopCache){
+        if(mDesktopCacheType!=AlmostNexusSettingsHelper.CACHE_DISABLED){
 	    	final int count = getChildCount();
 	        for (int i = 0; i < count; i++) {
 	            final CellLayout layout = (CellLayout) getChildAt(i);
