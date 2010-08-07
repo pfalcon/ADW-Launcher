@@ -1875,4 +1875,19 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 		mWallpaperScroll=scroll;
 		postInvalidate();
 	}
+	/**
+	 * ADW: hide live wallpaper to speedup the app drawer
+	 * I think the live wallpaper needs to support the "hide" command
+	 * and not every LWP supports it.
+	 * http://developer.android.com/intl/de/reference/android/app/WallpaperManager.html#sendWallpaperCommand%28android.os.IBinder,%20java.lang.String,%20int,%20int,%20int,%20android.os.Bundle%29
+	 * @param hide
+	 */
+    public void hideWallpaper(boolean hide) {
+    	if (hide)
+    		mWallpaperManager.sendWallpaperCommand(getWindowToken(),
+    				"hide", 0, 0, 0, null);
+    	else
+    		mWallpaperManager.sendWallpaperCommand(getWindowToken(),
+    				"show", 0, 0, 0, null);
+    }	
 }
