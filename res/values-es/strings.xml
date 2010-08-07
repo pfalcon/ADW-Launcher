@@ -271,8 +271,8 @@
 	<string name="widget_columns">Columnas</string>
 	<string name="widget_rows">Filas</string>
     
-    <string name="pref_title_screen_cache">Usa cache de dibujo</string>
-    <string name="pref_summary_screen_cache">Mejora el scroll. Desactívalo si usas MUCHÍSIMOS widgets.</string>
+    <string name="pref_title_screen_cache">Cache de dibujo</string>
+    <string name="pref_summary_screen_cache">Mejora el scroll a costa de usar memoria</string>
 
     <string name="pref_title_desktop_indicator">Mostrar indicador de pantalla</string>
     <string name="pref_summary_desktop_indicator">Muestra una ayuda visual de scroll de escritorio</string>

@@ -179,10 +179,14 @@
 			android:defaultValue="true"
 			android:summary="@string/pref_summary_wallpaper_hack"
 			android:key="wallpaperHack" />
-		<CheckBoxPreference android:title="@string/pref_title_screen_cache"
-			android:defaultValue="@bool/config_desktopCache"
-			android:summary="@string/pref_summary_screen_cache"
-			android:key="desktopCache" />
+		<ListPreference
+		  android:key="screenCache"
+		  android:title="@string/pref_title_screen_cache"
+		  android:summary="@string/pref_summary_screen_cache"
+		  android:defaultValue="@string/config_screenCache"
+		  android:entryValues="@array/screen_cache_values"
+		  android:entries="@array/screen_cache_entries"
+		/>
 		<CheckBoxPreference android:key="uiScrollableWidgets"
 			android:title="@string/pref_title_scrollable_widgets"
 			android:summary="@string/pref_summary_scrollable_widgets"

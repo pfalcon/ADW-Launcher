@@ -7,10 +7,15 @@ public final class AlmostNexusSettingsHelper {
 	public static final int ORIENTATION_SENSOR=1;
 	public static final int ORIENTATION_PORTRAIT=2;
 	public static final int ORIENTATION_LANDSCAPE=3;
+	
+	public static final int CACHE_LOW=1;
+	public static final int CACHE_AUTO=2;
+	public static final int CACHE_DISABLED=3;
+	
 	private static final String ALMOSTNEXUS_PREFERENCES = "launcher.preferences.almostnexus";
 	private static final String[] restart_keys={"desktopScreens","drawerNew","uiHideLabels","highlights_color",
 		"highlights_color_focus","uiNewSelectors","desktopRows","desktopColumns","autosizeIcons","uiDesktopIndicatorType",
-		"uiScrollableWidgets","desktopCache","uiDesktopIndicator","themePackageName","themeIcons"};
+		"uiScrollableWidgets","screenCache","uiDesktopIndicator","themePackageName","themeIcons"};
 
 	public static boolean needsRestart(String key){
 		for(int i=0;i<restart_keys.length;i++){
@@ -282,9 +287,9 @@ public final class AlmostNexusSettingsHelper {
 		boolean newD = sp.getBoolean("fadeDrawerLabels", context.getResources().getBoolean(R.bool.config_fadeDrawerLabels));
 		return newD;
 	}
-	public static boolean getDesktopCache(Context context) {
+	public static int getScreenCache(Context context) {
 		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
-		boolean newD = sp.getBoolean("desktopCache", context.getResources().getBoolean(R.bool.config_desktopCache));
+		int newD = Integer.valueOf(sp.getString("screenCache", context.getResources().getString(R.string.config_screenCache)));
 		return newD;
 	}
 	public static boolean getDesktopIndicator(Context context) {

@@ -341,8 +341,8 @@
 	<string name="widget_columns">Columns</string>
 	<string name="widget_rows">Rows</string>
     
-    <string name="pref_title_screen_cache">Use screen cache</string>
-    <string name="pref_summary_screen_cache">Smoother scrolling. Disable if you use TONS of widgets.</string>
+    <string name="pref_title_screen_cache">Scrolling cache</string>
+    <string name="pref_summary_screen_cache">Higher quality will use the more memory.</string>
 
     <string name="pref_title_desktop_indicator">Show desktop indicator</string>
     <string name="pref_summary_desktop_indicator">Show a visual hint on scrolling desktop</string>

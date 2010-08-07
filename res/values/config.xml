@@ -63,7 +63,6 @@
     <bool name="config_uiScrollableWidgets">true</bool>
     <bool name="config_drawerLabels">true</bool>
     <bool name="config_fadeDrawerLabels">false</bool>
-    <bool name="config_desktopCache">true</bool>
     <bool name="config_desktop_indicator">true</bool>
     <bool name="config_desktop_indicator_autohide">true</bool>
     <!-- 1=top dots, 2=top slider, 3=bottom slider -->
@@ -71,4 +70,6 @@
     <bool name="config_system_persistent">false</bool>
     <!-- 1=sensor, 2=portrait, 3=landscape -->
     <string name="config_orientation_default">1</string>
+    <!-- 1=low quality,2=auto, 3=disabled -->
+    <string name="config_screenCache">1</string>
 </resources>
