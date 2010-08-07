@@ -17,4 +17,10 @@
                 <item>上部にスライディングページ</item>
                 <item>下部にスライディングページ</item>
        </string-array>
+
+       <string-array name="home_orientation_entries">
+                <item>自動/センサー</item>
+                <item>ポートレイト</item>
+                <item>ランドスケープ</item>
+       </string-array>
 </resources>

@@ -71,10 +71,10 @@
     <string name="pref_summary_screen_preferences">スクリーンの数やデフォルト等</string>
 
     <string name="pref_title_wallpaper_hack">壁紙ハック</string>
-    <string name="pref_summary_wallpaper_hack">大きい壁紙で強制終了する場合はオフに,改良を維持するにはオンにする.</string>
+    <string name="pref_summary_wallpaper_hack">強制終了する場合はオフに,改良を維持するにはオンにする.</string>
 
-    <string name="pref_title_orientation_sensor">回転センサ</string>
-    <string name="pref_summary_orientation_sensor">回転センサによりデスクトップを回転する</string>
+    <string name="pref_title_orientation_sensor">ホームの向き</string>
+    <string name="pref_summary_orientation_sensor">希望するホームの向きを選択</string>
 
     <string name="pref_title_hide_statusbar">ステータスバーを隠す</string>
     <string name="pref_summary_hide_statusbar">ステータスバーを隠す</string>
@@ -92,7 +92,7 @@
     <string name="pref_dialog_desktop_scrolling_speed">低い値を設定するとより速くスクリーンを飛ばします</string>
 
     <string name="pref_title_desktop_overshoot">デスクトップオーバーシュート</string>
-    <string name="pref_summary_desktop_overshoot">最初と最後のデスクトップで行き過ぎた場合にスクリーンを弾ませる</string>
+    <string name="pref_summary_desktop_overshoot">デスクトップスクロールで行き過ぎた場合にスクリーンを弾ませる</string>
     <string name="pref_dialog_desktop_overshoot">0に設定するとオーバーシュートを無効にできます</string>
 
     <!-- Drawer Settings -->
@@ -298,7 +298,7 @@
 	<string name="pref_title_indicators_preferencecategory">スクリーンインジケータ</string>
 
     <string name="pref_title_system_persistent">システムに常駐</string>
-    <string name="pref_summary_system_persistent">システムからランチャーが終了されるのを防ぐ</string>
+    <string name="pref_summary_system_persistent">危険: システムからランチャーが終了されるのを防ぐ</string>
     <!-- Theme preferences -->
 	<string name="pref_title_theme_settings">テーマ設定</string>
 	<string name="pref_summary_theme_settings">ADW.Launcherのテーマを選択</string>
