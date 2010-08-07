@@ -3155,6 +3155,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	 */
     private void showAllApps(boolean animated){
 		if(!allAppsOpen){
+			mWorkspace.hideWallpaper(true);
 			allAppsOpen=true;
 			mWorkspace.enableChildrenCache();
 	        mWorkspace.lock();
@@ -3174,6 +3175,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
     private void closeAllApps(boolean animated){		
 		if(allAppsOpen){
+			mWorkspace.hideWallpaper(false);
 			allAppsOpen=false;
 	        mWorkspace.unlock();
 	        //mDesktopLocked=false;
