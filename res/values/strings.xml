@@ -399,10 +399,12 @@
 	<string name="AppGroup4">"eLive"</string>
 	<string name="AppGroup5">"Custom"</string>
 	<string name="AppGroupAll">"ALL"</string>
+	<string name="AppGroupAdd">"New Catalog"</string>
 	<string name="AppGroupChoose">"Choose Group"</string>
 	<string name="AppGroupConfig">"Setup Group"</string>
-	<string name="AppGroupRename">"Rename Group"</string>
+	<string name="AppGroupRename">"New Catalog"</string>
 	<string name="AppGroupConfigError">"You can not setup this group"</string>
-	<string name="rename_group_title">Rename Group</string>
-	<string name="rename_group_label">Group Name</string>
+	<string name="AppGroupAddError">"You Cannot have More Groups"</string>
+	<string name="rename_group_title">New Catalog</string>
+	<string name="rename_group_label">Catalog Name</string>
 </resources>
