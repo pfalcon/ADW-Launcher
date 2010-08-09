@@ -120,7 +120,6 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			Collections.sort(allItems,new ApplicationInfoComparator());
 		}
 		String s = info.intent.getComponent().flattenToString();
-		Log.v("-----adding-", s);
 		if (appInGroup(s)) {
 			super.add(info);
 		}

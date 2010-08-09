@@ -18,6 +18,7 @@ package org.adw.launcher.catalogue;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.widget.TextView;
 import org.adw.launcher.R;
 
@@ -110,7 +111,7 @@ public class AppGrpUtils {
 		return grpMask[cGrp];
 	}
 	
-	static public final int getFirstValidGrp() {
+	static private final int getFirstValidGrp() {
 		int ret = -1;
 		loadGrpArray();
 		
@@ -122,7 +123,18 @@ public class AppGrpUtils {
 		}
 		return ret;
 	}
-
+	
+	static public final boolean hasValidGrp() {
+		loadGrpArray();
+		
+		for (int i=0;i<APP_GROUP_SIZE;i++){
+			if (!grpMask[i]) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	static public final void checkAndDisableGrp(int cGrp) //disable app Grp
 	{
 		if ((cGrp < 0) || (cGrp >= APP_GROUP_SIZE))
@@ -148,7 +160,8 @@ public class AppGrpUtils {
 	static public final void checkAndInitGrp(String grpName) {
 		loadGrpArray();
 		int grp = getFirstValidGrp();
-		if ((grp < 0) || (grp >= APP_GROUP_SIZE)) {
+		Log.v("----","  "+grp);
+		if (!(grp < 0) || (grp >= APP_GROUP_SIZE)) {
 			SharedPreferences.Editor editor = appGrpIndex.edit();
 			editor.putString(GRP_INIT_TAG, grpIndex + grp +"/");
 			editor.putString("GrpName"+grp, grpName);			

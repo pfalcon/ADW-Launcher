@@ -46,7 +46,7 @@ public class AppGroupAdapter extends BaseAdapter {
     public static final int APP_GROUP_5   = 5;
     public static final int APP_GROUP_ALL = 6;
     public static final int APP_GROUP_CONFIG = 7;
-    
+    public static final int APP_GROUP_ADD = 8;
     /**
      * Specific item in our list.
      */
@@ -69,7 +69,6 @@ public class AppGroupAdapter extends BaseAdapter {
 	{
 
 		String grpTitle = AppGrpUtils.getGrpTextFromDB(i);
-		android.util.Log.v("-----",""+grpTitle+" "+i);
 		if (null != grpTitle) {
 			mItems.add(new ListItem(res, grpTitle,
 						/*iconId, */appGrp));
@@ -83,7 +82,9 @@ public class AppGroupAdapter extends BaseAdapter {
         
         // Create default actions
         Resources res = launcher.getResources();
-
+        
+       mItems.add(new ListItem(res, R.string.AppGroupAdd, APP_GROUP_ADD));
+	
 		mItems.add(new ListItem(res, R.string.AppGroupAll,
 					/*R.drawable.app_grp_all,*/ APP_GROUP_ALL));
 		addListItem(res,0,APP_GROUP_0/*,R.drawable.app_grp_multi_media*/);

@@ -160,7 +160,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private static final int DIALOG_CREATE_SHORTCUT = 1;
     static final int DIALOG_RENAME_FOLDER = 2;
     static final int DIALOG_CHOOSE_GROUP = 3;
-    static final int DIALOG_RENAME_GROUP = 4;
+    static final int DIALOG_NEW_GROUP = 4;
 
     private static final String PREFERENCES = "launcher.preferences";
 
@@ -1128,7 +1128,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             // An exception is thrown if the dialog is not visible, which is fine
         }
         try {
-            dismissDialog(DIALOG_RENAME_GROUP);
+            dismissDialog(DIALOG_NEW_GROUP);
             // Unlock the workspace if the dialog was showing
         } catch (Exception e) {
             // An exception is thrown if the dialog is not visible, which is fine
@@ -1469,7 +1469,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				showAppList();
                 return true;
             case MENU_APP_GRP_RENAME:
-				showRenameGrpDialog();
+				showNewGrpDialog();
                 return true;
             case MENU_APP_SWITCH_GRP:
 				showSwitchGrp();
@@ -1486,13 +1486,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		Intent i = new Intent(this, AppInfoMList.class);
 		startActivityForResult(i, REQUEST_SHOW_APP_LIST);
 	}
-    void showRenameGrpDialog() {
-        if (null==AppGrpUtils.getCurAppGrp()) {
-            Toast.makeText(this, getString(R.string.AppGroupConfigError), Toast.LENGTH_SHORT).show();
+    void showNewGrpDialog() {
+        if (!AppGrpUtils.hasValidGrp()) {
+            Toast.makeText(this, getString(R.string.AppGroupAddError), Toast.LENGTH_SHORT).show();
 			return;
 		}
         mWaitingForResult = true;
-        showDialog(DIALOG_RENAME_GROUP);
+        showDialog(DIALOG_NEW_GROUP);
     }
     /**
      * Indicates that we want global search for this activity by setting the globalSearch
@@ -2320,8 +2320,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 return new RenameFolder().createDialog();
 			case DIALOG_CHOOSE_GROUP:
 				return new CreateGrpDialog().createDialog();
-			case DIALOG_RENAME_GROUP:
-				return new RenameGrpTitle().createDialog();
+			case DIALOG_NEW_GROUP:
+				return new NewGrpTitle().createDialog();
         }
 
         return super.onCreateDialog(id);
@@ -2495,15 +2495,20 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
 		public void onClick(DialogInterface dialog, int which) {
 			cleanup();
-			//first is All, mapping to -1, check AppGrpUtils For detail
-		   //int dbGrp = AppGrpUtils.getGrpNumber(which-1);
-           AppGrpUtils.setCurGrp(which-1);
-           AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, which-1);
-           if(newDrawer){ 
-        	   ((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
-           }else{
-        	   ((AllAppsGridView)mAllAppsGrid).updateAppGrp();
-           }
+			//1st is add,
+			//2nd is All, mapping to -1, check AppGrpUtils For detail
+		   //int dbGrp = AppGrpUtils.getGrpNumber(which-2);
+		   if (0 == which ) {
+			   showNewGrpDialog() ;
+		   } else {
+			   AppGrpUtils.setCurGrp(which-2);
+			   AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, which-2);
+			   if(newDrawer){ 
+				   ((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
+			   }else{
+				   ((AllAppsGridView)mAllAppsGrid).updateAppGrp();
+			   }
+		   }
 			//mDrawer.open();
 		}
 
@@ -2511,7 +2516,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mWorkspace.lock();
         }
     }
-    private class RenameGrpTitle {
+    private class NewGrpTitle {
         private EditText mInput;
 
         Dialog createDialog() {
@@ -2564,19 +2569,14 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			mInput.setText("");
 			if (!TextUtils.isEmpty(name)) {
 				// Make sure we have the right folder info
-				SharedPreferences curAppGrp = AppGrpUtils.getCurAppGrp();
-				if (curAppGrp == null) return;//should not go here.
-
-				SharedPreferences.Editor editor = curAppGrp.edit();
-				editor.putString("GrpName", name);
-				editor.commit();
+				AppGrpUtils.checkAndInitGrp(name) ;
 			}
 			cleanup();
         }
 
         private void cleanup() {
             mWorkspace.unlock();
-            dismissDialog(DIALOG_RENAME_GROUP);
+            dismissDialog(DIALOG_NEW_GROUP);
             mWaitingForResult = false;
             mFolderInfo = null;
         }
