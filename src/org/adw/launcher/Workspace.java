@@ -339,6 +339,12 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         scrollTo(mCurrentScreen * getWidth(), 0);
         //ADW: dots
         indicatorLevels(mCurrentScreen);
+        if(mLauncher.getDesktopIndicator()!=null){
+        	mLauncher.getDesktopIndicator().fullIndicate(mCurrentScreen);
+        	if(mLauncher.isEditMode()){
+        		mLauncher.getDesktopIndicator().hide();
+        	}
+        }
         invalidate();
     }
 
@@ -1933,11 +1939,11 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         }
         moveItemPositions(screen, -1);
         removeView(getChildAt(screen));
-        if(getChildCount()<mCurrentScreen){
+        if(getChildCount()<=mCurrentScreen){
         	mCurrentScreen=0;
-        	snapToScreen(mCurrentScreen);
+        	setCurrentScreen(mCurrentScreen);
         }
-    	mLauncher.getDesktopIndicator().setItems(getChildCount());
+    	if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().setItems(getChildCount());
     	indicatorLevels(mCurrentScreen);        
         AlmostNexusSettingsHelper.setDesktopScreens(mLauncher, getChildCount());
     }
@@ -1946,7 +1952,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     	CellLayout screen=(CellLayout)layoutInflter.inflate(R.layout.workspace_screen, this, false);
     	addView(screen,position);
     	screen.setOnLongClickListener(mLongClickListener);
-    	mLauncher.getDesktopIndicator().setItems(getChildCount());
+    	if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().setItems(getChildCount());
     	indicatorLevels(mCurrentScreen);
     	AlmostNexusSettingsHelper.setDesktopScreens(mLauncher, getChildCount());
     	moveItemPositions(position, +1);
