@@ -1258,6 +1258,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         getContentResolver().unregisterContentObserver(mWidgetObserver);
         unregisterReceiver(mApplicationsReceiver);
         unregisterReceiver(mCloseSystemDialogsReceiver);
+        unregisterReceiver(sWallpaperReceiver);
         mWorkspace.unregisterProvider();
     }
 
@@ -1352,9 +1353,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         menu.add(0, MENU_SEARCH, 0, R.string.menu_search)
                 .setIcon(android.R.drawable.ic_search_category_default)
                 .setAlphabeticShortcut(SearchManager.MENU_KEY);
-        menu.add(0, MENU_NOTIFICATIONS, 0, R.string.menu_notifications)
-                .setIcon(R.drawable.ic_menu_notifications)
-                .setAlphabeticShortcut('N');
+        menu.add(0, MENU_NOTIFICATIONS, 0, R.string.menu_edit)
+                .setIcon(android.R.drawable.ic_menu_edit)
+                .setAlphabeticShortcut('E');
 
         final Intent settings = new Intent(android.provider.Settings.ACTION_SETTINGS);
         settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
@@ -1374,7 +1375,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-
+        if(mIsEditMode)return false;
         // We can't trust the view state here since views we may not be done binding.
         // Get the vacancy state from the model instead.
         mMenuAddInfo = mWorkspace.findAllVacantCellsFromModel();
@@ -1390,15 +1391,15 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 addItems();
                 return true;
             case MENU_WALLPAPER_SETTINGS:
-                //startWallpaper();
-            	//ADW: temp usage for desktop eiting
-            	startDesktopEdit();
+                startWallpaper();
                 return true;
             case MENU_SEARCH:
                 onSearchRequested();
                 return true;
             case MENU_NOTIFICATIONS:
-                showNotifications();
+                //showNotifications();
+            	//ADW: temp usage for desktop eiting
+            	startDesktopEdit();
                 return true;
             case MENU_ALMOSTNEXUS:
                 showCustomConfig();
