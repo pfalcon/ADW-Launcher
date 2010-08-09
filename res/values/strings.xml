@@ -400,6 +400,8 @@
 	<string name="AppGroup5">"Custom"</string>
 	<string name="AppGroupAll">"ALL"</string>
 	<string name="AppGroupAdd">"New Catalog"</string>
+	<string name="AppGroupDel">"Remove Catalog"</string>
+    <string name="AppGroupDelLong">"Really Remove\nCurrent Catalog?"</string>
 	<string name="AppGroupChoose">"Choose Group"</string>
 	<string name="AppGroupConfig">"Setup Group"</string>
 	<string name="AppGroupRename">"New Catalog"</string>

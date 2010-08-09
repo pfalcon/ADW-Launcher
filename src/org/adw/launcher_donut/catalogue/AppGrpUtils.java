@@ -135,8 +135,9 @@ public class AppGrpUtils {
 		return false;
 	}
 	
-	static public final void checkAndDisableGrp(int cGrp) //disable app Grp
+	static public final void checkAndDisableGrp() //disable app Grp
 	{
+		int cGrp = AppGrpUtils.currentGrp;
 		if ((cGrp < 0) || (cGrp >= APP_GROUP_SIZE))
 			return; // invalid index, do nothing.
 		
