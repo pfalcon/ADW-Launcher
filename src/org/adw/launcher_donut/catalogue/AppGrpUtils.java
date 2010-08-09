@@ -227,7 +227,7 @@ public class AppGrpUtils {
 	}
 
 	static public void setTitleView(TextView v) {
-		String grpTitle = getGrpTextFromDB(currentGrp);
+		String grpTitle = appGrpIndex.getString("GrpName"+currentGrp, null);//getGrpTextFromDB(currentGrp);
 		if (null != grpTitle) {
 			v.setText(grpTitle);
 		} else {
