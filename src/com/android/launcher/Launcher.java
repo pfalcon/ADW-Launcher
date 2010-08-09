@@ -57,7 +57,6 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LevelListDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -78,16 +77,21 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.WindowManager;
 import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -303,6 +307,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	public static final int THEME_ITEM_FOREGROUND=1;
 	public static final String THEME_DEFAULT="ADW.Default theme";
 	private Typeface themeFont=null;
+	private boolean mIsEditMode=false;
+	private View mScreensEditor=null;
+	///TODO:ADW. Current code fully ready for upto 9
+	//but need to add more drawables for the desktop dots...
+	//or completely redo the desktop dots implementation
+	private final static int MAX_SCREENS=7;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 		mMessWithPersistence=AlmostNexusSettingsHelper.getSystemPersistent(this);
@@ -1218,6 +1228,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
     @Override
     public void onDestroy() {
+    	d("LAUNCHER","onDestroy");
         mDestroyed = true;
     	//setPersistent(false);
         //ADW: unregister the sharedpref listener
@@ -1389,7 +1400,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 addItems();
                 return true;
             case MENU_WALLPAPER_SETTINGS:
-                startWallpaper();
+                //startWallpaper();
+            	//ADW: temp usage for desktop eiting
+            	startDesktopEdit();
                 return true;
             case MENU_SEARCH:
                 onSearchRequested();
@@ -1725,6 +1738,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                         }
                         if(isPreviewing()){
                         	dismissPreviews();
+                        }
+                        if(mIsEditMode){
+                        	stopDesktopEdit();
                         }
                     }
                     return true;
@@ -2726,6 +2742,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      * ADW: Refresh UI status variables and elements after changing settings.
      */
     private void updateAlmostNexusUI(){
+    	if(mIsEditMode)return;
     	updateAlmostNexusVars();
 		boolean tint=AlmostNexusSettingsHelper.getUITint(this);
 		float scale=AlmostNexusSettingsHelper.getuiScaleAB(this);
@@ -2935,6 +2952,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private void hideDesktop(boolean enable){
     	final View drwToolbar=findViewById(R.id.drawer_toolbar);
     	if(enable){
+    		if(mDesktopIndicator!=null)mDesktopIndicator.hide();
 	    	mHandleView.setVisibility(View.INVISIBLE);
 	    	mNextView.setVisibility(View.INVISIBLE);
 	    	mPreviousView.setVisibility(View.INVISIBLE);
@@ -2943,6 +2961,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	        	mDockBar.setVisibility(View.INVISIBLE);
 	        }    		
     	}else{
+    		if(mDesktopIndicator!=null)mDesktopIndicator.show();
 	        if(mDockBar.isOpen()){
 	        	mDockBar.setVisibility(View.VISIBLE);
 	        }else{
@@ -3315,6 +3334,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	 */
 	private void fireHomeBinding(int bindingValue, int type){
     	//ADW: switch home button binding user selection
+		if(mIsEditMode)return;
         switch (bindingValue) {
 		case BIND_DEFAULT:
 			dismissPreviews();
@@ -3588,5 +3608,103 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		default:
 			break;
 		}
+	}
+	/**
+	 * ADW: Put the launcher in desktop edit mode
+	 * We could be able to add, remove and reorder screens
+	 */
+	private void startDesktopEdit(){
+		if(!mIsEditMode){
+			mIsEditMode=true;
+	        final Workspace workspace = mWorkspace;
+			if(workspace==null)return;
+			workspace.enableChildrenCache();
+	    	hideDesktop(true);
+	    	workspace.lock();
+	        //Load a gallery view
+	        final ScreensAdapter screens=new ScreensAdapter(this,workspace.getChildAt(0).getWidth(),workspace.getChildAt(0).getHeight());
+	        for (int i=0;i<workspace.getChildCount();i++){
+	        	screens.addScreen((CellLayout) workspace.getChildAt(i));
+	        }
+	        mScreensEditor=mInflater.inflate(R.layout.screens_editor, null);
+	        final Gallery gal=(Gallery) mScreensEditor.findViewById(R.id.gallery_screens);
+	        gal.setCallbackDuringFling(false);
+	        gal.setClickable(false);
+	        gal.setAdapter(screens);
+	        //Setup delete button event
+	        View deleteButton=mScreensEditor.findViewById(R.id.delete_screen);
+	        deleteButton.setOnClickListener(new android.view.View.OnClickListener() {
+				public void onClick(View v) {
+					final int screenToDelete=gal.getSelectedItemPosition();
+					if(workspace.getChildCount()>1){
+		                AlertDialog alertDialog = new AlertDialog.Builder(Launcher.this).create();
+		                alertDialog.setTitle(getResources().getString(R.string.title_dialog_xml));
+		                alertDialog.setMessage(getResources().getString(R.string.message_delete_desktop_screen));
+		                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(android.R.string.ok), 
+		                    new DialogInterface.OnClickListener() {
+		                    public void onClick(DialogInterface dialog, int which) {
+		    					workspace.removeScreen(screenToDelete);
+		    					screens.removeScreen(screenToDelete);
+		                    }
+		                });
+		                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getResources().getString(android.R.string.cancel), 
+		                    new DialogInterface.OnClickListener() {
+		                    public void onClick(DialogInterface dialog, int which) {
+		                    }
+		                });
+		                alertDialog.show();
+					}else{
+						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_delete_desktop_screen, Toast.LENGTH_LONG);
+						t.show();
+					}
+					
+				}
+			});
+	        //Setup add buttons events
+	        View addLeftButton=mScreensEditor.findViewById(R.id.add_left);
+	        addLeftButton.setOnClickListener(new android.view.View.OnClickListener() {
+				public void onClick(View v) {
+					if(screens.getCount()<MAX_SCREENS){
+						final int screenToAddLeft=gal.getSelectedItemPosition();
+						CellLayout newScreen=workspace.addScreen(screenToAddLeft);
+						screens.addScreen(newScreen,screenToAddLeft);
+					}else{
+						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_add_desktop_screen, Toast.LENGTH_LONG);
+						t.show();
+					}
+				}
+			});
+	        View addRightButton=mScreensEditor.findViewById(R.id.add_right);
+	        addRightButton.setOnClickListener(new android.view.View.OnClickListener() {
+				public void onClick(View v) {
+					if(screens.getCount()<MAX_SCREENS){
+						final int screenToAddRight=gal.getSelectedItemPosition();
+						CellLayout newScreen=workspace.addScreen(screenToAddRight+1);
+						screens.addScreen(newScreen,screenToAddRight+1);
+					}else{
+						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_add_desktop_screen, Toast.LENGTH_LONG);
+						t.show();
+					}
+				}
+			});
+	        
+	        mDragLayer.addView(mScreensEditor);
+		}
+	}
+	private void stopDesktopEdit(){
+		mIsEditMode=false;
+    	hideDesktop(false);
+    	for(int i=0;i<mWorkspace.getChildCount();i++){
+    		mWorkspace.getChildAt(i).setDrawingCacheEnabled(false);
+    	}
+    	mWorkspace.clearChildrenCache();
+    	mWorkspace.unlock();
+		if(mScreensEditor!=null){
+			mDragLayer.removeView(mScreensEditor);
+			mScreensEditor=null;
+		}
+	}
+	protected boolean isEditMode(){
+		return mIsEditMode;
 	}
 }

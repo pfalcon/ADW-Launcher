@@ -146,10 +146,6 @@
     <string name="pref_title_hide_statusbar">Hide StatusBar</string>
     <string name="pref_summary_hide_statusbar">Hides your statusbar</string>
 
-    <string name="pref_title_desktop_screens">Desktop Screens</string>
-    <string name="pref_summary_desktop_screens">Select the number of desktop screens to use</string>
-    <string name="pref_dialog_desktop_screen">Select the number of desktop screens to use</string>
-
     <string name="pref_title_default_screen">Default Screen</string>
     <string name="pref_summary_default_screen">Select the screen to set as default</string>
     <string name="pref_dialog_default_screen">Select the screen to set as default</string>
@@ -378,4 +374,7 @@
 	
     <string name="pref_title_wallpaper_scrolling">Wallpaper Scrolling</string>
     <string name="pref_summary_wallpaper_scrolling">Allow wallpaper to move while scrolling screens</string>
+    <string name="message_delete_desktop_screen">Remove this screen and all the content?</string>
+    <string name="message_cannot_delete_desktop_screen">You can\'t delete the last screen</string>
+    <string name="message_cannot_add_desktop_screen">You can\'t add more screens</string>
 </resources>
