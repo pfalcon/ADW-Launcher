@@ -80,9 +80,6 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
         columnsDesktop.setMin(3);
         DialogSeekBarPreference rowsDesktop= (DialogSeekBarPreference) findPreference("desktopRows");
         rowsDesktop.setMin(3);
-        DialogSeekBarPreference desktopScreens= (DialogSeekBarPreference) findPreference("desktopScreens");
-        desktopScreens.setMin(1);
-        desktopScreens.setOnPreferenceChangeListener(this);
         DialogSeekBarPreference defaultScreen= (DialogSeekBarPreference) findPreference("defaultScreen");
         defaultScreen.setMin(1);
         defaultScreen.setMax(AlmostNexusSettingsHelper.getDesktopScreens(this)-1);
@@ -353,10 +350,7 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
 		super.onPause();
 	}
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
-		if (preference.getKey().equals("desktopScreens")) {
-			DialogSeekBarPreference pref = (DialogSeekBarPreference) findPreference("defaultScreen");
-			pref.setMax((Integer) newValue);
-		}else if(preference.getKey().equals("uiDots")) {
+		if(preference.getKey().equals("uiDots")) {
 			CheckBoxPreference ab2=(CheckBoxPreference) findPreference("uiAB2");
 			if(newValue.equals(true)){
 				ab2.setChecked(false);

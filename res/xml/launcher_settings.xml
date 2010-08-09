@@ -18,10 +18,6 @@
 		<PreferenceCategory
             android:title="@string/pref_title_screens_preferencecategory">
 			<org.adw.launcher.DialogSeekBarPreference
-				android:title="@string/pref_title_desktop_screens" android:summary="@string/pref_summary_desktop_screens"
-				android:dialogMessage="@string/pref_dialog_desktop_screen"
-				android:key="desktopScreens" android:defaultValue="4" android:max="6" />
-			<org.adw.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_default_screen" android:summary="@string/pref_summary_default_screen"
 				android:dialogMessage="@string/pref_dialog_default_screen"
 				android:key="defaultScreen" android:defaultValue="2" android:max="4" />

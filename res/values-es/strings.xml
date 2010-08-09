@@ -76,10 +76,6 @@
     <string name="pref_title_hide_statusbar">Ocultar barra de estado</string>
     <string name="pref_summary_hide_statusbar">Oculta la barra de estado</string>
 
-    <string name="pref_title_desktop_screens">Número de escritorios</string>
-    <string name="pref_summary_desktop_screens">Selecciona el número de escritorios que deseas</string>
-    <string name="pref_dialog_desktop_screen">Selecciona el número de escritorios que deseas</string>
-
     <string name="pref_title_default_screen">Escritorio por defecto</string>
     <string name="pref_summary_default_screen">Selecciona el escritorio por defecto</string>
     <string name="pref_dialog_default_screen">Selecciona el escritorio por defecto</string>
@@ -308,5 +304,7 @@
 
     <string name="pref_title_wallpaper_scrolling">Desplazar wallpaper</string>
     <string name="pref_summary_wallpaper_scrolling">Mover el wallpaper junto con el escritorio</string>
-
+	<string name="message_delete_desktop_screen">Remove this screen and all the content?</string>
+	<string name="message_cannot_delete_desktop_screen">No puedes eliminar la última pantalla</string>
+	<string name="message_cannot_add_desktop_screen">No puedes añadir más pantallas</string>
 </resources>

@@ -29,15 +29,6 @@
         android:layout_height="fill_parent"
 
         launcher:defaultScreen="2">
-
-        <include android:id="@+id/cell1" layout="@layout/workspace_screen" />
-        <include android:id="@+id/cell2" layout="@layout/workspace_screen" />
-        <include android:id="@+id/cell3" layout="@layout/workspace_screen" />
-        <include android:id="@+id/cell4" layout="@layout/workspace_screen" />
-        <include android:id="@+id/cell5" layout="@layout/workspace_screen" />
-        <include android:id="@+id/cell6" layout="@layout/workspace_screen" />
-        <include android:id="@+id/cell7" layout="@layout/workspace_screen" />
-
     </org.adw.launcher.Workspace>
     <ViewStub
 	android:id="@+id/stub_drawer"

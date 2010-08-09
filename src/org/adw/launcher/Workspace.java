@@ -36,6 +36,7 @@ import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -131,7 +132,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     private Drawable mNextIndicator;
     //rogro82@xda
     int mHomeScreens = 0;
-    int mHomeScreensLoaded = 0;
+    //int mHomeScreensLoaded = 0;
     //ADW: port from donut wallpaper drawing
     private Paint mPaint;
     //private Bitmap mWallpaper;
@@ -157,7 +158,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	private long startTime;
 	private int mStatus=SENSE_CLOSED;
 	private int mAnimationDuration=400;
-	private int[][] distro={{1},{2},{1,2},{2,2},{2,1,2},{2,2,2},{2,3,2}};
+	private int[][] distro={{1},{2},{1,2},{2,2},{2,1,2},{2,2,2},{2,3,2},{3,2,3},{3,3,3}};
 	private int maxPreviewWidth;
 	private int maxPreviewHeight;
 	//Wysie: Multitouch controller
@@ -177,7 +178,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	//And as those devices can perform pretty well without cache... let's add an option... one more...
 	private int mDesktopCacheType=AlmostNexusSettingsHelper.CACHE_LOW;
 	private boolean mWallpaperScroll=true;
-	
     /**
      * Used to inflate the Workspace from XML.
      *
@@ -206,6 +206,13 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         
         if(mDefaultScreen>mHomeScreens-1) mDefaultScreen=0;
 
+        //ADW: create desired screens programatically
+        LayoutInflater layoutInflter=LayoutInflater.from(context);
+        for(int i=0;i<mHomeScreens;i++){
+        	CellLayout screen=(CellLayout)layoutInflter.inflate(R.layout.workspace_screen, this, false);
+        	addView(screen);
+        }
+        
         initWorkspace();
     }
 
@@ -234,10 +241,10 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             throw new IllegalArgumentException("A Workspace can only have CellLayout children.");
         }
         /* Rogro82@xda Extended : Only load the number of home screens set */
-        if(mHomeScreensLoaded < mHomeScreens){
-            mHomeScreensLoaded++;
+        //if(mHomeScreensLoaded < mHomeScreens){
+            //mHomeScreensLoaded++;
             super.addView(child, index, params);
-        }
+        //}
     }
 
     @Override
@@ -551,7 +558,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	        // If the all apps drawer is open and the drawing region for the workspace
 	        // is contained within the drawer's bounds, we skip the drawing. This requires
 	        // the drawer to be fully opaque.
-	        if((mLauncher.isAllAppsVisible()) || mLauncher.isFullScreenPreviewing()){
+	        if((mLauncher.isAllAppsVisible()) || mLauncher.isFullScreenPreviewing() ||mLauncher.isEditMode()){
 	        	return;
 	        }
 	        // ViewGroup.dispatchDraw() supports many features we don't need:
@@ -1889,5 +1896,75 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     	else
     		mWallpaperManager.sendWallpaperCommand(getWindowToken(),
     				"show", 0, 0, 0, null);
-    }	
+    }
+    /**
+     * ADW: Remove the specified screen and all the contents
+     * Almos update remaining screens content inside model
+     * @param screen
+     */
+    protected void removeScreen(int screen){
+        final CellLayout layout = (CellLayout) getChildAt(screen);
+        int childCount = layout.getChildCount();
+        final LauncherModel model = Launcher.getModel();
+        for (int j = 0; j < childCount; j++) {
+            final View view = layout.getChildAt(j);
+            Object tag = view.getTag();
+            //DELETE ALL ITEMS FROM SCREEN
+            final ItemInfo item = (ItemInfo) tag;
+            if (item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
+                if (item instanceof LauncherAppWidgetInfo) {
+                    model.removeDesktopAppWidget((LauncherAppWidgetInfo) item);
+                } else {
+                    model.removeDesktopItem(item);
+                }
+            }
+            if (item instanceof UserFolderInfo) {
+                final UserFolderInfo userFolderInfo = (UserFolderInfo)item;
+                LauncherModel.deleteUserFolderContentsFromDatabase(mLauncher, userFolderInfo);
+                model.removeUserFolder(userFolderInfo);
+            } else if (item instanceof LauncherAppWidgetInfo) {
+                final LauncherAppWidgetInfo launcherAppWidgetInfo = (LauncherAppWidgetInfo) item;
+                final LauncherAppWidgetHost appWidgetHost = mLauncher.getAppWidgetHost();
+                if (appWidgetHost != null) {
+                    appWidgetHost.deleteAppWidgetId(launcherAppWidgetInfo.appWidgetId);
+                }
+            }
+            LauncherModel.deleteItemFromDatabase(mLauncher, item);
+        }
+        moveItemPositions(screen, -1);
+        removeView(getChildAt(screen));
+        if(getChildCount()<mCurrentScreen){
+        	mCurrentScreen=0;
+        	snapToScreen(mCurrentScreen);
+        }
+    	mLauncher.getDesktopIndicator().setItems(getChildCount());
+    	indicatorLevels(mCurrentScreen);        
+        AlmostNexusSettingsHelper.setDesktopScreens(mLauncher, getChildCount());
+    }
+    protected CellLayout addScreen(int position){
+        LayoutInflater layoutInflter=LayoutInflater.from(mLauncher);
+    	CellLayout screen=(CellLayout)layoutInflter.inflate(R.layout.workspace_screen, this, false);
+    	addView(screen,position);
+    	screen.setOnLongClickListener(mLongClickListener);
+    	mLauncher.getDesktopIndicator().setItems(getChildCount());
+    	indicatorLevels(mCurrentScreen);
+    	AlmostNexusSettingsHelper.setDesktopScreens(mLauncher, getChildCount());
+    	moveItemPositions(position, +1);
+    	return screen;
+    }
+    private void moveItemPositions(int screen, int diff){
+        //MOVE THE REMAINING ITEMS FROM OTHER SCREENS
+        for (int i=screen+1;i<getChildCount();i++){
+            final CellLayout layout = (CellLayout) getChildAt(i);
+            int childCount = layout.getChildCount();
+            for (int j = 0; j < childCount; j++) {
+                final View view = layout.getChildAt(j);
+                Object tag = view.getTag();
+                final ItemInfo item = (ItemInfo) tag;
+                if(item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
+	                LauncherModel.moveItemInDatabase(mLauncher, item, item.container, item.screen+diff, item.cellX, item.cellY);
+                }
+            }
+        }
+    }
 }

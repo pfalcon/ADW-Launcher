@@ -13,7 +13,7 @@ public final class AlmostNexusSettingsHelper {
 	public static final int CACHE_DISABLED=3;
 	
 	private static final String ALMOSTNEXUS_PREFERENCES = "launcher.preferences.almostnexus";
-	private static final String[] restart_keys={"desktopScreens","drawerNew","uiHideLabels","highlights_color",
+	private static final String[] restart_keys={"drawerNew","uiHideLabels","highlights_color",
 		"highlights_color_focus","uiNewSelectors","desktopRows","desktopColumns","autosizeIcons","uiDesktopIndicatorType",
 		"uiScrollableWidgets","screenCache","uiDesktopIndicator","themePackageName","themeIcons"};
 
@@ -338,6 +338,12 @@ public final class AlmostNexusSettingsHelper {
 		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
 		boolean newD = sp.getBoolean("wallpaper_scrolling", true);
 		return newD;
+	}
+	public static void setDesktopScreens(Context context,int screens) {
+		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+	    SharedPreferences.Editor editor = sp.edit();
+		editor.putInt("desktopScreens", screens-1);
+	    editor.commit();
 	}
 	
 }
