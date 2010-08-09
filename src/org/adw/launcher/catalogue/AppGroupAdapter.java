@@ -18,10 +18,12 @@ package org.adw.launcher.catalogue;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -93,19 +95,20 @@ public class AppGroupAdapter extends BaseAdapter {
 		addListItem(res,3,APP_GROUP_3/*,R.drawable.app_grp_business_tools*/);
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ListItem item = (ListItem) getItem(position);
-        
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.add_list_item, parent, false);
-        }
-        
-        TextView textView = (TextView) convertView;
-        textView.setTag(item);
-        textView.setText(item.text);
-        
-        return convertView;
-    }
+	public View getView(int position, View convertView, ViewGroup parent) {
+		ListItem item = (ListItem) getItem(position);
+
+		if (convertView == null) {
+			convertView = mInflater.inflate(R.layout.add_list_item, parent,
+					false);
+		}
+
+		TextView textView = (TextView) convertView;
+		textView.setTag(item);
+		textView.setText(item.text);
+
+		return convertView;
+	}
 
     public int getCount() {
         return mItems.size();

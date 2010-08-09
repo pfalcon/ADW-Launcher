@@ -135,6 +135,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private static final int MENU_APP_GRP_CONFIG = MENU_SETTINGS + 2;
     private static final int MENU_APP_GRP_RENAME = MENU_SETTINGS + 3;
     private static final int MENU_APP_SWITCH_GRP = MENU_SETTINGS + 4;
+    private static final int MENU_APP_DELETE_GRP = MENU_SETTINGS + 5;
     
     private static final int REQUEST_CREATE_SHORTCUT = 1;
     private static final int REQUEST_CREATE_LIVE_FOLDER = 4;
@@ -161,6 +162,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     static final int DIALOG_RENAME_FOLDER = 2;
     static final int DIALOG_CHOOSE_GROUP = 3;
     static final int DIALOG_NEW_GROUP = 4;
+    static final int DIALOG_DELETE_GROUP_CONFIRM = 5;
 
     private static final String PREFERENCES = "launcher.preferences";
 
@@ -1133,7 +1135,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         } catch (Exception e) {
             // An exception is thrown if the dialog is not visible, which is fine
         }
-    }
+        try {
+            dismissDialog(DIALOG_DELETE_GROUP_CONFIRM);
+            // Unlock the workspace if the dialog was showing
+        } catch (Exception e) {
+            // An exception is thrown if the dialog is not visible, which is fine
+        }
+     }
     
     @Override
     protected void onNewIntent(Intent intent) {
@@ -1427,6 +1435,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		//	.setIcon(R.drawable.ic_menu_notifications); 
    		menu.add(MENU_GROUP_CATALOGUE, MENU_APP_SWITCH_GRP, 0, R.string.AppGroupChoose)
 			.setIcon(R.drawable.ic_menu_notifications); 
+   		menu.add(MENU_GROUP_CATALOGUE, MENU_APP_DELETE_GRP, 0, R.string.AppGroupDel)
+			.setIcon(R.drawable.ic_menu_notifications); 
      return true;
     }
 
@@ -1474,6 +1484,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             case MENU_APP_SWITCH_GRP:
 				showSwitchGrp();
                 return true;
+            case MENU_APP_DELETE_GRP:
+				showDeleteGrpDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -1486,6 +1499,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		Intent i = new Intent(this, AppInfoMList.class);
 		startActivityForResult(i, REQUEST_SHOW_APP_LIST);
 	}
+    void showDeleteGrpDialog() {
+        if (null==AppGrpUtils.getCurAppGrp()) {
+            Toast.makeText(this, getString(R.string.AppGroupConfigError), Toast.LENGTH_SHORT).show();
+			return;
+		}
+        showDialog(DIALOG_DELETE_GROUP_CONFIRM);
+    }
     void showNewGrpDialog() {
         if (!AppGrpUtils.hasValidGrp()) {
             Toast.makeText(this, getString(R.string.AppGroupAddError), Toast.LENGTH_SHORT).show();
@@ -1494,7 +1514,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         mWaitingForResult = true;
         showDialog(DIALOG_NEW_GROUP);
     }
-    /**
+     /**
      * Indicates that we want global search for this activity by setting the globalSearch
      * argument for {@link #startSearch} to true.
      */
@@ -2322,7 +2342,21 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				return new CreateGrpDialog().createDialog();
 			case DIALOG_NEW_GROUP:
 				return new NewGrpTitle().createDialog();
-        }
+   			case DIALOG_DELETE_GROUP_CONFIRM:
+			    return new AlertDialog.Builder(this).setTitle(
+					R.string.AppGroupDelLong).setPositiveButton(
+					R.string.buttonOk, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,  int whichButton) {
+							delCurrentGrp();
+							/* User clicked OK so do some stuff */
+						}
+					}).setNegativeButton(
+					R.string.buttonCancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,	int whichButton) {							
+							/* User clicked OK so do some stuff */
+						}})
+					.create();
+     }
 
         return super.onCreateDialog(id);
     }
@@ -2342,6 +2376,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 break;
         }
     }
+	public void delCurrentGrp()
+	{
+		AppGrpUtils.checkAndDisableGrp();
+		showSwitchGrp();
+	}
 	public void showSwitchGrp()
 	{
 		removeDialog(DIALOG_CHOOSE_GROUP);
@@ -2475,7 +2514,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             dialog.setOnCancelListener(this);
             dialog.setOnDismissListener(this);
             dialog.setOnShowListener(this);
-
             return dialog;
         }
 
@@ -2483,7 +2521,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mWaitingForResult = false;
             cleanup();
         }
-
+        
         public void onDismiss(DialogInterface dialog) {
             mWorkspace.unlock();
         }
@@ -2511,7 +2549,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		   }
 			//mDrawer.open();
 		}
-
+		
         public void onShow(DialogInterface dialog) {
             mWorkspace.lock();
         }
