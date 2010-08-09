@@ -387,4 +387,22 @@
 	<string name="shirtcut_header">Select your desired application activity to launch.\nYou can select a custom icon too.</string>
 	<string name="shirtcut_pick_activity">Pick your activity</string>
 	<string name="shirtcut_label">Label</string>
+
+
+	<string name="buttonOk">"OK"</string>
+	<string name="buttonCancel">"Cancel"</string>
+	<string name="selectAll">All</string>
+	<string name="AppGroup0">"MultiMedia"</string>
+	<string name="AppGroup1">"Tools"</string>
+	<string name="AppGroup2">"Life"</string>
+	<string name="AppGroup3">"Business"</string>
+	<string name="AppGroup4">"eLive"</string>
+	<string name="AppGroup5">"Custom"</string>
+	<string name="AppGroupAll">"ALL"</string>
+	<string name="AppGroupChoose">"Choose Group"</string>
+	<string name="AppGroupConfig">"Setup Group"</string>
+	<string name="AppGroupRename">"Rename Group"</string>
+	<string name="AppGroupConfigError">"You can not setup this group"</string>
+	<string name="rename_group_title">Rename Group</string>
+	<string name="rename_group_label">Group Name</string>
 </resources>

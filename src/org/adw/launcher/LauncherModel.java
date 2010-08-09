@@ -55,7 +55,7 @@ import org.adw.launcher.IconShader;
  * for the Launcher.
  */
 public class LauncherModel {
-    static final boolean DEBUG_LOADERS = false;
+    static final boolean DEBUG_LOADERS = true;
     static final String LOG_TAG = "HomeLoaders";
 
     private static final int UI_NOTIFICATION_RATE = 4;
@@ -71,8 +71,9 @@ public class LauncherModel {
     private ArrayList<LauncherAppWidgetInfo> mDesktopAppWidgets;
     private HashMap<Long, FolderInfo> mFolders;
 
-    private ArrayList<ApplicationInfo> mApplications;
-    private ApplicationsAdapter mApplicationsAdapter;
+    public static ArrayList<ApplicationInfo> mApplications;
+    
+    public static ApplicationsAdapter mApplicationsAdapter;
     private ApplicationsLoader mApplicationsLoader;
     private DesktopItemsLoader mDesktopItemsLoader;
     private Thread mApplicationsLoaderThread;
@@ -197,14 +198,17 @@ public class LauncherModel {
                     adapter.setNotifyOnChange(false);
                     adapter.add(makeAndCacheApplicationInfo(packageManager, cache, info, launcher));
                 }
+				adapter.updateDataSet();
 
-                adapter.sort(new ApplicationInfoComparator());
-                adapter.notifyDataSetChanged();
+                //adapter.sort(new ApplicationInfoComparator());
+                //adapter.notifyDataSetChanged();
             }
         }
     }
 
     synchronized void removePackage(Launcher launcher, String packageName) {
+    	// for add/remove Package, we need use applications adapter's "full" list.
+    	
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
             dropApplicationCache(); // TODO: this could be optimized
             startApplicationsLoaderLocked(launcher, false);
@@ -215,10 +219,11 @@ public class LauncherModel {
             final ApplicationsAdapter adapter = mApplicationsAdapter;
 
             final List<ApplicationInfo> toRemove = new ArrayList<ApplicationInfo>();
-            final int count = adapter.getCount();
+            final ArrayList<ApplicationInfo> allItems = adapter.allItems;
+            final int count = allItems.size();
 
             for (int i = 0; i < count; i++) {
-                final ApplicationInfo applicationInfo = adapter.getItem(i);
+                final ApplicationInfo applicationInfo = allItems.get(i);
                 final Intent intent = applicationInfo.intent;
                 final ComponentName component = intent.getComponent();
                 if (packageName.equals(component.getPackageName())) {
@@ -234,8 +239,9 @@ public class LauncherModel {
             }
 
             if (toRemove.size() > 0) {
-                adapter.sort(new ApplicationInfoComparator());
-                adapter.notifyDataSetChanged();
+				adapter.updateDataSet();
+                //adapter.sort(new ApplicationInfoComparator());
+                //adapter.notifyDataSetChanged();
             }
         }
     }
@@ -268,8 +274,9 @@ public class LauncherModel {
             if (syncLocked(launcher, packageName)) changed = true;
 
             if (changed) {
-                adapter.sort(new ApplicationInfoComparator());
-                adapter.notifyDataSetChanged();
+				adapter.updateDataSet();
+                //adapter.sort(new ApplicationInfoComparator());
+                //adapter.notifyDataSetChanged();
             }
         }
     }
@@ -293,8 +300,9 @@ public class LauncherModel {
         if (packageName != null && packageName.length() > 0 && mApplicationsAdapter!=null) {
             if (syncLocked(launcher, packageName)) {
                 final ApplicationsAdapter adapter = mApplicationsAdapter;
-                adapter.sort(new ApplicationInfoComparator());
-                adapter.notifyDataSetChanged();                
+				adapter.updateDataSet();
+                //adapter.sort(new ApplicationInfoComparator());
+                //adapter.notifyDataSetChanged();                
             }
         }
     }
@@ -595,8 +603,9 @@ public class LauncherModel {
 
             buffer.clear();
 
-            applicationList.sort(new ApplicationInfoComparator());
-            applicationList.notifyDataSetChanged();
+			applicationList.updateDataSet();
+            //applicationList.sort(new ApplicationInfoComparator());
+            //applicationList.notifyDataSetChanged();
         }
 
         boolean add(ApplicationInfo application) {

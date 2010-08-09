@@ -21,77 +21,208 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.TextView;
 
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+import org.adw.launcher.catalogue.AppGrpUtils;
 
 /**
  * GridView adapter to show the list of applications and shortcuts
  */
 public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
-    private final LayoutInflater mInflater;
-    private Drawable mBackground;
-    private int mTextColor=0;
-    private boolean useThemeTextColor=false;
+	private final LayoutInflater mInflater;
+	private Drawable mBackground;
+	private int mTextColor = 0;
+	private boolean useThemeTextColor = false;
     private Typeface themeFont=null;
-    public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps) {
-        super(context, 0, apps);
-        mInflater = LayoutInflater.from(context);
-        //ADW: Load textcolor and bubble color from theme
-        String themePackage=AlmostNexusSettingsHelper.getThemePackageName(getContext(), Launcher.THEME_DEFAULT);
-        if(!themePackage.equals(Launcher.THEME_DEFAULT)){
-        	Resources themeResources=null;
-        	try {
-    			themeResources=getContext().getPackageManager().getResourcesForApplication(themePackage);
-    		} catch (NameNotFoundException e) {
-    			//e.printStackTrace();
-    		}
-    		if(themeResources!=null){
-    			int textColorId=themeResources.getIdentifier("drawer_text_color", "color", themePackage);
-    			if(textColorId!=0){
-    				mTextColor=themeResources.getColor(textColorId);
-    				useThemeTextColor=true;
-    			}
-    			mBackground=IconHighlights.getDrawable(getContext(), IconHighlights.TYPE_DRAWER);
+	public ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();;
+	public ArrayList<ApplicationInfo> filtered = new ArrayList<ApplicationInfo>();;
+	private CatalogueFilter filter;
+    private static final Collator sCollator = Collator.getInstance();
+
+	public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps) {
+		super(context, 0, apps);
+
+		mInflater = LayoutInflater.from(context);
+		// ADW: Load textcolor and bubble color from theme
+		String themePackage = AlmostNexusSettingsHelper.getThemePackageName(
+				getContext(), Launcher.THEME_DEFAULT);
+		if (!themePackage.equals(Launcher.THEME_DEFAULT)) {
+			Resources themeResources = null;
+			try {
+				themeResources = getContext().getPackageManager()
+						.getResourcesForApplication(themePackage);
+			} catch (NameNotFoundException e) {
+				// e.printStackTrace();
+			}
+			if (themeResources != null) {
+				int textColorId = themeResources.getIdentifier(
+						"drawer_text_color", "color", themePackage);
+				if (textColorId != 0) {
+					mTextColor = themeResources.getColor(textColorId);
+					useThemeTextColor = true;
+				}
+				mBackground = IconHighlights.getDrawable(getContext(),
+						IconHighlights.TYPE_DRAWER);
     			try{
     				themeFont=Typeface.createFromAsset(themeResources.getAssets(), "themefont.ttf");
     			}catch (RuntimeException e) {
 					// TODO: handle exception
 				}
-    		}
-        }
-    }
+			}
+		}
+	}
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final ApplicationInfo info = getItem(position);
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		final ApplicationInfo info = getItem(position);
 
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.application_boxed, parent, false);
-        }
+		if (convertView == null) {
+			convertView = mInflater.inflate(R.layout.application_boxed, parent,
+					false);
+		}
 
-        if (!info.filtered) {
-            info.icon = Utilities.createIconThumbnail(info.icon, getContext());
-            info.filtered = true;
-        }
+		if (!info.filtered) {
+			info.icon = Utilities.createIconThumbnail(info.icon, getContext());
+			info.filtered = true;
+		}
 
-        final TextView textView = (TextView) convertView;
-        textView.setCompoundDrawablesWithIntrinsicBounds(null, info.icon, null, null);
-        textView.setText(info.title);
-		if(useThemeTextColor){
+		final TextView textView = (TextView) convertView;
+		textView.setCompoundDrawablesWithIntrinsicBounds(null, info.icon, null,
+				null);
+		textView.setText(info.title);
+		if (useThemeTextColor) {
 			textView.setTextColor(mTextColor);
 		}
 		//ADW: Custom font
 		if(themeFont!=null) textView.setTypeface(themeFont);
-        //TODO:ADW Loading the background drawable for the app drawer hogs the ram and cpu
-        //so i'd better not use it, sorry themers
-		if(mBackground!=null)
+		// so i'd better not use it, sorry themers
+		if (mBackground != null)
 			convertView.setBackgroundDrawable(mBackground);
-        return convertView;
-    }
+		return convertView;
+	}
+
+
+	@Override
+	public void add(ApplicationInfo info) {
+		synchronized (allItems) {
+			allItems.add(info);
+			Collections.sort(allItems,new ApplicationInfoComparator());
+		}
+		String s = info.intent.getComponent().flattenToString();
+		Log.v("-----adding-", s);
+		if (appInGroup(s)) {
+			super.add(info);
+		}
+	}
+
+	//2 super functions, to make sure related add/clear do not affect allItems.
+	//in current Froyo/Eclair, it is not necessary.
+	void superAdd(ApplicationInfo info) {
+		String s = info.intent.getComponent().flattenToString();
+		if (appInGroup(s)) {
+			super.add(info);
+		}
+	}
+	
+	void superClear() {
+		super.clear();
+	}
+	
+	@Override
+	public void remove(ApplicationInfo info) {
+		synchronized (allItems) {
+			allItems.remove(info);
+		}
+		super.remove(info);
+	}
+
+	private boolean appInGroup(String s) {
+		return AppGrpUtils.checkAppInGroup(s);
+	}
+
+	private void filterApps(ArrayList<ApplicationInfo> theFiltered,
+			ArrayList<ApplicationInfo> theItems) {
+		theFiltered.clear();
+		//AppGrpUtils.checkAndInitGrp();
+		if (theItems != null) {
+			int length = theItems.size();
+
+			for (int i = 0; i < length; i++) {
+				ApplicationInfo info = theItems.get(i);
+				String s = info.intent.getComponent().flattenToString();
+				if (appInGroup(s)) {
+					theFiltered.add(info);
+				}
+			}
+		}
+	}
+	//filter,sort,update
+    public void updateDataSet()
+	{
+        getFilter().filter(null);
+	}
+    
+	@Override
+	public Filter getFilter() {
+		if (filter == null)
+			filter = new CatalogueFilter();
+		return filter;
+	}
+
+	private class CatalogueFilter extends Filter {
+		ArrayList<ApplicationInfo> lItems = new ArrayList<ApplicationInfo>();
+		ArrayList<ApplicationInfo> filt = new ArrayList<ApplicationInfo>();
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+
+			FilterResults result = new FilterResults();
+			filt.clear();
+			lItems.clear();
+			
+			synchronized (allItems) {
+				lItems.addAll(allItems);
+			}
+			
+			filterApps(filt, lItems);
+
+			result.values = filt;
+			result.count = filt.size();
+			return result;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		protected void publishResults(CharSequence constraint,
+				FilterResults results) {
+			// NOTE: this function is *always* called from the UI thread.
+			filtered = (ArrayList<ApplicationInfo>) results.values;
+
+			setNotifyOnChange(false);
+			
+			superClear();
+			// there could be a serious sync issue.
+			// very bad
+			for (int i = 0, l = filtered.size(); i < l; i++)
+				superAdd(filtered.get(i));
+			
+			notifyDataSetChanged();
+			//notifyDataSetInvalidated();
+		}
+	}
+    static class ApplicationInfoComparator implements Comparator<ApplicationInfo> {
+        public final int compare(ApplicationInfo a, ApplicationInfo b) {
+            return sCollator.compare(a.title.toString(), b.title.toString());
+        }
+    }	
 }

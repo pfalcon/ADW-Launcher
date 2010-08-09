@@ -16,8 +16,9 @@
 
 package org.adw.launcher;
 
+//import org.adw.launcher.catalogue.CataGridView;
+
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -27,149 +28,171 @@ import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
+//import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
-public class AllAppsGridView extends GridView implements AdapterView.OnItemClickListener,
-        AdapterView.OnItemLongClickListener, DragSource {
+public class AllAppsGridView extends GridView implements
+		AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener,
+		DragSource {
 
-    private DragController mDragger;
-    private Launcher mLauncher;
-    private Paint mPaint;
-    //ADW: Animation vars
-	private final static int CLOSED=1;
-	private final static int OPEN=2;
-	private final static int CLOSING=3;
-	private final static int OPENING=4;
-	private int mStatus=CLOSED;
+	private DragController mDragger;
+	private Launcher mLauncher;
+	private Paint mPaint;
+	// ADW: Animation vars
+	private final static int CLOSED = 1;
+	private final static int OPEN = 2;
+	private final static int CLOSING = 3;
+	private final static int OPENING = 4;
+	private int mStatus = CLOSED;
 	private boolean isAnimating;
 	private long startTime;
 	private float mScaleFactor;
-	private int mIconSize=0;
-	private int mBgAlpha=255;
-	private int mTargetAlpha=255;
+	private int mIconSize = 0;
+	private int mBgAlpha = 255;
+	private int mTargetAlpha = 255;
 	private Paint mLabelPaint;
-	private boolean shouldDrawLabels=false;
-	private int mAnimationDuration=800;
-	private int mBgColor=0xFF000000;
-	private boolean mDrawLabels=true;
-	private boolean mFadeDrawLabels=false;
+	private boolean shouldDrawLabels = false;
+	private int mAnimationDuration = 800;
+	private int mBgColor = 0xFF000000;
+	private boolean mDrawLabels = true;
+	private boolean mFadeDrawLabels = false;
 	private float mLabelFactor;
-    public AllAppsGridView(Context context) {
-        super(context);
-    }
 
-    public AllAppsGridView(Context context, AttributeSet attrs) {
-        this(context, attrs, android.R.attr.gridViewStyle);
-    }
-
-    public AllAppsGridView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-
-        mPaint = new Paint();
-        mPaint.setDither(false); 
-        mLabelPaint=new Paint();
-        mLabelPaint.setDither(false);
-    }
-
-    public boolean isOpaque() {
-    	if(mBgAlpha>=255)return true;
-    	else return false;
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        setOnItemClickListener(this);
-        setOnItemLongClickListener(this);
-    }
-
-    public void onItemClick(AdapterView parent, View v, int position, long id) {
-        ApplicationInfo app = (ApplicationInfo) parent.getItemAtPosition(position);
-        mLauncher.startActivitySafely(app.intent);
-    }
-
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        if (!view.isInTouchMode()) {
-            return false;
-        }
-
-        ApplicationInfo app = (ApplicationInfo) parent.getItemAtPosition(position);
-        app = new ApplicationInfo(app);
-
-        mDragger.startDrag(view, this, app, DragController.DRAG_ACTION_COPY);
-        mLauncher.closeAllApplications();
-
-        return true;
-    }
-
-    public void setDragger(DragController dragger) {
-        mDragger = dragger;
-    }
-
-    public void onDropCompleted(View target, boolean success) {
-    }
-
-    void setLauncher(Launcher launcher) {
-        mLauncher = launcher;
-        setSelector(IconHighlights.getDrawable(mLauncher,IconHighlights.TYPE_DESKTOP));
-    }
-    /**
-     * ADW: easing functions for animation
-     */
-	static float easeOut (float time, float begin, float end, float duration) {
-		float change=end- begin;
-		return change*((time=time/duration-1)*time*time + 1) + begin;
+	public AllAppsGridView(Context context) {
+		super(context);
 	}
-	static float easeIn (float time, float begin, float end, float duration) {
-		float change=end- begin;
-		return change*(time/=duration)*time*time + begin;
+
+	public AllAppsGridView(Context context, AttributeSet attrs) {
+		this(context, attrs, android.R.attr.gridViewStyle);
 	}
-	static float easeInOut (float time, float begin, float end, float duration) {
-		float change=end- begin;
-		if ((time/=duration/2.0f) < 1) return change/2.0f*time*time*time + begin;
-		return change/2.0f*((time-=2.0f)*time*time + 2.0f) + begin;
+
+	public AllAppsGridView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+
+		mPaint = new Paint();
+		mPaint.setDither(false);
+		mLabelPaint = new Paint();
+		mLabelPaint.setDither(false);
 	}
+
+	public boolean isOpaque() {
+		if (mBgAlpha >= 255)
+			return true;
+		else
+			return false;
+	}
+
+	@Override
+	protected void onFinishInflate() {
+		setOnItemClickListener(this);
+		setOnItemLongClickListener(this);
+	}
+
+	public void onItemClick(AdapterView parent, View v, int position, long id) {
+		ApplicationInfo app = (ApplicationInfo) parent
+				.getItemAtPosition(position);
+		mLauncher.startActivitySafely(app.intent);
+	}
+
+	public boolean onItemLongClick(AdapterView<?> parent, View view,
+			int position, long id) {
+		if (!view.isInTouchMode()) {
+			return false;
+		}
+
+		ApplicationInfo app = (ApplicationInfo) parent
+				.getItemAtPosition(position);
+		app = new ApplicationInfo(app);
+
+		mDragger.startDrag(view, this, app, DragController.DRAG_ACTION_COPY);
+		mLauncher.closeAllApplications();
+
+		return true;
+	}
+
+	public void setDragger(DragController dragger) {
+		mDragger = dragger;
+	}
+
+	public void onDropCompleted(View target, boolean success) {
+	}
+
+	void setLauncher(Launcher launcher) {
+		mLauncher = launcher;
+		setSelector(IconHighlights.getDrawable(mLauncher,
+				IconHighlights.TYPE_DESKTOP));
+	}
+
+	/**
+	 * ADW: easing functions for animation
+	 */
+	static float easeOut(float time, float begin, float end, float duration) {
+		float change = end - begin;
+		return change * ((time = time / duration - 1) * time * time + 1)
+				+ begin;
+	}
+
+	static float easeIn(float time, float begin, float end, float duration) {
+		float change = end - begin;
+		return change * (time /= duration) * time * time + begin;
+	}
+
+	static float easeInOut(float time, float begin, float end, float duration) {
+		float change = end - begin;
+		if ((time /= duration / 2.0f) < 1)
+			return change / 2.0f * time * time * time + begin;
+		return change / 2.0f * ((time -= 2.0f) * time * time + 2.0f) + begin;
+	}
+
 	/**
 	 * ADW: Override drawing methods to do animation
 	 */
 	@Override
 	public void draw(Canvas canvas) {
 		long currentTime;
-		if(startTime==0){
-			startTime=SystemClock.uptimeMillis();
-			currentTime=0;
-		}else{
-			currentTime=SystemClock.uptimeMillis()-startTime;
+		if (startTime == 0) {
+			startTime = SystemClock.uptimeMillis();
+			currentTime = 0;
+		} else {
+			currentTime = SystemClock.uptimeMillis() - startTime;
 		}
-		if(mStatus==OPENING){
-			mScaleFactor=easeOut(currentTime, 3.0f, 1.0f, mAnimationDuration);
-			mLabelFactor=easeOut(currentTime, -1.0f, 1.0f, mAnimationDuration);
-		}else if (mStatus==CLOSING){
-			mScaleFactor=easeIn(currentTime, 1.0f, 3.0f, mAnimationDuration);
-			mLabelFactor=easeIn(currentTime, 1.0f, -1.0f, mAnimationDuration);
+		if (mStatus == OPENING) {
+			mScaleFactor = easeOut(currentTime, 3.0f, 1.0f, mAnimationDuration);
+			mLabelFactor = easeOut(currentTime, -1.0f, 1.0f, mAnimationDuration);
+		} else if (mStatus == CLOSING) {
+			mScaleFactor = easeIn(currentTime, 1.0f, 3.0f, mAnimationDuration);
+			mLabelFactor = easeIn(currentTime, 1.0f, -1.0f, mAnimationDuration);
 		}
-		if(mLabelFactor<0)mLabelFactor=0;
-		if(currentTime>=mAnimationDuration){
-			isAnimating=false;
-			if(mStatus==OPENING){
-				mStatus=OPEN;
-			}else if(mStatus==CLOSING){
-				mStatus=CLOSED;
+		if (mLabelFactor < 0)
+			mLabelFactor = 0;
+		if (currentTime >= mAnimationDuration) {
+			isAnimating = false;
+			if (mStatus == OPENING) {
+				mStatus = OPEN;
+			} else if (mStatus == CLOSING) {
+				mStatus = CLOSED;
 				mLauncher.getWorkspace().clearChildrenCache();
 				setVisibility(View.GONE);
 			}
 		}
-		shouldDrawLabels=mFadeDrawLabels && mDrawLabels && (mStatus==OPENING||mStatus==CLOSING);
-		float porcentajeScale=1.0f;
-		if(isAnimating){
-			porcentajeScale=1.0f-((mScaleFactor-1)/3.0f);
-			if(porcentajeScale>0.9f)porcentajeScale=1f;
-			if(porcentajeScale<0)porcentajeScale=0;
-			mBgAlpha=(int)(porcentajeScale*255);
+		shouldDrawLabels = mFadeDrawLabels && mDrawLabels
+				&& (mStatus == OPENING || mStatus == CLOSING);
+		float porcentajeScale = 1.0f;
+		if (isAnimating) {
+			porcentajeScale = 1.0f - ((mScaleFactor - 1) / 3.0f);
+			if (porcentajeScale > 0.9f)
+				porcentajeScale = 1f;
+			if (porcentajeScale < 0)
+				porcentajeScale = 0;
+			mBgAlpha = (int) (porcentajeScale * 255);
 		}
 		mPaint.setAlpha(mBgAlpha);
-		if(getVisibility()==View.VISIBLE){
-			canvas.drawARGB((int)(porcentajeScale*mTargetAlpha), Color.red(mBgColor), Color.green(mBgColor), Color.blue(mBgColor));
+		if (getVisibility() == View.VISIBLE) {
+			canvas
+					.drawARGB((int) (porcentajeScale * mTargetAlpha), Color
+							.red(mBgColor), Color.green(mBgColor), Color
+							.blue(mBgColor));
 			super.draw(canvas);
 		}
 
@@ -178,53 +201,65 @@ public class AllAppsGridView extends GridView implements AdapterView.OnItemClick
 	@Override
 	protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
 		int saveCount = canvas.save();
-		Drawable[] tmp=((TextView)child).getCompoundDrawables();
-		if(mIconSize==0){
-			mIconSize=tmp[1].getIntrinsicHeight()+child.getPaddingTop();
+		Drawable[] tmp = ((TextView) child).getCompoundDrawables();
+		if (mIconSize == 0) {
+			mIconSize = tmp[1].getIntrinsicHeight() + child.getPaddingTop();
 		}
-		if(isAnimating){
+		if (isAnimating) {
 			postInvalidate();
 			float x;
 			float y;
-			int distH=(child.getLeft()+(child.getWidth()/2))-(getWidth()/2);
-			int distV=(child.getTop()+(child.getHeight()/2))-(getHeight()/2);
-			x=child.getLeft()+(distH*(mScaleFactor-1))*(mScaleFactor);
-			y=child.getTop()+(distV*(mScaleFactor-1))*(mScaleFactor);
-			float width=child.getWidth()*mScaleFactor;
-			float height=(child.getHeight()-(child.getHeight()-mIconSize))*mScaleFactor;
-			if(shouldDrawLabels)child.setDrawingCacheEnabled(true);
-			if(shouldDrawLabels && child.getDrawingCache()!=null){
-				//ADW: try to manually draw labels
-				Rect rl1=new Rect(0,mIconSize,child.getDrawingCache().getWidth(),child.getDrawingCache().getHeight());
-				Rect rl2=new Rect(child.getLeft(),child.getTop()+mIconSize,child.getLeft()+child.getDrawingCache().getWidth(),child.getTop()+child.getDrawingCache().getHeight());
-				mLabelPaint.setAlpha((int) (mLabelFactor*255));
-				canvas.drawBitmap(child.getDrawingCache(), rl1, rl2, mLabelPaint);
+			int distH = (child.getLeft() + (child.getWidth() / 2))
+					- (getWidth() / 2);
+			int distV = (child.getTop() + (child.getHeight() / 2))
+					- (getHeight() / 2);
+			x = child.getLeft() + (distH * (mScaleFactor - 1)) * (mScaleFactor);
+			y = child.getTop() + (distV * (mScaleFactor - 1)) * (mScaleFactor);
+			float width = child.getWidth() * mScaleFactor;
+			float height = (child.getHeight() - (child.getHeight() - mIconSize))
+					* mScaleFactor;
+			if (shouldDrawLabels)
+				child.setDrawingCacheEnabled(true);
+			if (shouldDrawLabels && child.getDrawingCache() != null) {
+				// ADW: try to manually draw labels
+				Rect rl1 = new Rect(0, mIconSize, child.getDrawingCache()
+						.getWidth(), child.getDrawingCache().getHeight());
+				Rect rl2 = new Rect(child.getLeft(),
+						child.getTop() + mIconSize, child.getLeft()
+								+ child.getDrawingCache().getWidth(), child
+								.getTop()
+								+ child.getDrawingCache().getHeight());
+				mLabelPaint.setAlpha((int) (mLabelFactor * 255));
+				canvas.drawBitmap(child.getDrawingCache(), rl1, rl2,
+						mLabelPaint);
 			}
-			float scale=((width)/child.getWidth());
+			float scale = ((width) / child.getWidth());
 			Rect r3 = tmp[1].getBounds();
-			int xx=(child.getWidth()/2)-(r3.width()/2);
+			int xx = (child.getWidth() / 2) - (r3.width() / 2);
 			canvas.save();
-			canvas.translate(x+xx, y+child.getPaddingTop());
+			canvas.translate(x + xx, y + child.getPaddingTop());
 			canvas.scale(scale, scale);
 			tmp[1].draw(canvas);
 			canvas.restore();
-		}else{
-			if(mDrawLabels){
+		} else {
+			if (mDrawLabels) {
 				child.setDrawingCacheEnabled(true);
-				if(child.getDrawingCache()!=null){
+				if (child.getDrawingCache() != null) {
 					mPaint.setAlpha(255);
-					canvas.drawBitmap(child.getDrawingCache(), child.getLeft(), child.getTop(), mPaint);
-				}else{
+					canvas.drawBitmap(child.getDrawingCache(), child.getLeft(),
+							child.getTop(), mPaint);
+				} else {
 					canvas.save();
 					canvas.translate(child.getLeft(), child.getTop());
 					child.draw(canvas);
 					canvas.restore();
 				}
-			}else{
+			} else {
 				Rect r3 = tmp[1].getBounds();
-				int xx=(child.getWidth()/2)-(r3.width()/2);
+				int xx = (child.getWidth() / 2) - (r3.width() / 2);
 				canvas.save();
-				canvas.translate(child.getLeft()+xx, child.getTop()+child.getPaddingTop());
+				canvas.translate(child.getLeft() + xx, child.getTop()
+						+ child.getPaddingTop());
 				tmp[1].draw(canvas);
 				canvas.restore();
 			}
@@ -232,46 +267,56 @@ public class AllAppsGridView extends GridView implements AdapterView.OnItemClick
 		canvas.restoreToCount(saveCount);
 		return true;
 	}
+
 	/**
 	 * Open/close public methods
 	 */
-	public void open(boolean animate){
-		mBgColor=AlmostNexusSettingsHelper.getDrawerColor(mLauncher);
-		mTargetAlpha=Color.alpha(mBgColor);
-		mDrawLabels=AlmostNexusSettingsHelper.getDrawerLabels(mLauncher);
-		mFadeDrawLabels=AlmostNexusSettingsHelper.getFadeDrawerLabels(mLauncher);
-		if(animate  && getChildCount()>0){
-			if(mFadeDrawLabels&&mDrawLabels){
-				for(int i=0;i<getChildCount();i++){
+	public void open(boolean animate) {
+		mBgColor = AlmostNexusSettingsHelper.getDrawerColor(mLauncher);
+		mTargetAlpha = Color.alpha(mBgColor);
+		mDrawLabels = AlmostNexusSettingsHelper.getDrawerLabels(mLauncher);
+		mFadeDrawLabels = AlmostNexusSettingsHelper
+				.getFadeDrawerLabels(mLauncher);
+		if (animate  && getChildCount()>0) {
+			if (mFadeDrawLabels && mDrawLabels) {
+				for (int i = 0; i < getChildCount(); i++) {
 					getChildAt(i).setDrawingCacheEnabled(true);
 				}
 			}
-			mBgAlpha=0;
-			isAnimating=true;
-			mStatus=OPENING;
-		}else{
-			mBgAlpha=mTargetAlpha;
-			isAnimating=false;
-			mStatus=OPEN;
+			mBgAlpha = 0;
+			isAnimating = true;
+			mStatus = OPENING;
+		} else {
+			mBgAlpha = mTargetAlpha;
+			isAnimating = false;
+			mStatus = OPEN;
 		}
-		startTime=0;
+		startTime = 0;
 		this.setVisibility(View.VISIBLE);
 		invalidate();
 	}
-	public void close(boolean animate){
-		if(animate  && getChildCount()>0){
-			mStatus=CLOSING;
-			isAnimating=true;
-		}else{
-			mStatus=CLOSED;
-			isAnimating=false;
+
+	public void close(boolean animate) {
+		if (animate && getChildCount()>0) {
+			mStatus = CLOSING;
+			isAnimating = true;
+		} else {
+			mStatus = CLOSED;
+			isAnimating = false;
 			mLauncher.getWorkspace().clearChildrenCache();
 			setVisibility(View.GONE);
 		}
-		startTime=0;
+		startTime = 0;
 		invalidate();
 	}
-	public void setAnimationSpeed(int speed){
-		mAnimationDuration=speed;
+
+	public void setAnimationSpeed(int speed) {
+		mAnimationDuration = speed;
+	}
+
+	public void updateAppGrp() {
+		if(getAdapter()!=null){
+			((ApplicationsAdapter) getAdapter()).updateDataSet();
+		}
 	}
 }

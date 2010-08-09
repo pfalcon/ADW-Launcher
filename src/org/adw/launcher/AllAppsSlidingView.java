@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 import android.widget.AdapterView.OnItemClickListener;
@@ -1870,4 +1871,19 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
     		}
     	}
 	}
+	public void updateAppGrp() {
+			if(getAdapter()!=null){
+		       ((ApplicationsAdapter) getAdapter()).updateDataSet();
+				scrollTo(0, 0);
+				mTotalScreens=getPageCount();
+				mCurrentScreen=0;
+				mCurrentHolder=1;
+	    		mPager.setTotalItems(mTotalScreens);
+	    		mPager.setCurrentItem(0);
+				mBlockLayouts=false;
+				mScrollToScreen=0;
+				mLayoutMode=LAYOUT_NORMAL;
+	    		requestLayout();
+			}
+	}	
 }
