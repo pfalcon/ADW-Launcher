@@ -61,11 +61,9 @@
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.PERSISTENT_ACTIVITY" />
-    <application
-        android:name="LauncherApplication"
-        android:process="android.process.acore"
-        android:label="@string/application_name"
-        android:icon="@drawable/ic_launcher_home">
+	<application android:name="LauncherApplication"
+		android:process="android.process.acore" android:label="@string/application_name"
+		android:icon="@drawable/ic_launcher_home">
 
         <activity
             android:name="Launcher"
@@ -99,28 +97,19 @@
             </intent-filter>
         </activity>
 
-        <!-- Enable system-default search mode for any activity in Home -->
-        <meta-data
-            android:name="android.app.default_searchable"
-            android:value="*" />
+		<!-- Enable system-default search mode for any activity in Home -->
+		<meta-data android:name="android.app.default_searchable"
+			android:value="*" />
 
-        <!-- Intent received used to install shortcuts from other applications -->
-        <receiver
-            android:name=".InstallShortcutReceiver"
-            android:permission="com.android.launcher.permission.INSTALL_SHORTCUT">
-            <intent-filter>
-                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
-            </intent-filter>
-        </receiver>
-
-        <!-- Intent received used to uninstall shortcuts from other applications -->
-        <receiver
-            android:name=".UninstallShortcutReceiver"
-            android:permission="com.android.launcher.permission.UNINSTALL_SHORTCUT">
-            <intent-filter>
-                <action android:name="com.android.launcher.action.UNINSTALL_SHORTCUT" />
-            </intent-filter>
-        </receiver>
+		<!--
+			Intent received used to install shortcuts from other applications
+		-->
+		<receiver android:name=".InstallShortcutReceiver"
+			android:permission="com.android.launcher.permission.INSTALL_SHORTCUT">
+			<intent-filter>
+				<action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
+			</intent-filter>
+		</receiver>
 
         <!-- The settings provider contains Home's data, like the workspace favorites -->
         <provider
@@ -128,7 +117,8 @@
             android:authorities="org.adw.launcher_donut.settings"
             android:writePermission="org.adw.launcher_donut.permission.WRITE_SETTINGS"
             android:readPermission="org.adw.launcher_donut.permission.READ_SETTINGS" />
-
+		
+		<activity android:name="org.adw.launcher_donut.catalogue.AppInfoMList"></activity>
     </application>
     <uses-sdk android:minSdkVersion="4"
     android:targetSdkVersion="4"
