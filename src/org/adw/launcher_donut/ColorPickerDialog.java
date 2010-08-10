@@ -51,6 +51,9 @@ import android.widget.TextView;
 
 
 public class ColorPickerDialog extends Dialog {
+    private static int CENTER_X = 100;
+    private static int CENTER_Y = 100;
+    private static int CENTER_RADIUS = 32;
 
     public interface OnColorChangedListener {
         void colorChanged(int color);
@@ -77,7 +80,7 @@ public class ColorPickerDialog extends Dialog {
             mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mPaint.setShader(s);
             mPaint.setStyle(Paint.Style.STROKE);
-            mPaint.setStrokeWidth(32);
+            mPaint.setStrokeWidth(CENTER_RADIUS);
             
             mCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mCenterPaint.setColor(color);
@@ -89,7 +92,7 @@ public class ColorPickerDialog extends Dialog {
 
         @Override 
         protected void onDraw(Canvas canvas) {
-            float r = CENTER_X - mPaint.getStrokeWidth()*0.5f;
+            float r = CENTER_X - mPaint.getStrokeWidth()*0.8f;
             
             canvas.translate(CENTER_X, CENTER_X);
             
@@ -118,10 +121,6 @@ public class ColorPickerDialog extends Dialog {
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             setMeasuredDimension(CENTER_X*2, CENTER_Y*2);
         }
-        
-        private static final int CENTER_X = 100;
-        private static final int CENTER_Y = 100;
-        private static final int CENTER_RADIUS = 32;
 
         public void setCenterColor(int color) {
             mCenterPaint.setColor(color);
@@ -267,6 +266,8 @@ public class ColorPickerDialog extends Dialog {
         mContext = context;
         mListener = listener;
         mInitialColor = initialColor;
+        CENTER_Y=CENTER_X=context.getResources().getDimensionPixelSize(R.dimen.color_picker_center);
+        CENTER_RADIUS=context.getResources().getDimensionPixelSize(R.dimen.color_picker_radius);
     }
 
     protected void onCreate(Bundle savedInstanceState) {
