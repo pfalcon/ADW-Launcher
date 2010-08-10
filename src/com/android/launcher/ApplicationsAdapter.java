@@ -45,8 +45,8 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	private int mTextColor = 0;
 	private boolean useThemeTextColor = false;
     private Typeface themeFont=null;
-	public ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();;
-	public ArrayList<ApplicationInfo> filtered = new ArrayList<ApplicationInfo>();;
+	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();;
+	public static ArrayList<ApplicationInfo> filtered = new ArrayList<ApplicationInfo>();;
 	private CatalogueFilter filter;
     private static final Collator sCollator = Collator.getInstance();
 
