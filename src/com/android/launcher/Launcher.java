@@ -1407,6 +1407,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             case MENU_NOTIFICATIONS:
                 //showNotifications();
             	//ADW: temp usage for desktop eiting
+            	if(allAppsOpen)closeAllApps(false);
             	startDesktopEdit();
                 return true;
             case MENU_ALMOSTNEXUS:
