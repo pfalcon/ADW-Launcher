@@ -1228,7 +1228,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
     @Override
     public void onDestroy() {
-    	d("LAUNCHER","onDestroy");
         mDestroyed = true;
     	//setPersistent(false);
         //ADW: unregister the sharedpref listener
@@ -1258,7 +1257,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         getContentResolver().unregisterContentObserver(mWidgetObserver);
         unregisterReceiver(mApplicationsReceiver);
         unregisterReceiver(mCloseSystemDialogsReceiver);
-        unregisterReceiver(sWallpaperReceiver);
         mWorkspace.unregisterProvider();
     }
 
