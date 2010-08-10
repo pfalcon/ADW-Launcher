@@ -345,5 +345,11 @@ public final class AlmostNexusSettingsHelper {
 		editor.putInt("desktopScreens", screens-1);
 	    editor.commit();
 	}
+	public static void setDefaultScreen(Context context,int screens) {
+		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+	    SharedPreferences.Editor editor = sp.edit();
+		editor.putInt("defaultScreen", screens);
+	    editor.commit();
+	}
 	
 }
