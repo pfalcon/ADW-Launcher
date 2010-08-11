@@ -226,7 +226,6 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
                 appWidgetHost.deleteAppWidgetId(launcherAppWidgetInfo.appWidgetId);
             }
         }
-        LauncherModel.deleteItemFromDatabase(mLauncher, item);
 		//Now we need to update database (and position) for remainint items
 		final int count=getChildCount();
 		for(int i=0;i<count;i++){
