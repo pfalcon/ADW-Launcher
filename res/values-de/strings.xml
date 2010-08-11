@@ -70,10 +70,10 @@
     <string name="pref_summary_screen_preferences">Einstellungen für Bildschirmanzahl, Standardbildschirm, Effekte, ...</string>
 
     <string name="pref_title_wallpaper_hack">Wallpaper-Hack</string>
-    <string name="pref_summary_wallpaper_hack">Für schnelleres Scrollen. Bei Fehlermeldungen und Nutzung großer Hintergrundbilder ausschalten.</string>
+    <string name="pref_summary_wallpaper_hack">Für schnelleres Scrollen. Bei Fehlermeldungen nicht benutzen.</string>
 
-    <string name="pref_title_orientation_sensor">Orientierungssensor</string>
-    <string name="pref_summary_orientation_sensor">Anzeige der Geräteorientierung anpassen</string>
+    <string name="pref_title_orientation_sensor">Homescreen-Orientierung</string>
+    <string name="pref_summary_orientation_sensor">Gewünschte Orientierung auswählen</string>
 
     <string name="pref_title_hide_statusbar">Statuszeile ausblenden</string>
     <string name="pref_summary_hide_statusbar">Obere Statuszeile ausblenden</string>
@@ -296,7 +296,7 @@
     <string name="pref_title_indicators_preferencecategory">Bildschirm-Indikator</string>
 
     <string name="pref_title_system_persistent">System persistent</string>
-    <string name="pref_summary_system_persistent">Einschalten, um Beendigung des Launchers durch das System zu verhindern</string>
+    <string name="pref_summary_system_persistent">Einschalten, um Beendigung des Launchers durch das System zu verhindern (gefährlich)</string>
 
     <!-- Theme preferences -->
     <string name="pref_title_theme_settings">Themes</string>
