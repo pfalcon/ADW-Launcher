@@ -113,7 +113,7 @@ import org.adw.launcher_donut.SliderView.OnTriggerListener;
  */
 public final class Launcher extends Activity implements View.OnClickListener, OnLongClickListener, OnSharedPreferenceChangeListener {
     static final String LOG_TAG = "Launcher";
-    static final boolean LOGD = true;
+    static final boolean LOGD = false;
 
     private static final boolean PROFILE_STARTUP = false;
     private static final boolean PROFILE_ROTATE = false;
