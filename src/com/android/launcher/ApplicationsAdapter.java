@@ -45,8 +45,8 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	private int mTextColor = 0;
 	private boolean useThemeTextColor = false;
     private Typeface themeFont=null;
-	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();;
-	public static ArrayList<ApplicationInfo> filtered = new ArrayList<ApplicationInfo>();;
+	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();
+	public static ArrayList<ApplicationInfo> filtered = new ArrayList<ApplicationInfo>();
 	private CatalogueFilter filter;
     private static final Collator sCollator = Collator.getInstance();
 
@@ -115,14 +115,18 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 
 	@Override
 	public void add(ApplicationInfo info) {
+		boolean changed = false;
+		//check allItems before added. It is a fix for all of the multi-icon issue, but will 
+		//lose performance. Anyway, we do not expected to have many applications.
 		synchronized (allItems) {
-			allItems.add(info);
-			Collections.sort(allItems,new ApplicationInfoComparator());
+			if (!allItems.contains(info)) {
+				changed = true;
+				allItems.add(info);
+				Collections.sort(allItems,new ApplicationInfoComparator());
+			}
 		}
-		String s = info.intent.getComponent().flattenToString();
-		if (appInGroup(s)) {
-			super.add(info);
-		}
+//		Log.v("added",info.intent.getComponent().flattenToString()+" "+allItems.size());
+		if (changed) updateDataSet();
 	}
 
 	//2 super functions, to make sure related add/clear do not affect allItems.
@@ -143,7 +147,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 		synchronized (allItems) {
 			allItems.remove(info);
 		}
-		super.remove(info);
+		updateDataSet();
 	}
 
 	private boolean appInGroup(String s) {
@@ -160,6 +164,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			for (int i = 0; i < length; i++) {
 				ApplicationInfo info = theItems.get(i);
 				String s = info.intent.getComponent().flattenToString();
+				
 				if (appInGroup(s)) {
 					theFiltered.add(info);
 				}
@@ -180,21 +185,17 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	}
 
 	private class CatalogueFilter extends Filter {
-		ArrayList<ApplicationInfo> lItems = new ArrayList<ApplicationInfo>();
 		ArrayList<ApplicationInfo> filt = new ArrayList<ApplicationInfo>();
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 
 			FilterResults result = new FilterResults();
 			filt.clear();
-			lItems.clear();
 			
 			synchronized (allItems) {
-				lItems.addAll(allItems);
+				filterApps(filt, allItems);
 			}
 			
-			filterApps(filt, lItems);
-
 			result.values = filt;
 			result.count = filt.size();
 			return result;
@@ -212,11 +213,13 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			superClear();
 			// there could be a serious sync issue.
 			// very bad
-			for (int i = 0, l = filtered.size(); i < l; i++)
+			int l = filtered.size(); 
+			for (int i = 0;i < l; i++) {
 				superAdd(filtered.get(i));
+			}
 			
 			notifyDataSetChanged();
-			//notifyDataSetInvalidated();
+
 		}
 	}
     static class ApplicationInfoComparator implements Comparator<ApplicationInfo> {
