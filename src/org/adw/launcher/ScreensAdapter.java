@@ -1,6 +1,7 @@
 package org.adw.launcher;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -33,16 +34,19 @@ public class ScreensAdapter extends BaseAdapter {
 	    public void addScreen(CellLayout screen, int position){
 	    	if(mScreens==null)
 	    		mScreens=new ArrayList<CellLayout>();
-	    	android.util.Log.d("SCREENSADAPTER","Lengt before="+mScreens.size());
-	    	android.util.Log.d("SCREENSADAPTER","Add screen="+screen);
 	    	mScreens.add(position, screen);
-	    	android.util.Log.d("SCREENSADAPTER","Lengt after="+mScreens.size());
 	    	notifyDataSetChanged();
 	    }
 	    public void removeScreen(int position){
 	    	if(mScreens==null)
 	    		return;
 	    	mScreens.remove(position);
+	    	notifyDataSetChanged();
+	    }
+	    public void swapScreens(int a, int b){
+	    	if(mScreens==null)
+	    		return;
+	    	Collections.swap(mScreens, a, b);
 	    	notifyDataSetChanged();
 	    }
 	    public int getCount() {

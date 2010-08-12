@@ -1962,6 +1962,35 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     	moveItemPositions(position, +1);
     	return screen;
     }
+    protected void swapScreens(int screen_a, int screen_b){
+    	//Swap database positions for both screens
+        CellLayout layout = (CellLayout) getChildAt(screen_a);
+        int childCount = layout.getChildCount();
+        for (int j = 0; j < childCount; j++) {
+            final View view = layout.getChildAt(j);
+            Object tag = view.getTag();
+            final ItemInfo item = (ItemInfo) tag;
+            if(item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
+                LauncherModel.moveItemInDatabase(mLauncher, item, item.container, screen_b, item.cellX, item.cellY);
+            }
+        }
+        layout = (CellLayout) getChildAt(screen_b);
+        childCount = layout.getChildCount();
+        for (int j = 0; j < childCount; j++) {
+            final View view = layout.getChildAt(j);
+            Object tag = view.getTag();
+            final ItemInfo item = (ItemInfo) tag;
+            if(item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
+                LauncherModel.moveItemInDatabase(mLauncher, item, item.container, screen_a, item.cellX, item.cellY);
+            }
+        }
+    	//swap the views
+    	CellLayout a=(CellLayout) getChildAt(screen_a);
+    	LayoutParams lp=a.getLayoutParams();
+    	detachViewFromParent(a);
+    	attachViewToParent(a, screen_b, lp);
+    	requestLayout();
+    }
     private void moveItemPositions(int screen, int diff){
         //MOVE THE REMAINING ITEMS FROM OTHER SCREENS
         for (int i=screen+1;i<getChildCount();i++){

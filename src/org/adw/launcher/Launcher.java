@@ -3677,6 +3677,33 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				}
 			});
 	        
+	        View swapLeftButton=mScreensEditor.findViewById(R.id.swap_left);
+	        swapLeftButton.setOnClickListener(new android.view.View.OnClickListener() {
+				public void onClick(View v) {
+					int currentScreen=gal.getSelectedItemPosition();
+					if(currentScreen>0){
+						workspace.swapScreens(currentScreen-1,currentScreen);
+						screens.swapScreens(currentScreen-1,currentScreen);
+					}else{
+						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_add_desktop_screen, Toast.LENGTH_LONG);
+						t.show();
+					}
+				}
+			});
+	        View swapRightButton=mScreensEditor.findViewById(R.id.swap_right);
+	        swapRightButton.setOnClickListener(new android.view.View.OnClickListener() {
+				public void onClick(View v) {
+					int currentScreen=gal.getSelectedItemPosition();
+					if(currentScreen<gal.getCount()-1){
+						workspace.swapScreens(currentScreen,currentScreen+1);
+						screens.swapScreens(currentScreen,currentScreen+1);
+					}else{
+						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_add_desktop_screen, Toast.LENGTH_LONG);
+						t.show();
+					}
+				}
+			});
+	        
 	        mDragLayer.addView(mScreensEditor);
 		}
 	}
