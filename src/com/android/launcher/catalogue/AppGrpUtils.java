@@ -161,7 +161,7 @@ public class AppGrpUtils {
 	static public final void checkAndInitGrp(String grpName) {
 		loadGrpArray();
 		int grp = getFirstValidGrp();
-		Log.v("----","  "+grp);
+
 		if (!(grp < 0) || (grp >= APP_GROUP_SIZE)) {
 			SharedPreferences.Editor editor = appGrpIndex.edit();
 			editor.putString(GRP_INIT_TAG, grpIndex + grp +"/");
@@ -169,6 +169,8 @@ public class AppGrpUtils {
 			editor.commit();
 			forceLoadGrpArray();
 		}
+		currentGrp = grp;
+		curAppGrp = getAppGrp(currentGrp);
 	}
 
 	private static SharedPreferences getAppGrp(int i) {
@@ -194,7 +196,7 @@ public class AppGrpUtils {
 		}
 		appGrpIndex = context.getSharedPreferences(APP_GROUP_PREFS_PREFIX
 				+ "Index", 0);
-		//test code
+/*		//test code
 		SharedPreferences.Editor editor = appGrpIndex.edit();
 		//editor.putString(GRP_INIT_TAG, "1/3/2/");
 		editor.putString(GRP_INIT_TAG, "2/");
@@ -204,7 +206,7 @@ public class AppGrpUtils {
 		editor.putString("GrpName0","text+0");	
 		editor.commit();
 		//test code;
-		loadGrpArray();
+*/		loadGrpArray();
 		setCurGrp(-1);
 	}
 

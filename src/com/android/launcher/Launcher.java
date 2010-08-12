@@ -2586,7 +2586,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             builder.setPositiveButton(getString(R.string.rename_action),
                 new Dialog.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        changeGrpName();
+                        newGrpName();
                     }
                 }
             );
@@ -2607,12 +2607,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             return dialog;
         }
 
-        private void changeGrpName() {
-            final String name = mInput.getText().toString();
+        private void newGrpName() {
+			final String name = mInput.getText().toString();
 			mInput.setText("");
 			if (!TextUtils.isEmpty(name)) {
 				// Make sure we have the right folder info
-				AppGrpUtils.checkAndInitGrp(name) ;
+				AppGrpUtils.checkAndInitGrp(name);
+				LauncherModel.mApplicationsAdapter.updateDataSet();
 			}
 			cleanup();
         }
