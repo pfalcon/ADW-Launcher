@@ -177,7 +177,7 @@ public class LauncherModel {
             return;
         }
 
-        if (packageName != null && packageName.length() > 0) {
+        if (packageName != null && packageName.length() > 0 && mApplicationsAdapter!=null) {
             final PackageManager packageManager = launcher.getPackageManager();
             final List<ResolveInfo> matches = findActivitiesForPackage(packageManager, packageName);
 
@@ -203,7 +203,7 @@ public class LauncherModel {
             return;
         }
 
-        if (packageName != null && packageName.length() > 0) {
+        if (packageName != null && packageName.length() > 0 && mApplicationsAdapter!=null) {
             final ApplicationsAdapter adapter = mApplicationsAdapter;
 
             final List<ApplicationInfo> toRemove = new ArrayList<ApplicationInfo>();
@@ -238,7 +238,7 @@ public class LauncherModel {
             return;
         }
 
-        if (packageName != null && packageName.length() > 0) {
+        if (packageName != null && packageName.length() > 0 && mApplicationsAdapter!=null) {
             final PackageManager packageManager = launcher.getPackageManager();
             final ApplicationsAdapter adapter = mApplicationsAdapter;
 
@@ -282,7 +282,7 @@ public class LauncherModel {
             return;
         }
 
-        if (packageName != null && packageName.length() > 0) {
+        if (packageName != null && packageName.length() > 0 && mApplicationsAdapter!=null) {
             if (syncLocked(launcher, packageName)) {
                 final ApplicationsAdapter adapter = mApplicationsAdapter;
                 adapter.sort(new ApplicationInfoComparator());
@@ -295,7 +295,7 @@ public class LauncherModel {
         final PackageManager packageManager = launcher.getPackageManager();
         final List<ResolveInfo> matches = findActivitiesForPackage(packageManager, packageName);
 
-        if (matches.size() > 0) {
+        if (matches.size() > 0 && mApplicationsAdapter!=null) {
             final ApplicationsAdapter adapter = mApplicationsAdapter;
 
             // Find disabled activities and remove them from the adapter
