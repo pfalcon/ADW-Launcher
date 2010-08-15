@@ -377,6 +377,7 @@
     <string name="message_delete_desktop_screen">Remove this screen and all the content?</string>
     <string name="message_cannot_delete_desktop_screen">You can\'t delete the last screen</string>
     <string name="message_cannot_add_desktop_screen">You can\'t add more screens</string>
+    <string name="message_cannot_swap_desktop_screen">You can\'t swap screens</string>
     
     <string name="menu_edit">Edit</string>
 </resources>
