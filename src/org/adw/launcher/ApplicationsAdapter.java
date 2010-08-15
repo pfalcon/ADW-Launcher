@@ -215,7 +215,11 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			// very bad
 			int l = filtered.size(); 
 			for (int i = 0;i < l; i++) {
-				superAdd(filtered.get(i));
+				try{
+					superAdd(filtered.get(i));
+				}catch (IndexOutOfBoundsException e) {
+					Log.d("APPLICATIONSADAPTER","filtered IndexOutOfBoundsException whith size="+l+" and i="+i);
+				}
 			}
 			
 			notifyDataSetChanged();
