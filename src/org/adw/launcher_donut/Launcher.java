@@ -90,6 +90,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -3620,7 +3621,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				}
 			});
 	        
-	        View swapLeftButton=mScreensEditor.findViewById(R.id.swap_left);
+	        final View swapLeftButton=mScreensEditor.findViewById(R.id.swap_left);
 	        swapLeftButton.setOnClickListener(new android.view.View.OnClickListener() {
 				public void onClick(View v) {
 					int currentScreen=gal.getSelectedItemPosition();
@@ -3628,12 +3629,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 						workspace.swapScreens(currentScreen-1,currentScreen);
 						screens.swapScreens(currentScreen-1,currentScreen);
 					}else{
-						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_add_desktop_screen, Toast.LENGTH_LONG);
+						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_swap_desktop_screen, Toast.LENGTH_LONG);
 						t.show();
 					}
 				}
 			});
-	        View swapRightButton=mScreensEditor.findViewById(R.id.swap_right);
+	        final View swapRightButton=mScreensEditor.findViewById(R.id.swap_right);
 	        swapRightButton.setOnClickListener(new android.view.View.OnClickListener() {
 				public void onClick(View v) {
 					int currentScreen=gal.getSelectedItemPosition();
@@ -3641,12 +3642,28 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 						workspace.swapScreens(currentScreen,currentScreen+1);
 						screens.swapScreens(currentScreen,currentScreen+1);
 					}else{
-						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_add_desktop_screen, Toast.LENGTH_LONG);
+						Toast t=Toast.makeText(Launcher.this, R.string.message_cannot_swap_desktop_screen, Toast.LENGTH_LONG);
 						t.show();
 					}
 				}
 			});
-	        
+	        gal.setOnItemSelectedListener(new OnItemSelectedListener() {
+				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+					if(position<=0){
+						swapLeftButton.setVisibility(View.GONE);
+					}else{
+						swapLeftButton.setVisibility(View.VISIBLE);
+					}
+					if(position<parent.getCount()-1){
+						swapRightButton.setVisibility(View.VISIBLE);
+					}else{
+						swapRightButton.setVisibility(View.GONE);
+					}
+				}
+				public void onNothingSelected(AdapterView<?> arg0) {
+				}
+	        	
+			});
 	        mDragLayer.addView(mScreensEditor);
 		}
 	}
