@@ -1430,13 +1430,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		.setAlphabeticShortcut('X');
        
 		menu.add(MENU_GROUP_CATALOGUE, MENU_APP_GRP_CONFIG, 0, R.string.AppGroupConfig)
-			.setIcon(R.drawable.ic_menu_notifications);
+			.setIcon(android.R.drawable.ic_menu_agenda);
 		//menu.add(MENU_GROUP_CATALOGUE, MENU_APP_GRP_RENAME, 0, R.string.AppGroupRename)
 		//	.setIcon(R.drawable.ic_menu_notifications); 
    		menu.add(MENU_GROUP_CATALOGUE, MENU_APP_SWITCH_GRP, 0, R.string.AppGroupChoose)
-			.setIcon(R.drawable.ic_menu_notifications); 
+			.setIcon(android.R.drawable.ic_menu_manage); 
    		menu.add(MENU_GROUP_CATALOGUE, MENU_APP_DELETE_GRP, 0, R.string.AppGroupDel)
-			.setIcon(R.drawable.ic_menu_notifications); 
+			.setIcon(android.R.drawable.ic_menu_delete); 
      return true;
     }
 
