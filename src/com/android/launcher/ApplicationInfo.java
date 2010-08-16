@@ -146,6 +146,8 @@ public class ApplicationInfo extends ItemInfo {
 
 		// cast to native object is now safe
 		ApplicationInfo that = (ApplicationInfo) aThat;
+		if(that.intent.getComponent()==null)
+			return false;
 		// now a proper field-by-field evaluation can be made
 		return this.intent.getComponent().flattenToString().equals(
 				that.intent.getComponent().flattenToString());
