@@ -140,7 +140,9 @@ public class AppGrpUtils {
 		int cGrp = AppGrpUtils.currentGrp;
 		if ((cGrp < 0) || (cGrp >= APP_GROUP_SIZE))
 			return; // invalid index, do nothing.
-		
+		SharedPreferences.Editor ed = curAppGrp.edit();
+		ed.clear();
+		ed.commit();
 		loadGrpArray();
 		String sGrp = ""+cGrp;
 		
@@ -158,7 +160,7 @@ public class AppGrpUtils {
 		forceLoadGrpArray();
 	}
 	
-	static public final void checkAndInitGrp(String grpName) {
+	static public final int checkAndInitGrp(String grpName) {
 		loadGrpArray();
 		int grp = getFirstValidGrp();
 
@@ -171,6 +173,7 @@ public class AppGrpUtils {
 		}
 		currentGrp = grp;
 		curAppGrp = getAppGrp(currentGrp);
+		return currentGrp;
 	}
 
 	private static SharedPreferences getAppGrp(int i) {
