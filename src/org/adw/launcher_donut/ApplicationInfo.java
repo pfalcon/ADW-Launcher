@@ -132,7 +132,9 @@ public class ApplicationInfo extends ItemInfo {
 		// check for self-comparison
 		if (this == aThat)
 			return true;
-
+		//ADW: Shortcuts (contacts, bookmarks, etc) don't have component.....
+		if(this.intent.getComponent()==null)
+			return super.equals(aThat);
 		// use instanceof instead of getClass here for two reasons
 		// 1. if need be, it can match any supertype, and not just one class;
 		// 2. it renders an explict check for "that == null" redundant, since
@@ -144,7 +146,6 @@ public class ApplicationInfo extends ItemInfo {
 
 		// cast to native object is now safe
 		ApplicationInfo that = (ApplicationInfo) aThat;
-
 		// now a proper field-by-field evaluation can be made
 		return this.intent.getComponent().flattenToString().equals(
 				that.intent.getComponent().flattenToString());
