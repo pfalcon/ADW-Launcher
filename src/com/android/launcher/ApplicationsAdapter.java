@@ -46,7 +46,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	private boolean useThemeTextColor = false;
     private Typeface themeFont=null;
 	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();
-	public static ArrayList<ApplicationInfo> filtered = new ArrayList<ApplicationInfo>();
+	public static ArrayList<ApplicationInfo> itemsFiltered = new ArrayList<ApplicationInfo>();
 	private CatalogueFilter filter;
     private static final Collator sCollator = Collator.getInstance();
 
@@ -186,48 +186,42 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	}
 
 	private class CatalogueFilter extends Filter {
-		ArrayList<ApplicationInfo> filt = new ArrayList<ApplicationInfo>();
-		@Override
-		protected FilterResults performFiltering(CharSequence constraint) {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
 
-			FilterResults result = new FilterResults();
-			filt.clear();
-			
-			synchronized (allItems) {
-				filterApps(filt, allItems);
-			}
-			
-			result.values = filt;
-			result.count = filt.size();
-			return result;
-		}
+                FilterResults result = new FilterResults();
+                ArrayList<ApplicationInfo> filt = new ArrayList<ApplicationInfo>();
 
-		@SuppressWarnings("unchecked")
-		@Override
-		protected void publishResults(CharSequence constraint,
-				FilterResults results) {
-			// NOTE: this function is *always* called from the UI thread.
-			filtered = (ArrayList<ApplicationInfo>) results.values;
+                synchronized (allItems) {
+                        filterApps(filt, allItems);
+                }
 
-			setNotifyOnChange(false);
-			
-			superClear();
-			// there could be a serious sync issue.
-			// very bad
-			int l = filtered.size(); 
-			for (int i = 0;i < l; i++) {
-				ApplicationInfo item=null;
-				try{
-					item=filtered.get(i);
-				}catch (IndexOutOfBoundsException e) {
-					Log.d("APPLICATIONSADAPTER","filtered IndexOutOfBoundsException whith size="+l+" and i="+i);
-				}
-				if(item!=null)superAdd(item);
-			}
-			
-			notifyDataSetChanged();
+                result.values = filt;
+                result.count = filt.size();
+                return result;
+        }
 
-		}
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint,
+                        FilterResults results) {
+                // NOTE: this function is *always* called from the UI thread.
+                ArrayList<ApplicationInfo> localFiltered =(ArrayList<ApplicationInfo>) results.values;
+
+                itemsFiltered = localFiltered;
+
+                setNotifyOnChange(false);
+
+                superClear();
+                // there could be a serious sync issue.
+                // very bad
+                for (int i = 0;i < results.count; i++) {
+                        superAdd(localFiltered.get(i));
+                }
+
+                notifyDataSetChanged();
+
+        }
 	}
     static class ApplicationInfoComparator implements Comparator<ApplicationInfo> {
         public final int compare(ApplicationInfo a, ApplicationInfo b) {
