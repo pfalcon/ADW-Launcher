@@ -2607,7 +2607,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			mInput.setText("");
 			if (!TextUtils.isEmpty(name)) {
 				// Make sure we have the right folder info
-				AppGrpUtils.checkAndInitGrp(name);
+				int which=AppGrpUtils.checkAndInitGrp(name);
+				AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, which);
 				LauncherModel.mApplicationsAdapter.updateDataSet();
 			}
 			cleanup();
