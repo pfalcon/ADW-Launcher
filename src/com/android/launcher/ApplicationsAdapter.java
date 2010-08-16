@@ -132,6 +132,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	//2 super functions, to make sure related add/clear do not affect allItems.
 	//in current Froyo/Eclair, it is not necessary.
 	void superAdd(ApplicationInfo info) {
+		if(info==null)return;
 		String s = info.intent.getComponent().flattenToString();
 		if (appInGroup(s)) {
 			super.add(info);
@@ -215,11 +216,13 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			// very bad
 			int l = filtered.size(); 
 			for (int i = 0;i < l; i++) {
+				ApplicationInfo item=null;
 				try{
-					superAdd(filtered.get(i));
+					item=filtered.get(i);
 				}catch (IndexOutOfBoundsException e) {
 					Log.d("APPLICATIONSADAPTER","filtered IndexOutOfBoundsException whith size="+l+" and i="+i);
 				}
+				if(item!=null)superAdd(item);
 			}
 			
 			notifyDataSetChanged();
