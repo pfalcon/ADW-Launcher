@@ -84,6 +84,12 @@
             </intent-filter>
         </activity>
 		<activity android:name="MyLauncherSettings" android:label="@string/pref_label_settings" />
+		<activity android:name="ActivityPickerActivity" android:label="@string/pref_label_activities" />
+		<activity 
+			android:name="CustomShirtcutActivity"
+			android:label="@string/pref_label_shirtcuts"
+			android:theme="@android:style/Theme.Dialog"
+		/>
         <activity
             android:name="WallpaperChooser"
             android:label="@string/pick_wallpaper"
