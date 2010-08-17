@@ -5,6 +5,7 @@
 
 package org.adw.launcher;
 
+import java.util.ArrayList;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -16,24 +17,28 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 public class CustomShirtcutActivity extends Activity implements OnClickListener {
 	private static final int PICK_CUSTOM_ICON=1;
-	private static final int PICK_CUSTOM_ACTIVITY=2;
+	private static final int PICK_STANDARD_MENU=2;
+	private static final int PICK_STANDARD_SHORTCUT=3;
+	private static final int PICK_STANDARD_APPLICATION=4;
 	private Button btPickActivity;
 	private ImageButton btPickIcon;
 	private Button btOk;
 	private EditText edLabel;
-	private ActivityInfo mInfo;
+	//private ActivityInfo mInfo;
 	private Drawable mIcon;
 	private Bitmap mBitmap;
 	PackageManager mPackageManager;
+	private Intent mIntent;
+	private ShortcutIconResource mIconResource;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,20 +60,100 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		super.onActivityResult(requestCode, resultCode, data);
 		if(resultCode==RESULT_OK){
 			switch (requestCode) {
-			case PICK_CUSTOM_ACTIVITY:
-				mInfo=data.getParcelableExtra("activityInfo");
-				btPickActivity.setText(mInfo.packageName);
-				mIcon=mInfo.loadIcon(mPackageManager);
-				btPickIcon.setImageDrawable(mIcon);
-				btPickIcon.setEnabled(true);
-				btOk.setEnabled(true);
-				edLabel.setText(mInfo.loadLabel(mPackageManager));
-				break;
 			case PICK_CUSTOM_ICON:
 				mBitmap = (Bitmap) data.getParcelableExtra("data");
 				if(mBitmap!=null){
 					btPickIcon.setImageBitmap(mBitmap);
 				}
+				break;
+			case PICK_STANDARD_MENU:
+		        String applicationName = getResources().getString(R.string.group_applications);
+		        String activitiesName=getResources().getString(R.string.pref_label_activities);
+		        String shortcutName = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
+		        
+		        if (applicationName != null && applicationName.equals(shortcutName)) {
+		            Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+		            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+		            Intent pickIntent = new Intent(Intent.ACTION_PICK_ACTIVITY);
+		            pickIntent.putExtra(Intent.EXTRA_INTENT, mainIntent);
+		            startActivityForResult(pickIntent, PICK_STANDARD_APPLICATION);
+		        } else if (activitiesName != null && activitiesName.equals(shortcutName)) {
+					Intent picker=new Intent();
+		        	picker.setClass(this, ActivityPickerActivity.class);
+					startActivityForResult(picker,PICK_STANDARD_SHORTCUT);
+		        } else {
+		            startActivityForResult(data, PICK_STANDARD_SHORTCUT);
+		        }
+		        break;
+			case PICK_STANDARD_APPLICATION:
+				android.util.Log.d("SHIRTCUTS","APP");
+		        ComponentName component = data.getComponent();
+		        ActivityInfo activityInfo = null;
+		        try {
+		            activityInfo = mPackageManager.getActivityInfo(component, 0 /* no flags */);
+		        } catch (NameNotFoundException e) {
+		        }
+		        String title=null;
+		        if (activityInfo != null) {
+		            title = activityInfo.loadLabel(mPackageManager).toString();
+		            if (title == null) {
+		                title = activityInfo.name;
+		            }
+			        mIconResource = new ShortcutIconResource();
+			        mIconResource.packageName = activityInfo.packageName;
+			        try {
+						Resources resources = mPackageManager.getResourcesForApplication(mIconResource.packageName);
+						mIconResource.resourceName = resources.getResourceName(activityInfo.getIconResource());
+					} catch (NameNotFoundException e) {
+						mIconResource=null;
+					} catch (Resources.NotFoundException e) {
+						mIconResource=null;
+					}
+		            
+			        mIntent=data;
+					btPickActivity.setText(title);
+					mIcon=activityInfo.loadIcon(mPackageManager);
+					btPickIcon.setImageDrawable(mIcon);
+					btPickIcon.setEnabled(true);
+					btOk.setEnabled(true);
+					edLabel.setText(title);
+		        }
+				break;
+			case PICK_STANDARD_SHORTCUT:
+		        Intent intent = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
+		        String name = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
+		        Bitmap bitmap = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON);
+
+		        Drawable icon = null;
+		        mIconResource=null;
+		        if (bitmap != null) {
+		            icon = new FastBitmapDrawable(Utilities.createBitmapThumbnail(bitmap, this));
+		            mBitmap=bitmap;
+		        } else {
+		            Parcelable extra = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE);
+		            if (extra != null && extra instanceof ShortcutIconResource) {
+		                try {
+		                    mIconResource = (ShortcutIconResource) extra;
+		                    Resources resources = mPackageManager.getResourcesForApplication(
+		                            mIconResource.packageName);
+		                    final int id = resources.getIdentifier(mIconResource.resourceName, null, null);
+		                    icon = resources.getDrawable(id);
+		                } catch (Exception e) {
+		                }
+		            }
+		        }
+		        if (icon == null) {
+		            icon = getPackageManager().getDefaultActivityIcon();
+		        }
+		        mIntent=intent;
+				btPickActivity.setText(name);
+				mIcon=icon;
+				btPickIcon.setImageDrawable(mIcon);
+				btPickIcon.setEnabled(true);
+				btOk.setEnabled(true);
+				edLabel.setText(name);
+				break;
 			default:
 				break;
 			}
@@ -76,10 +161,25 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	}
 	@Override
 	public void onClick(View v) {
-		Intent picker=new Intent();
+		//Intent picker=new Intent();
 		if(v.equals(btPickActivity)){
-			picker.setClass(this, ActivityPickerActivity.class);
-			startActivityForResult(picker,PICK_CUSTOM_ACTIVITY);
+	        Bundle bundle = new Bundle();
+	        ArrayList<String> shortcutNames = new ArrayList<String>();
+	        shortcutNames.add(getString(R.string.group_applications));
+	        shortcutNames.add(getString(R.string.pref_label_activities));
+	        bundle.putStringArrayList(Intent.EXTRA_SHORTCUT_NAME, shortcutNames);
+	        
+	        ArrayList<ShortcutIconResource> shortcutIcons = new ArrayList<ShortcutIconResource>();
+	        shortcutIcons.add(ShortcutIconResource.fromContext(CustomShirtcutActivity.this,
+	                        R.drawable.ic_launcher_application));
+	        shortcutIcons.add(ShortcutIconResource.fromContext(CustomShirtcutActivity.this,
+                    R.drawable.ic_launcher_home));
+	        bundle.putParcelableArrayList(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, shortcutIcons);
+
+	        Intent pickIntent = new Intent(Intent.ACTION_PICK_ACTIVITY);
+	        pickIntent.putExtra(Intent.EXTRA_INTENT, new Intent(Intent.ACTION_CREATE_SHORTCUT));
+	        pickIntent.putExtras(bundle);
+	        startActivityForResult(pickIntent, PICK_STANDARD_MENU);
 		}else if(v.equals(btPickIcon)){
 			int width;
 			int height;
@@ -95,30 +195,13 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	        intent.putExtra("return-data", true);
 			startActivityForResult(intent, PICK_CUSTOM_ICON);
 		}else if(v.equals(btOk)){
-	        // Build the intent for the chosen activity
-	        Intent intent = new Intent();
-	        intent.setComponent(new ComponentName(mInfo.applicationInfo.packageName,
-	                mInfo.name));
 	        Intent mReturnData = new Intent();
-	        intent.setAction(Intent.ACTION_MAIN);
-	        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-	        mReturnData.putExtra(Intent.EXTRA_SHORTCUT_INTENT, intent);
-
-	        // Set the name of the activity
+	        mReturnData.putExtra(Intent.EXTRA_SHORTCUT_INTENT, mIntent);
 	        mReturnData.putExtra(Intent.EXTRA_SHORTCUT_NAME, edLabel.getText().toString());
-			
 	        if(mBitmap==null){
-		        ShortcutIconResource iconResource = new ShortcutIconResource();
-		        iconResource.packageName = mInfo.packageName;
-		        try {
-					Resources resources = mPackageManager.getResourcesForApplication(iconResource.packageName);
-					iconResource.resourceName = resources.getResourceName(mInfo.getIconResource());
-					mReturnData.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
-				} catch (NameNotFoundException e) {
-				} catch (Resources.NotFoundException e) {
-				}
+				if(mIconResource!=null)mReturnData.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, mIconResource);
 	        }else{
-				mReturnData.putExtra(Intent.EXTRA_SHORTCUT_ICON, mBitmap);
+	        	mReturnData.putExtra(Intent.EXTRA_SHORTCUT_ICON, mBitmap);
 	        }
 			setResult(RESULT_OK,mReturnData);
 			finish();
