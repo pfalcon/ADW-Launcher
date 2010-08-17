@@ -384,7 +384,7 @@
 	<string name="pref_label_shirtcuts">Custom shortcut</string>
 	<string name="pref_label_activities">Activities</string>
 	<string name="pref_label_activities_loading">Loading activity list...</string>
-	<string name="shirtcut_header">Select your desired application activity to launch.\\n You can select a custom icon too.</string>
+	<string name="shirtcut_header">Select your desired application activity to launch.\nYou can select a custom icon too.</string>
 	<string name="shirtcut_pick_activity">Pick your activity</string>
 	<string name="shirtcut_label">Label</string>
 </resources>
