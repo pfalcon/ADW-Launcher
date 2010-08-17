@@ -16,6 +16,7 @@
 
 package org.adw.launcher;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
@@ -45,8 +46,8 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	private int mTextColor = 0;
 	private boolean useThemeTextColor = false;
     private Typeface themeFont=null;
-	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();
-	public static ArrayList<ApplicationInfo> itemsFiltered = new ArrayList<ApplicationInfo>();
+	// TODO: Check if allItems is used somewhere else!
+	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();	
 	private CatalogueFilter filter;
     private static final Collator sCollator = Collator.getInstance();
 
@@ -125,18 +126,14 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 				Collections.sort(allItems,new ApplicationInfoComparator());
 			}
 		}
-//		Log.v("added",info.intent.getComponent().flattenToString()+" "+allItems.size());
 		if (changed) updateDataSet();
 	}
 
 	//2 super functions, to make sure related add/clear do not affect allItems.
 	//in current Froyo/Eclair, it is not necessary.
 	void superAdd(ApplicationInfo info) {
-		if(info==null)return;
-		String s = info.intent.getComponent().flattenToString();
-		if (appInGroup(s)) {
+		if(info!=null)
 			super.add(info);
-		}
 	}
 	
 	void superClear() {
@@ -154,6 +151,15 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	private boolean appInGroup(String s) {
 		return AppGrpUtils.checkAppInGroup(s);
 	}
+	
+	private String getComponentName(ApplicationInfo info) {
+		if (info == null || info.intent == null)
+			return null;
+		ComponentName cmpName = info.intent.getComponent();
+		if (cmpName == null)
+			return null;
+		return cmpName.flattenToString();
+	}
 
 	private void filterApps(ArrayList<ApplicationInfo> theFiltered,
 			ArrayList<ApplicationInfo> theItems) {
@@ -164,9 +170,9 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 
 			for (int i = 0; i < length; i++) {
 				ApplicationInfo info = theItems.get(i);
-				String s = info.intent.getComponent().flattenToString();
+				String s = getComponentName(info);
 				
-				if (appInGroup(s)) {
+				if (s != null && appInGroup(s)) {
 					theFiltered.add(info);
 				}
 			}
@@ -208,15 +214,12 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
                 // NOTE: this function is *always* called from the UI thread.
                 ArrayList<ApplicationInfo> localFiltered =(ArrayList<ApplicationInfo>) results.values;
 
-                itemsFiltered = localFiltered;
-
                 setNotifyOnChange(false);
-
                 superClear();
                 // there could be a serious sync issue.
                 // very bad
                 for (int i = 0;i < results.count; i++) {
-                        superAdd(localFiltered.get(i));
+                    superAdd(localFiltered.get(i));
                 }
 
                 notifyDataSetChanged();
