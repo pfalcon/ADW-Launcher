@@ -41,6 +41,7 @@ public class AddAdapter extends BaseAdapter {
     public static final int ITEM_APPWIDGET = 1;
     public static final int ITEM_LIVE_FOLDER = 2;
     public static final int ITEM_WALLPAPER = 3;
+    public static final int ITEM_ANYCUT = 4;
     private Typeface themeFont=null;
     /**
      * Specific item in our list.
@@ -80,6 +81,9 @@ public class AddAdapter extends BaseAdapter {
         
         mItems.add(new ListItem(res, R.string.group_wallpapers,
                 R.drawable.ic_launcher_wallpaper, ITEM_WALLPAPER));
+
+        mItems.add(new ListItem(res, R.string.pref_label_shirtcuts,
+                R.drawable.ic_launcher_shortcut, ITEM_ANYCUT));
 
     }
 
