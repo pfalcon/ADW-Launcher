@@ -5,13 +5,15 @@
 package org.adw.launcher;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -25,45 +27,33 @@ import android.widget.TextView;
 
 public class ActivityPickerActivity extends ExpandableListActivity {
 	private PackageManager mPackageManager;
-    MyExpandableListAdapter mAdapter;
     private final class LoadingTask extends AsyncTask<Void, Void, Void> {
+    	List<PackageInfo> groups;
         @Override
         public void onPreExecute() {
             setProgressBarIndeterminateVisibility(true);
-            setTitle(getResources().getString(R.string.pref_label_activities_loading));
         }
         @Override
         public Void doInBackground(Void... params) {
-            List<PackageInfo> list = mPackageManager.getInstalledPackages(PackageManager.GET_ACTIVITIES);
-            
-            for(PackageInfo item : list) {
-            	if(item.activities!=null){
-					AppInfoWrapper pkg=new AppInfoWrapper(item);
-					int groupId=mAdapter.addGroup(pkg);
-    	        	for(int i=0; i< item.activities.length;i++){
-    	        		mAdapter.addChildForGroup(groupId,item.activities[i]);
-    	        	}
-            	}
-            }
-			return null;
+            groups = mPackageManager.getInstalledPackages(0);
+            Collections.sort(groups, new PackageInfoComparable());
+            return null;
         }
         @Override
         public void onPostExecute(Void result) {
             setProgressBarIndeterminateVisibility(false);
-            setListAdapter(mAdapter);
-            setTitle(getResources().getString(R.string.pref_label_activities));
+            setListAdapter(new MyExpandableListAdapter(groups));
         }
     }
 
     @Override
     protected void onCreate(Bundle savedState) {
         super.onCreate(savedState);
-        mAdapter= new MyExpandableListAdapter();
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_list);
         getExpandableListView().setTextFilterEnabled(true);
         mPackageManager = getPackageManager();
-        // Start loading the data
+        // Start async loading the data 
         new LoadingTask().execute();
     }
 	@Override
@@ -75,6 +65,7 @@ public class ActivityPickerActivity extends ExpandableListActivity {
         setResult(RESULT_OK,intent);
         finish();
         return true;
+        
 	}
 	/**
 	 * ExpandableListAdapter to handle packages and activities
@@ -82,109 +73,96 @@ public class ActivityPickerActivity extends ExpandableListActivity {
 	 *
 	 */
     public class MyExpandableListAdapter extends BaseExpandableListAdapter {
-        private ArrayList<AppInfoWrapper> groups;
-        private ArrayList<ArrayList<ActivityInfo>> children;
-        
-        public MyExpandableListAdapter() {
+    	private List<PackageInfo> groups;
+    	private AbsListView.LayoutParams lpGroup;
+    	private AbsListView.LayoutParams lpChild;
+    	private int leftPadding;
+        public MyExpandableListAdapter(List<PackageInfo> g) {
 			super();
-			groups=new ArrayList<AppInfoWrapper>();
-			children=new ArrayList<ArrayList<ActivityInfo>>();
+			groups=g;
+            leftPadding=getResources().getDimensionPixelSize(android.R.dimen.app_icon_size);
+            
+            lpGroup = new AbsListView.LayoutParams(
+                    ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lpChild = new AbsListView.LayoutParams(
+                    ViewGroup.LayoutParams.FILL_PARENT, leftPadding);
 		}
-        public int addGroup(AppInfoWrapper pkg){
-        	int ret=groups.size();
-        	groups.add(pkg);
-        	children.add(new ArrayList<ActivityInfo>());
-        	return ret;
-        }
-        public void addChildForGroup(int group,ActivityInfo activ){
-        	children.get(group).add(activ);
-        }
         public ActivityInfo getChild(int groupPosition, int childPosition) {
-            //return children[groupPosition][childPosition];
-        	return children.get(groupPosition).get(childPosition);
+        	//return groups.get(groupPosition).activities[childPosition];
+        	PackageInfo tmp;
+			try {
+				tmp = mPackageManager.getPackageInfo(groups.get(groupPosition).packageName, PackageManager.GET_ACTIVITIES);
+	        	if(tmp.activities!=null)
+	        		return tmp.activities[childPosition];
+	        	else
+	        		return null;
+			} catch (NameNotFoundException e) {
+				return null;
+			}
+        	
         }
-
         public long getChildId(int groupPosition, int childPosition) {
             return childPosition;
         }
-
         public int getChildrenCount(int groupPosition) {
-            //return children[groupPosition].length;
-        	return children.get(groupPosition).size();
+        	//return groups.get(groupPosition).activities.length;
+        	PackageInfo tmp;
+			try {
+				tmp = mPackageManager.getPackageInfo(groups.get(groupPosition).packageName, PackageManager.GET_ACTIVITIES);
+	        	if(tmp.activities!=null)
+	        		return tmp.activities.length;
+	        	else
+	        		return 0;
+			} catch (NameNotFoundException e) {
+				return 0;
+			}
         }
-
         public TextView getGenericView() {
-            // Layout parameters for the ExpandableListView
-            AbsListView.LayoutParams lp = new AbsListView.LayoutParams(
-                    ViewGroup.LayoutParams.FILL_PARENT, 64);
-
             TextView textView = new TextView(ActivityPickerActivity.this);
-            textView.setLayoutParams(lp);
-            // Center the text vertically
+            textView.setLayoutParams(lpGroup);
             textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
-            // Set the text starting position
-            textView.setPadding(36, 0, 0, 0);
+            textView.setPadding(leftPadding, 0, 0, 0);
             return textView;
         }
-
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                 View convertView, ViewGroup parent) {
             TextView textView = getGenericView();
             ActivityInfo activity=getChild(groupPosition, childPosition);
-            String name=activity.name.replace(activity.packageName, "");
-        	textView.setText(activity.loadLabel(mPackageManager)+"("+name+")");
+            if(activity!=null){
+	            String name=activity.name.replace(activity.packageName, "");
+	        	textView.setText(activity.loadLabel(mPackageManager)+"("+name+")");
+	        	textView.setLayoutParams(lpChild);
+            }
             return textView;
         }
-
-        public AppInfoWrapper getGroup(int groupPosition) {
-            //return groups[groupPosition];
+        public PackageInfo getGroup(int groupPosition) {
         	return groups.get(groupPosition);
         }
-
         public int getGroupCount() {
-            //return groups.length;
         	return groups.size();
         }
-
         public long getGroupId(int groupPosition) {
             return groupPosition;
         }
-
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                 ViewGroup parent) {
             TextView textView = getGenericView();
-            AppInfoWrapper info=getGroup(groupPosition);
-            textView.setText(info.getInfo().applicationInfo.loadLabel(mPackageManager));
-            textView.setCompoundDrawablesWithIntrinsicBounds(info.getImage(), null, null, null);
+            PackageInfo info=getGroup(groupPosition);
+            textView.setText(info.applicationInfo.loadLabel(mPackageManager));
+            textView.setCompoundDrawablesWithIntrinsicBounds(Utilities.createIconThumbnail(info.applicationInfo.loadIcon(mPackageManager),ActivityPickerActivity.this), null, null, null);
             return textView;
         }
-
         public boolean isChildSelectable(int groupPosition, int childPosition) {
             return true;
         }
-
         public boolean hasStableIds() {
             return true;
         }
     }
-    private final class AppInfoWrapper {
-        private PackageInfo mInfo;
-        private Drawable icon;
-        public AppInfoWrapper(PackageInfo info) {
-            mInfo = info;
-            icon=Utilities.createIconThumbnail(mInfo.applicationInfo.loadIcon(mPackageManager),ActivityPickerActivity.this);
-        }
-
-        @Override
-        public String toString() {
-            return mInfo.applicationInfo.loadLabel(mPackageManager).toString();
-        }
-
-        public PackageInfo getInfo() {
-            return mInfo;
-        }
-        public Drawable getImage(){
-        	return icon;
-        }
+    public class PackageInfoComparable implements Comparator<PackageInfo>{
+    	@Override
+    	public int compare(PackageInfo o1, PackageInfo o2) {
+    		return o1.applicationInfo.loadLabel(mPackageManager).toString().compareToIgnoreCase(o2.applicationInfo.loadLabel(mPackageManager).toString());
+    	}
     }    
 }

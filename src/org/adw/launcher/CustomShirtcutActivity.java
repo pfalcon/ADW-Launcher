@@ -100,6 +100,8 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	        intent.setComponent(new ComponentName(mInfo.applicationInfo.packageName,
 	                mInfo.name));
 	        Intent mReturnData = new Intent();
+	        intent.setAction(Intent.ACTION_MAIN);
+	        intent.addCategory(Intent.CATEGORY_LAUNCHER);
 	        mReturnData.putExtra(Intent.EXTRA_SHORTCUT_INTENT, intent);
 
 	        // Set the name of the activity
