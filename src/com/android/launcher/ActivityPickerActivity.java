@@ -131,7 +131,8 @@ public class ActivityPickerActivity extends ExpandableListActivity {
                 View convertView, ViewGroup parent) {
             TextView textView = getGenericView();
             ActivityInfo activity=getChild(groupPosition, childPosition);
-            textView.setText(activity.name);
+            String name=activity.name.replace(activity.packageName, "");
+        	textView.setText(activity.loadLabel(mPackageManager)+"("+name+")");
             return textView;
         }
 
