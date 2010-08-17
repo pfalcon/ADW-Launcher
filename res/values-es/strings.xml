@@ -314,7 +314,7 @@
 	<string name="pref_label_shirtcuts">Icono personalizado</string>
 	<string name="pref_label_activities">Actividades</string>
 	<string name="pref_label_activities_loading">Cargando lista...</string>
-	<string name="shirtcut_header">Selecciona la actividad deseada.\\n puedes seleccionar un icono personalizado.</string>
+	<string name="shirtcut_header">Selecciona la actividad deseada.\nPuedes seleccionar un icono personalizado.</string>
 	<string name="shirtcut_pick_activity">Seleccionar actividad</string>
 	<string name="shirtcut_label">Etiqueta</string>
 </resources>
