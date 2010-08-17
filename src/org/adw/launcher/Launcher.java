@@ -132,6 +132,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private static final int REQUEST_PICK_SHORTCUT = 7;
     private static final int REQUEST_PICK_LIVE_FOLDER = 8;
     private static final int REQUEST_PICK_APPWIDGET = 9;
+    private static final int REQUEST_PICK_ANYCUT=10;
 
     static final String EXTRA_SHORTCUT_DUPLICATE = "duplicate";
 
@@ -507,6 +508,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 case REQUEST_CREATE_APPWIDGET:
                     completeAddAppWidget(data, mAddItemCellInfo, !mDesktopLocked);
                     break;
+                case REQUEST_PICK_ANYCUT:
+                	completeAddShortcut(data,mAddItemCellInfo, !mDesktopLocked);
             }
         } else if ((requestCode == REQUEST_PICK_APPWIDGET ||
                 requestCode == REQUEST_CREATE_APPWIDGET) && resultCode == RESULT_CANCELED &&
@@ -959,7 +962,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             sModel.addDesktopItem(info);
         }
     }
-
 
     /**
      * Add a widget to the workspace.
@@ -2468,6 +2470,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
                 case AddAdapter.ITEM_WALLPAPER: {
                     startWallpaper();
+                    break;
+                }
+                
+                case AddAdapter.ITEM_ANYCUT: {
+                	Intent anycutIntent=new Intent();
+                	anycutIntent.setClass(Launcher.this, CustomShirtcutActivity.class);
+                	startActivityForResult(anycutIntent, REQUEST_PICK_ANYCUT);
                     break;
                 }
             }
