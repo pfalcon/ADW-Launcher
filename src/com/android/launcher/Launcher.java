@@ -711,6 +711,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	            }
 			}
 		});
+		mHandleView.setNextFocusUpId(R.id.drag_layer);
+		mHandleView.setNextFocusLeftId(R.id.drag_layer);
         if(newDrawer){
         	((AllAppsSlidingView)grid).setDragger(dragLayer);
         	((AllAppsSlidingView)grid).setLauncher(this);
@@ -3184,6 +3186,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	 */
     private void showAllApps(boolean animated){
 		if(!allAppsOpen){
+			if(getWindow().getDecorView().getWidth()>getWindow().getDecorView().getHeight()){
+				mHandleView.setNextFocusUpId(R.id.drag_layer);
+				mHandleView.setNextFocusLeftId(R.id.all_apps_view);
+			}else{
+				mHandleView.setNextFocusUpId(R.id.all_apps_view);
+				mHandleView.setNextFocusLeftId(R.id.drag_layer);
+			}
 			mWorkspace.hideWallpaper(true);
 			allAppsOpen=true;
 			mWorkspace.enableChildrenCache();
@@ -3204,6 +3213,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
     private void closeAllApps(boolean animated){		
 		if(allAppsOpen){
+			mHandleView.setNextFocusUpId(R.id.drag_layer);
+			mHandleView.setNextFocusLeftId(R.id.drag_layer);
 			mWorkspace.hideWallpaper(false);
 			allAppsOpen=false;
 	        mWorkspace.unlock();
