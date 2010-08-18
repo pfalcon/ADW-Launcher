@@ -723,6 +723,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	            }
 			}
 		});
+		mHandleView.setNextFocusUpId(R.id.drag_layer);
+		mHandleView.setNextFocusLeftId(R.id.drag_layer);
         if(newDrawer){
         	((AllAppsSlidingView)grid).setDragger(dragLayer);
         	((AllAppsSlidingView)grid).setLauncher(this);
@@ -3125,6 +3127,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	 */
     private void showAllApps(boolean animated){
 		if(!allAppsOpen){
+			if(getWindow().getDecorView().getWidth()>getWindow().getDecorView().getHeight()){
+				mHandleView.setNextFocusUpId(R.id.drag_layer);
+				mHandleView.setNextFocusLeftId(R.id.all_apps_view);
+			}else{
+				mHandleView.setNextFocusUpId(R.id.all_apps_view);
+				mHandleView.setNextFocusLeftId(R.id.drag_layer);
+			}
 			allAppsOpen=true;
 			mWorkspace.enableChildrenCache();
 	        mWorkspace.lock();
@@ -3144,6 +3153,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
     private void closeAllApps(boolean animated){		
 		if(allAppsOpen){
+<<<<<<< HEAD:src/org/adw/launcher_donut/Launcher.java
+=======
+			mHandleView.setNextFocusUpId(R.id.drag_layer);
+			mHandleView.setNextFocusLeftId(R.id.drag_layer);
+			mWorkspace.hideWallpaper(false);
+>>>>>>> 6c4094c... Fix (once again) the apps button not passing focus properly to app drawer or desktop.:src/org/adw/launcher/Launcher.java
 			allAppsOpen=false;
 	        mWorkspace.unlock();
 	        //mDesktopLocked=false;
