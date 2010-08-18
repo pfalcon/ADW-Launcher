@@ -87,7 +87,10 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		        }
 		        break;
 			case PICK_STANDARD_APPLICATION:
-				android.util.Log.d("SHIRTCUTS","APP");
+				if(mBitmap!=null){
+					mBitmap.recycle();
+					mBitmap=null;
+				}
 		        ComponentName component = data.getComponent();
 		        ActivityInfo activityInfo = null;
 		        try {
@@ -121,6 +124,10 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		        }
 				break;
 			case PICK_STANDARD_SHORTCUT:
+				if(mBitmap!=null){
+					mBitmap.recycle();
+					mBitmap=null;
+				}
 		        Intent intent = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
 		        String name = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
 		        Bitmap bitmap = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON);
