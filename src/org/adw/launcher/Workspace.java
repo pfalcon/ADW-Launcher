@@ -835,11 +835,10 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                     	if (!mTouchedScrollableWidget)
                     	{
 	                    	// Only y axis movement. So may be a Swipe down or up gesture
-	                    	if ((y - mLastMotionY) > 0)
-	                    		mTouchState = TOUCH_SWIPE_DOWN_GESTURE;
-	                    	else
-	                    	{
-	                    		mTouchState = TOUCH_SWIPE_UP_GESTURE;
+	                    	if ((y - mLastMotionY) > 0){
+	                    		if(Math.abs(y-mLastMotionY)>(touchSlop*2))mTouchState = TOUCH_SWIPE_DOWN_GESTURE;
+	                    	}else{
+	                    		if(Math.abs(y-mLastMotionY)>(touchSlop*2))mTouchState = TOUCH_SWIPE_UP_GESTURE;
 	                    	}
                     	}
                     }
