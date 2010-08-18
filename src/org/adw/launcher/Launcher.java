@@ -3602,21 +3602,22 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		return themeFont;
 	}
 	private void changeOrientation(int type, boolean persistence){
-		switch (type) {
-		case AlmostNexusSettingsHelper.ORIENTATION_SENSOR:
-			if(!persistence)
+		if(!persistence){
+			switch (type) {
+			case AlmostNexusSettingsHelper.ORIENTATION_SENSOR:
 				this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
-			else
-				this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-			break;
-		case AlmostNexusSettingsHelper.ORIENTATION_PORTRAIT:
+				break;
+			case AlmostNexusSettingsHelper.ORIENTATION_PORTRAIT:
+				this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+				break;
+			case AlmostNexusSettingsHelper.ORIENTATION_LANDSCAPE:
+				this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+				break;
+			default:
+				break;
+			}
+		}else{
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-			break;
-		case AlmostNexusSettingsHelper.ORIENTATION_LANDSCAPE:
-			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-			break;
-		default:
-			break;
 		}
 	}
 	/**
