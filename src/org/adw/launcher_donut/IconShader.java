@@ -16,28 +16,16 @@ import android.graphics.drawable.Drawable;
  */
 class IconShader {
     
-    static enum IMAGE {
+    private static enum IMAGE {
         ICON, BUFFER, OUTPUT
     }
 
-    static enum MODE {
+    private static enum MODE {
         NONE, WRITE, MULTIPLY, DIVIDE, ADD, SUBTRACT
     }
 
-    static enum INPUT {
+    private static enum INPUT {
         AVERAGE, INTENSITY, CHANNEL, VALUE
-    }
-    
-    static class CompiledIconShader {
-        private List<Shader> shaders;
-        
-        CompiledIconShader(List<Shader> s) {
-            shaders = s;
-        }
-        
-        List<Shader> getShaderList() {
-            return shaders;
-        }
     }
 
     private static class Shader {
@@ -59,6 +47,18 @@ class IconShader {
             this.inputMode = inputMode;
             this.inputChannel = inputChannel;
             this.inputValue = inputValue;
+        }
+    }
+    
+    static class CompiledIconShader {
+        private List<Shader> shaders;
+        
+        CompiledIconShader(List<Shader> s) {
+            shaders = s;
+        }
+        
+        List<Shader> getShaderList() {
+            return shaders;
         }
     }
 
@@ -190,9 +190,16 @@ class IconShader {
 
     static Drawable processIcon(Drawable icon_d, CompiledIconShader c) {
         List<Shader> shaders = c.getShaderList();
-        //main.text = "";
-        BitmapDrawable icon_bd = (BitmapDrawable) icon_d;
-        Bitmap icon_bitmap = icon_bd.getBitmap();
+        Bitmap icon_bitmap=null;
+        // get bitmap
+        if(icon_d instanceof BitmapDrawable){
+            BitmapDrawable icon_bd = (BitmapDrawable) icon_d;
+            icon_bitmap = icon_bd.getBitmap();
+        }else if (icon_d instanceof FastBitmapDrawable){
+            FastBitmapDrawable icon_bd = (FastBitmapDrawable) icon_d;
+            icon_bitmap = icon_bd.getBitmap();
+        }else return null;      
+        
         int width = icon_bitmap.getWidth();
         int height = icon_bitmap.getHeight();
         int length = width * height;
@@ -206,8 +213,8 @@ class IconShader {
         float[] icon_intensity = null;
         float[] buffer_intensity = null;
         float[] output_intensity = null;
-
-        // //main.text += "Init...";
+        
+        // convert to float
         icon_bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
         for (int i = 0; i < length; i++) {
             icon[3][i] = pixels[i] & 0x000000FF;
@@ -215,28 +222,22 @@ class IconShader {
             icon[1][i] = (pixels[i] >> 16) & 0x000000FF;
             icon[0][i] = (pixels[i] >> 24) & 0x000000FF;
         }
-        // //main.text += "done\n";
-        /*
-         * for (int i=48*10; i<48*11; i++) { //main.text += icon[0][i] + " "; }
-         */
-
+        
+        // temporary pointers/values
         float inputValue = 0;
         float[] inputArray = null;
         float[] targetArray = null;
+        // process each shader
         for (Shader s : shaders) {
-
-            //main.text += main.ts(s) + "\n";
 
             if (s.mode == MODE.NONE)
                 continue;
 
             // determine input
             if (s.inputMode == INPUT.AVERAGE) {
-                //main.text += "input average " + s.input + "\n";
                 switch (s.input) {
                 case ICON:
                     if (icon_average == null) {
-                        //main.text += "makeaverage\n";
                         icon_average = getAverage(icon, length);
                     }
                     inputValue = icon_average;
@@ -294,8 +295,6 @@ class IconShader {
                 inputValue = s.inputValue;
             }
 
-            // //main.text += "done input\n";
-
             // determine target
             if (s.target == IMAGE.BUFFER) {
                 targetArray = buffer[s.targetChannel];
@@ -304,9 +303,7 @@ class IconShader {
                 targetArray = output[s.targetChannel];
                 //main.text += "target output\n";
             }
-
-            // //main.text += "done target\n";
-
+            
             // write to target
             switch (s.mode) {
             case WRITE:
@@ -365,13 +362,7 @@ class IconShader {
                 }
                 break;
             }
-
-            //main.text += "done write\n";
-            /*
-             * for (int i=480; i<510; i++) { //main.text += targetArray[i] + " ";
-             * }
-             */
-
+            
             // invalidate average/intensity
             switch (s.target) {
             case BUFFER:
@@ -383,15 +374,10 @@ class IconShader {
                 output_intensity = null;
                 break;
             }
-
-            // //main.text += "done inval\n";
         }
-
-        // //main.text += "done shading\n";
-        for (int i = 480; i < 510; i++) {
-            //main.text += output[0][i] + " ";
-        }
-
+        // finished processing
+        
+        // convert back to 32bit color
         int a, r, g, b;
         for (int i = 0; i < length; i++) {
             a = (int) output[0][i];
@@ -412,13 +398,13 @@ class IconShader {
             a |= b;
             pixels[i] = a;
         }
-
-        // //main.text += "done writeback\n";
-
-        Bitmap outputBitmap = Bitmap.createBitmap(pixels, width, height,
+        
+        // built drawable
+        Bitmap output_bitmap = Bitmap.createBitmap(pixels, width, height,
                 icon_bitmap.getConfig());
-        BitmapDrawable outputBD = new BitmapDrawable(outputBitmap);
-        return outputBD;
+        BitmapDrawable output_bd = new BitmapDrawable(output_bitmap);
+        
+        return output_bd;
     }
     
     private static float getAverage(float[][] array, int length) {
@@ -430,7 +416,6 @@ class IconShader {
             total += array[0][i];
         }
         average /= total;
-        //main.text += "final average " + average + "\n";
         return (float) average;
     }
 
@@ -438,7 +423,6 @@ class IconShader {
         float[] intensity = new float[length];
         for (int i = 0; i < length; i++)
             intensity[i] = (array[1][i] + array[2][i] + array[3][i]) / 3;
-        //main.text += "got intensity\n";
         return intensity;
     }
 }
