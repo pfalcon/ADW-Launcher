@@ -2342,13 +2342,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
    			case DIALOG_DELETE_GROUP_CONFIRM:
 			    return new AlertDialog.Builder(this).setTitle(
 					R.string.AppGroupDelLong).setPositiveButton(
-					R.string.buttonOk, new DialogInterface.OnClickListener() {
+					android.R.string.ok, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,  int whichButton) {
 							delCurrentGrp();
 							/* User clicked OK so do some stuff */
 						}
 					}).setNegativeButton(
-					R.string.buttonCancel, new DialogInterface.OnClickListener() {
+					android.R.string.cancel, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,	int whichButton) {							
 							/* User clicked OK so do some stuff */
 						}})
