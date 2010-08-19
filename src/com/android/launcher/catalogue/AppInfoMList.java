@@ -33,7 +33,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.content.SharedPreferences;
 import android.view.Window;
 import android.content.pm.ActivityInfo;
-import com.androidw.launcher.*;
+import com.android.launcher.*;
 
 import com.android.launcher.R;
 
