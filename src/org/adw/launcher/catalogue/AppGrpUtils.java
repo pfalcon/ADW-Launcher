@@ -216,7 +216,7 @@ public class AppGrpUtils {
 	public static boolean checkAppInGroup(String className) {
 		boolean ret = true;
 		if (curAppGrp != null)
-			ret = curAppGrp.getBoolean(className, false);
+			ret = curAppGrp.getBoolean(className, true);
 		return ret;
 	}
 	
