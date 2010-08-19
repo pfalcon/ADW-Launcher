@@ -1,5 +1,6 @@
 package org.adw.launcher;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,30 +17,42 @@ import android.graphics.drawable.Drawable;
  */
 class IconShader {
     
-    private static enum IMAGE {
-        ICON, BUFFER, OUTPUT
+    static class IMAGE {
+        static final int ICON = 0;
+        static final int BUFFER = 1;
+        static final int OUTPUT = 2;
     }
 
-    private static enum MODE {
-        NONE, WRITE, MULTIPLY, DIVIDE, ADD, SUBTRACT
+    static class MODE {
+        static final int NONE = 0;
+        static final int WRITE = 1;
+        static final int MULTIPLY = 2;
+        static final int DIVIDE = 3;
+        static final int ADD = 4;
+        static final int SUBTRACT = 5;
     }
 
-    private static enum INPUT {
-        AVERAGE, INTENSITY, CHANNEL, VALUE
+    static class INPUT {
+        static final int AVERAGE = 0;
+        static final int INTENSITY = 1;
+        static final int CHANNEL = 2;
+        static final int VALUE = 3;
+    }
+    
+    static class CHANNEL {
+        static final int ALPHA = 0;
+        static final int RED = 1;
+        static final int GREEN = 2;
+        static final int BLUE = 3;
     }
 
-    private static class Shader {
-        MODE mode;
-        IMAGE target;
-        int targetChannel;
-
-        IMAGE input;
-        INPUT inputMode;
-        int inputChannel;
+    static class Shader {
+        int mode, target, targetChannel;
+        int input, inputMode, inputChannel;
         float inputValue;
 
-        public Shader(MODE mode, IMAGE target, int targetChannel, IMAGE input,
-                INPUT inputMode, int inputChannel, float inputValue) {
+        Shader(int mode, int target, int targetChannel, int input,
+                int inputMode, int inputChannel, float inputValue) {
             this.mode = mode;
             this.target = target;
             this.targetChannel = targetChannel;
@@ -51,14 +64,10 @@ class IconShader {
     }
     
     static class CompiledIconShader {
-        private List<Shader> shaders;
+        List<Shader> shaders;
         
         CompiledIconShader(List<Shader> s) {
             shaders = s;
-        }
-        
-        List<Shader> getShaderList() {
-            return shaders;
         }
     }
 
@@ -86,12 +95,12 @@ class IconShader {
     }
 
     private static Shader createShader(String targetStr, String modeStr, String inputStr) {
-        MODE mode = MODE.NONE;
-        IMAGE target = IMAGE.OUTPUT;
-        int targetChannel = 0;
-        IMAGE input = IMAGE.ICON;
-        INPUT inputMode = INPUT.CHANNEL;
-        int inputChannel = 0;
+        int mode = MODE.NONE;
+        int target = IMAGE.OUTPUT;
+        int targetChannel = CHANNEL.ALPHA;
+        int input = IMAGE.ICON;
+        int inputMode = INPUT.CHANNEL;
+        int inputChannel = CHANNEL.ALPHA;
         float inputValue = 0;
         try {
             switch (modeStr.charAt(0)) {
@@ -126,16 +135,16 @@ class IconShader {
             }
             switch (targetStr.charAt(1)) {
             case 'A':
-                targetChannel = 0;
+                targetChannel = CHANNEL.ALPHA;
                 break;
             case 'R':
-                targetChannel = 1;
+                targetChannel = CHANNEL.RED;
                 break;
             case 'G':
-                targetChannel = 2;
+                targetChannel = CHANNEL.GREEN;
                 break;
             case 'B':
-                targetChannel = 3;
+                targetChannel = CHANNEL.BLUE;
                 break;
             default:
                 throw (new Exception());
@@ -153,7 +162,7 @@ class IconShader {
                 input = IMAGE.OUTPUT;
                 break;
             default:
-                inputValue = new Float(inputStr);
+                inputValue = Float.parseFloat(inputStr);
                 isValue = true;
                 inputMode = INPUT.VALUE;
                 ;
@@ -161,16 +170,16 @@ class IconShader {
             if (!isValue)
                 switch (inputStr.charAt(1)) {
                 case 'A':
-                    inputChannel = 0;
+                    inputChannel = CHANNEL.ALPHA;
                     break;
                 case 'R':
-                    inputChannel = 1;
+                    inputChannel = CHANNEL.RED;
                     break;
                 case 'G':
-                    inputChannel = 2;
+                    inputChannel = CHANNEL.GREEN;
                     break;
                 case 'B':
-                    inputChannel = 3;
+                    inputChannel = CHANNEL.BLUE;
                     break;
                 case 'I':
                     inputMode = INPUT.INTENSITY;
@@ -187,9 +196,32 @@ class IconShader {
         return new Shader(mode, target, targetChannel, input, inputMode,
                 inputChannel, inputValue);
     }
-
+    
+    static class ShaderUses {
+        boolean buffer, icon_intensity, buffer_intensity, output_intensity;
+        
+        ShaderUses(CompiledIconShader c){
+            for(Shader s : c.shaders) {
+                if (s.input == IMAGE.BUFFER || s.target == IMAGE.BUFFER)
+                    buffer = true;
+                if (s.inputMode == INPUT.INTENSITY)
+                    switch(s.input) {
+                    case IMAGE.ICON:
+                        icon_intensity = true;
+                        break;
+                    case IMAGE.BUFFER:
+                        buffer_intensity = true;
+                        break;
+                    case IMAGE.OUTPUT:
+                        output_intensity = true;
+                        break;
+                    }
+            }
+        }
+    }
     static Drawable processIcon(Drawable icon_d, CompiledIconShader c) {
-        List<Shader> shaders = c.getShaderList();
+        ShaderUses su = new ShaderUses(c);
+        List<Shader> shaders = c.shaders;
         Bitmap icon_bitmap=null;
         // get bitmap
         if(icon_d instanceof BitmapDrawable){
@@ -205,22 +237,36 @@ class IconShader {
         int length = width * height;
         int[] pixels = new int[length];
         float[][] icon = new float[4][length];
-        float[][] buffer = new float[4][length];
+        float[][] buffer = null;
+        if (su.buffer)
+            buffer = new float[4][length];
         float[][] output = new float[4][length];
-        Float icon_average = null;
-        Float buffer_average = null;
-        Float output_average = null;
-        float[] icon_intensity = null;
-        float[] buffer_intensity = null;
-        float[] output_intensity = null;
+        
+        float icon_average = 0;
+        float buffer_average = 0;
+        float output_average = 0;
+        boolean icon_average_valid = false;
+        boolean buffer_average_valid = false;
+        boolean output_average_valid = false;
+        
+        float[] icon_intensity = null, buffer_intensity = null, output_intensity = null;
+        if (su.icon_intensity)
+            icon_intensity = new float[length];
+        if (su.buffer_intensity)
+            buffer_intensity = new float[length];
+        if (su.output_intensity)
+            output_intensity = new float[length];
+        boolean icon_intensity_valid = false;
+        boolean buffer_intensity_valid = false;
+        boolean output_intensity_valid = false;
         
         // convert to float
         icon_bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
         for (int i = 0; i < length; i++) {
-            icon[3][i] = pixels[i] & 0x000000FF;
-            icon[2][i] = (pixels[i] >> 8) & 0x000000FF;
-            icon[1][i] = (pixels[i] >> 16) & 0x000000FF;
-            icon[0][i] = (pixels[i] >> 24) & 0x000000FF;
+            icon[CHANNEL.BLUE][i] = pixels[i] & 0x000000FF;
+            icon[CHANNEL.GREEN][i] = (pixels[i] >> 8) & 0x000000FF;
+            icon[CHANNEL.RED][i] = (pixels[i] >> 16) & 0x000000FF;
+            icon[CHANNEL.ALPHA][i] = (pixels[i] >> 24) & 0x000000FF;
         }
         
         // temporary pointers/values
@@ -236,21 +282,24 @@ class IconShader {
             // determine input
             if (s.inputMode == INPUT.AVERAGE) {
                 switch (s.input) {
-                case ICON:
-                    if (icon_average == null) {
+                case IMAGE.ICON:
+                    if (!icon_average_valid) {
                         icon_average = getAverage(icon, length);
+                        icon_average_valid = true;
                     }
                     inputValue = icon_average;
                     break;
-                case BUFFER:
-                    if (buffer_average == null) {
+                case IMAGE.BUFFER:
+                    if (!buffer_average_valid) {
                         buffer_average = getAverage(buffer, length);
+                        buffer_average_valid = true;
                     }
                     inputValue = buffer_average;
                     break;
-                case OUTPUT:
-                    if (output_average == null) {
+                case IMAGE.OUTPUT:
+                    if (!output_average_valid) {
                         output_average = getAverage(output, length);
+                        output_average_valid = true;
                     }
                     inputValue = output_average;
                     break;
@@ -258,21 +307,24 @@ class IconShader {
             }
             if (s.inputMode == INPUT.INTENSITY) {
                 switch (s.input) {
-                case ICON:
-                    if (icon_intensity == null) {
-                        icon_intensity = getIntensity(icon, length);
+                case IMAGE.ICON:
+                    if (!icon_intensity_valid) {
+                        getIntensity(icon_intensity, icon, length);
+                        icon_intensity_valid = true;
                     }
                     inputArray = icon_intensity;
                     break;
-                case BUFFER:
-                    if (buffer_intensity == null) {
-                        buffer_intensity = getIntensity(buffer, length);
+                case IMAGE.BUFFER:
+                    if (!buffer_intensity_valid) {
+                        getIntensity(buffer_intensity, buffer, length);
+                        buffer_intensity_valid = true;
                     }
                     inputArray = buffer_intensity;
                     break;
-                case OUTPUT:
-                    if (output_intensity == null) {
-                        output_intensity = getIntensity(output, length);
+                case IMAGE.OUTPUT:
+                    if (!output_intensity_valid) {
+                        getIntensity(output_intensity, output, length);
+                        output_intensity_valid = true;
                     }
                     inputArray = output_intensity;
                     break;
@@ -280,13 +332,13 @@ class IconShader {
             }
             if (s.inputMode == INPUT.CHANNEL) {
                 switch (s.input) {
-                case ICON:
+                case IMAGE.ICON:
                     inputArray = icon[s.inputChannel];
                     break;
-                case BUFFER:
+                case IMAGE.BUFFER:
                     inputArray = buffer[s.inputChannel];
                     break;
-                case OUTPUT:
+                case IMAGE.OUTPUT:
                     inputArray = output[s.inputChannel];
                     break;
                 }
@@ -306,18 +358,16 @@ class IconShader {
             
             // write to target
             switch (s.mode) {
-            case WRITE:
+            case MODE.WRITE:
                 if (s.inputMode == INPUT.AVERAGE || s.inputMode == INPUT.VALUE) {
-                    for (int i = 0; i < length; i++)
-                        targetArray[i] = inputValue;
+                    Arrays.fill(targetArray, inputValue);
                 }
                 if (s.inputMode == INPUT.INTENSITY
                         || s.inputMode == INPUT.CHANNEL) {
-                    for (int i = 0; i < length; i++)
-                        targetArray[i] = inputArray[i];
+                    System.arraycopy(inputArray, 0, targetArray, 0, length);
                 }
                 break;
-            case MULTIPLY:
+            case MODE.MULTIPLY:
                 if (s.inputMode == INPUT.AVERAGE || s.inputMode == INPUT.VALUE) {
                     for (int i = 0; i < length; i++)
                         targetArray[i] *= inputValue;
@@ -328,10 +378,12 @@ class IconShader {
                         targetArray[i] *= inputArray[i];
                 }
                 break;
-            case DIVIDE:
+            case MODE.DIVIDE:
                 if (s.inputMode == INPUT.AVERAGE || s.inputMode == INPUT.VALUE) {
+                    // multiply by 1/value
+                    inputValue = 1 / inputValue;
                     for (int i = 0; i < length; i++)
-                        targetArray[i] /= inputValue;
+                        targetArray[i] *= inputValue;
                 }
                 if (s.inputMode == INPUT.INTENSITY
                         || s.inputMode == INPUT.CHANNEL) {
@@ -339,7 +391,7 @@ class IconShader {
                         targetArray[i] /= inputArray[i];
                 }
                 break;
-            case ADD:
+            case MODE.ADD:
                 if (s.inputMode == INPUT.AVERAGE || s.inputMode == INPUT.VALUE) {
                     for (int i = 0; i < length; i++)
                         targetArray[i] += inputValue;
@@ -350,7 +402,7 @@ class IconShader {
                         targetArray[i] += inputArray[i];
                 }
                 break;
-            case SUBTRACT:
+            case MODE.SUBTRACT:
                 if (s.inputMode == INPUT.AVERAGE || s.inputMode == INPUT.VALUE) {
                     for (int i = 0; i < length; i++)
                         targetArray[i] -= inputValue;
@@ -365,13 +417,13 @@ class IconShader {
             
             // invalidate average/intensity
             switch (s.target) {
-            case BUFFER:
-                buffer_average = null;
-                buffer_intensity = null;
+            case IMAGE.BUFFER:
+                buffer_average_valid = false;;
+                buffer_intensity_valid = false;
                 break;
-            case OUTPUT:
-                output_average = null;
-                output_intensity = null;
+            case IMAGE.OUTPUT:
+                output_average_valid = false;
+                output_intensity_valid = false;
                 break;
             }
         }
@@ -380,10 +432,10 @@ class IconShader {
         // convert back to 32bit color
         int a, r, g, b;
         for (int i = 0; i < length; i++) {
-            a = (int) output[0][i];
-            r = (int) output[1][i];
-            g = (int) output[2][i];
-            b = (int) output[3][i];
+            a = (int) output[CHANNEL.ALPHA][i];
+            r = (int) output[CHANNEL.RED][i];
+            g = (int) output[CHANNEL.GREEN][i];
+            b = (int) output[CHANNEL.BLUE][i];
 
             a = a > 255 ? 255 : a < 0 ? 0 : a;
             r = r > 255 ? 255 : r < 0 ? 0 : r;
@@ -419,10 +471,8 @@ class IconShader {
         return (float) average;
     }
 
-    private static float[] getIntensity(float[][] array, int length) {
-        float[] intensity = new float[length];
+    private static void getIntensity(float[] intensity, float[][] array, int length) {
         for (int i = 0; i < length; i++)
             intensity[i] = (array[1][i] + array[2][i] + array[3][i]) / 3;
-        return intensity;
     }
 }
