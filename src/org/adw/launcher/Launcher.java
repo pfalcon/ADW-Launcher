@@ -1413,9 +1413,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         menu.add(MENU_GROUP_NORMAL, MENU_NOTIFICATIONS, 0, R.string.menu_edit)
                 .setIcon(android.R.drawable.ic_menu_edit)
                 .setAlphabeticShortcut('E');
-        menu.add(MENU_GROUP_NORMAL, MENU_NOTIFICATIONS, 0, R.string.menu_notifications)
-                .setIcon(R.drawable.ic_menu_notifications)
-                .setAlphabeticShortcut('N');
 
         final Intent settings = new Intent(android.provider.Settings.ACTION_SETTINGS);
         settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
