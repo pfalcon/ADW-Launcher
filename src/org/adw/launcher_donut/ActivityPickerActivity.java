@@ -2,7 +2,7 @@
  * @author AnderWeb <anderweb@gmail.com>
  *
  */
-package org.adw.launcher;
+package org.adw.launcher_donut;
 
 import java.util.ArrayList;
 import java.util.Collections;

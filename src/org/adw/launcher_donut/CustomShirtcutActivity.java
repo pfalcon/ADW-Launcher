@@ -3,9 +3,11 @@
 *
 **/
 
-package org.adw.launcher;
+package org.adw.launcher_donut;
 
 import java.util.ArrayList;
+
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
