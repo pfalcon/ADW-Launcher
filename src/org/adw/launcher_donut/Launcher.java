@@ -3153,12 +3153,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
     private void closeAllApps(boolean animated){		
 		if(allAppsOpen){
-<<<<<<< HEAD:src/org/adw/launcher_donut/Launcher.java
-=======
 			mHandleView.setNextFocusUpId(R.id.drag_layer);
 			mHandleView.setNextFocusLeftId(R.id.drag_layer);
-			mWorkspace.hideWallpaper(false);
->>>>>>> 6c4094c... Fix (once again) the apps button not passing focus properly to app drawer or desktop.:src/org/adw/launcher/Launcher.java
 			allAppsOpen=false;
 	        mWorkspace.unlock();
 	        //mDesktopLocked=false;
