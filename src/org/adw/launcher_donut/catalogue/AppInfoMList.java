@@ -106,8 +106,11 @@ public class AppInfoMList extends ListActivity implements
 			for (int i = 0; i < adapter.getCount(); i++) {
 				AppListInfo tempAppListInfo = (AppListInfo) adapter.getItem(i);
 				boolean checked = tempAppListInfo.checked;
-				//if (checked)
-					editor.putBoolean(tempAppListInfo.className, checked);
+				//ADW: Change to only store hidden apps
+				if (!checked)
+					editor.putBoolean(tempAppListInfo.className, false);
+				else
+					editor.remove(tempAppListInfo.className);
 
 				if (DBG && checked)
 					Log.v("-----", tempAppListInfo.className);
@@ -160,7 +163,7 @@ public class AppInfoMList extends ListActivity implements
 			tempAppListInfo.title = (String) tempAppInfo.title;
 			if (curAppGrp != null)
 				tempAppListInfo.checked = curAppGrp.getBoolean(
-						tempAppListInfo.className, false);
+						tempAppListInfo.className, true);
 			else
 				tempAppListInfo.checked = false;
 
