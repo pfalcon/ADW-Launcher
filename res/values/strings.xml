@@ -135,7 +135,7 @@
     <string name="pref_label_settings">ADW Settings</string>
     <!-- Screen preferences -->
     <string name="pref_title_screen_preferences">Screen preferences</string>
-    <string name="pref_summary_screen_preferences">Screen count, default screen...</string>
+    <string name="pref_summary_screen_preferences">Default screen, layout...</string>
 
     <string name="pref_title_wallpaper_hack">Wallpaper Hack</string>
     <string name="pref_summary_wallpaper_hack">Disable this if you get FCs. Leaving it enabled improves the scrolling speed.</string>
@@ -338,7 +338,7 @@
 	<string name="widget_rows">Rows</string>
     
     <string name="pref_title_screen_cache">Scrolling cache</string>
-    <string name="pref_summary_screen_cache">Higher quality will use the more memory.</string>
+    <string name="pref_summary_screen_cache">Higher quality will use more memory.</string>
 
     <string name="pref_title_desktop_indicator">Show desktop indicator</string>
     <string name="pref_summary_desktop_indicator">Show a visual hint on scrolling desktop</string>

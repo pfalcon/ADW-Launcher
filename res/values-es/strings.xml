@@ -65,7 +65,7 @@
     <string name="pref_label_settings">ADW Settings</string>
     <!-- Screen preferences -->
     <string name="pref_title_screen_preferences">Pantalla</string>
-    <string name="pref_summary_screen_preferences">Numero de escritorios, escritorio por defecto, etc...</string>
+    <string name="pref_summary_screen_preferences">Escritorio por defecto, disposición, etc...</string>
 
     <string name="pref_title_wallpaper_hack">Wallpaper Hack</string>
     <string name="pref_summary_wallpaper_hack">Mejora el desplazamiento entre escritorios. Desactívalo si tienes FCs con wallpapers grandes.</string>
@@ -218,7 +218,7 @@
     <string name="import_export_sdcard_unmounted">No tienes tarjeta SD!</string>
     
     <!-- XML Import/Export strings -->
-    <string name="message_dialog_export">Exportar ADW settings? LA copia anterior se eliminará.</string>
+    <string name="message_dialog_export">Exportar ADW settings? La copia anterior se eliminará.</string>
     <string name="xml_export_dialog">Exportando ADW settings...</string>
     <string name="xml_export_success">ADW settings exportado con éxito!</string>
     <string name="xml_export_error">Error exportando ADW settings!</string>    
