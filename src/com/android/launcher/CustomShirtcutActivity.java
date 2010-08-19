@@ -3,7 +3,7 @@
 *
 **/
 
-package org.adw.launcher;
+package com.android.launcher;
 
 import android.app.Activity;
 import android.content.ComponentName;
