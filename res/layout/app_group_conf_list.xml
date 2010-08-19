@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:gravity="bottom">
         
-        <Button android:text="@string/buttonOk" 
+        <Button android:text="@android:string/ok" 
             android:id="@+id/Button_Ok_App" 
             android:layout_weight="1" 
             android:layout_width="fill_parent" 

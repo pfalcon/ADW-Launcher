@@ -389,15 +389,7 @@
 	<string name="shirtcut_label">Label</string>
 
 
-	<string name="buttonOk">"OK"</string>
-	<string name="buttonCancel">"Cancel"</string>
-	<string name="selectAll">All</string>
-	<string name="AppGroup0">"MultiMedia"</string>
-	<string name="AppGroup1">"Tools"</string>
-	<string name="AppGroup2">"Life"</string>
-	<string name="AppGroup3">"Business"</string>
-	<string name="AppGroup4">"eLive"</string>
-	<string name="AppGroup5">"Custom"</string>
+	<string name="selectAll">Select all</string>
 	<string name="AppGroupAll">"ALL"</string>
 	<string name="AppGroupAdd">"New Catalog"</string>
 	<string name="AppGroupDel">"Remove Catalog"</string>

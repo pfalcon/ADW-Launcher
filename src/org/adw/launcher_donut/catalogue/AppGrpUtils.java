@@ -224,7 +224,7 @@ public class AppGrpUtils {
 	 * Displays the shortcut creation dialog and launches, if necessary, the
 	 * appropriate activity.
 	 */
-	static private int getDefaultGrpText(int i) {
+	/*static private int getDefaultGrpText(int i) {
 
 		int ret = R.string.AppGroupAll;
 
@@ -243,14 +243,14 @@ public class AppGrpUtils {
 			break;
 		}
 		return ret;
-	}
+	}*/
 
 	static public void setTitleView(TextView v) {
 		String grpTitle = appGrpIndex.getString("GrpName"+currentGrp, null);//getGrpTextFromDB(currentGrp);
 		if (null != grpTitle) {
 			v.setText(grpTitle);
 		} else {
-			v.setText(getDefaultGrpText(currentGrp));
+			v.setText(R.string.AppGroupAdd);
 		}
 	}
 
