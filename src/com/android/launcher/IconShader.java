@@ -69,6 +69,8 @@ class IconShader {
         ShaderUses(List<Shader> shaders){
             boolean buffer = false, icon_intensity = false, buffer_intensity = false, output_intensity = false;
             for(Shader s : shaders) {
+                if (s.mode == MODE.NONE)
+                    continue;
                 if (s.input == IMAGE.BUFFER || s.target == IMAGE.BUFFER)
                     buffer = true;
                 if (s.inputMode == INPUT.INTENSITY)
@@ -258,13 +260,16 @@ class IconShader {
         List<Shader> shaders = compiledShader.shaders;
         Bitmap icon_bitmap=null;
         // get bitmap
-        if(icon_d instanceof BitmapDrawable){
+        if (icon_d instanceof BitmapDrawable) {
             BitmapDrawable icon_bd = (BitmapDrawable) icon_d;
             icon_bitmap = icon_bd.getBitmap();
-        /*}else if (icon_d instanceof FastBitmapDrawable){
+        } else if(icon_d instanceof FastBitmapDrawable) {
             FastBitmapDrawable icon_bd = (FastBitmapDrawable) icon_d;
-            icon_bitmap = icon_bd.getBitmap();*/
-        }else return null;      
+            icon_bitmap = icon_bd.getBitmap();
+        } else
+            return null;
+        if (icon_bitmap == null)
+            return null;
         
         int width = icon_bitmap.getWidth();
         int height = icon_bitmap.getHeight();
@@ -483,11 +488,11 @@ class IconShader {
             pixels[i] = a;
         }
         
-        // built drawable
-        Bitmap output_bitmap = Bitmap.createBitmap(pixels, width, height,
-                icon_bitmap.getConfig());
+        // build drawable
+        Bitmap.Config c = (icon_bitmap.getConfig()==null) ?
+                Bitmap.Config.ARGB_4444 : icon_bitmap.getConfig();
+        Bitmap output_bitmap = Bitmap.createBitmap(pixels, width, height, c);
         BitmapDrawable output_bd = new BitmapDrawable(output_bitmap);
-        
         return output_bd;
     }
     
