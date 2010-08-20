@@ -335,5 +335,9 @@
 	<string name="AppGroupAddError">"No puedes tener más grupos"</string>
 	<string name="rename_group_title">Nuevo grupo</string>
 	<string name="rename_group_label">Nombre</string>
-	
+
+	<string name="pref_title_adw_restart">Reiniciar ADW</string>
+	<string name="pref_summary_adw_restart">Cierra y reinicia ADW.Launcher</string>
+	<string name="pref_title_adw_reset">Restablecer ADW</string>
+	<string name="pref_summary_adw_reset">Borra la configuración de ADW.Launcher y reinicia</string>	
 </resources>
