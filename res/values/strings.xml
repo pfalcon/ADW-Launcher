@@ -405,4 +405,10 @@
 	<string name="AppGroupAddError">"You Cannot have More Groups"</string>
 	<string name="rename_group_title">New Catalog</string>
 	<string name="rename_group_label">Catalog Name</string>
+	
+	<string name="pref_title_adw_restart">Restart ADW</string>
+	<string name="pref_summary_adw_restart">Close and restart ADW.Launcher</string>
+	<string name="pref_title_adw_reset">Reset ADW</string>
+	<string name="pref_summary_adw_reset">Clear ADW.Launcher settings and restart</string>
+	
 </resources>
