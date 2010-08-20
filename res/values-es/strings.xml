@@ -317,6 +317,11 @@
 	<string name="shirtcut_header">Selecciona la actividad deseada.\nPuedes seleccionar un icono personalizado.</string>
 	<string name="shirtcut_pick_activity">Seleccionar actividad</string>
 	<string name="shirtcut_label">Etiqueta</string>
+	<string name="shirtcuts_select_picture">Seleccionar imagen</string>
+	<string name="shirtcuts_crop_picture">Recortar imagen</string>
+	<string name="shirtcuts_icon_packs">ADWTheme IconPacks</string>
+	<string name="shirtcuts_select_icon_type">Elige el tipo de icono</string>
+	<string name="shirtcuts_select_icon_pack">Elige un pack</string>
 	
 	<string name="selectAll">Seleccionar todos</string>
 	<string name="AppGroupAll">"TODAS"</string>

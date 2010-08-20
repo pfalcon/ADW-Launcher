@@ -5,9 +5,18 @@
 
 package org.adw.launcher;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+
+import org.adw.launcher.Launcher.CreateGrpDialog;
+import org.adw.launcher.catalogue.AppGroupAdapter;
+import org.adw.launcher.catalogue.AppGrpUtils;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Intent.ShortcutIconResource;
 import android.content.pm.ActivityInfo;
@@ -15,20 +24,30 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.MediaStore.Images.Media;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 public class CustomShirtcutActivity extends Activity implements OnClickListener {
+	private static final String ACTION_ADW_PICK_ICON="org.adw.launcher.icons.ACTION_PICK_ICON";
+	
 	private static final int PICK_CUSTOM_ICON=1;
 	private static final int PICK_STANDARD_MENU=2;
 	private static final int PICK_STANDARD_SHORTCUT=3;
 	private static final int PICK_STANDARD_APPLICATION=4;
+	private static final int PICK_CUSTOM_PICTURE=5;
+	private static final int PICK_FROM_ICON_PACK=6;
+	
+	private static final int DIALOG_ICON_TYPE=1;
 	private Button btPickActivity;
 	private ImageButton btPickIcon;
 	private Button btOk;
@@ -39,6 +58,7 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	PackageManager mPackageManager;
 	private Intent mIntent;
 	private ShortcutIconResource mIconResource;
+	private int mIconSize;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,6 +73,7 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		btOk.setOnClickListener(this);
 		edLabel=(EditText) findViewById(R.id.shirtcut_label);
 		mPackageManager=getPackageManager();
+		mIconSize=(int) getResources().getDimension(android.R.dimen.app_icon_size);
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -60,9 +81,41 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		super.onActivityResult(requestCode, resultCode, data);
 		if(resultCode==RESULT_OK){
 			switch (requestCode) {
-			case PICK_CUSTOM_ICON:
+			case PICK_CUSTOM_PICTURE:
 				mBitmap = (Bitmap) data.getParcelableExtra("data");
 				if(mBitmap!=null){
+					if(mBitmap.getWidth()>mIconSize)
+						mBitmap=Utilities.createBitmapThumbnail(mBitmap, this);
+					btPickIcon.setImageBitmap(mBitmap);
+				}
+				break;
+			case PICK_CUSTOM_ICON:
+				Uri photoUri = data.getData();
+				try {
+					InputStream is = getContentResolver().openInputStream(
+							photoUri);
+					BitmapFactory.Options opts = new BitmapFactory.Options();
+					Bitmap bitmap;
+					opts.inJustDecodeBounds = true;
+					bitmap = BitmapFactory.decodeStream(is, null, opts);
+
+					BitmapFactory.Options ops2 = new BitmapFactory.Options();
+					int width = mIconSize;
+					float w = opts.outWidth;
+					int scale = Math.round(w / width);
+					ops2.inSampleSize = scale;
+					is = getContentResolver().openInputStream(photoUri);
+					mBitmap = BitmapFactory.decodeStream(is, null, ops2);
+					btPickIcon.setImageBitmap(mBitmap);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				break;
+			case PICK_FROM_ICON_PACK:
+				mBitmap = (Bitmap) data.getParcelableExtra("icon");
+				if(mBitmap!=null){
+					if(mBitmap.getWidth()>mIconSize)
+						mBitmap=Utilities.createBitmapThumbnail(mBitmap, this);
 					btPickIcon.setImageBitmap(mBitmap);
 				}
 				break;
@@ -188,19 +241,7 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	        pickIntent.putExtras(bundle);
 	        startActivityForResult(pickIntent, PICK_STANDARD_MENU);
 		}else if(v.equals(btPickIcon)){
-			int width;
-			int height;
-		    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		    intent.setType("image/*");
-			width = height=(int) getResources().getDimension(android.R.dimen.app_icon_size);
-	        intent.putExtra("crop", "true");
-			intent.putExtra("outputX", width);
-			intent.putExtra("outputY", height);
-			intent.putExtra("aspectX", width);
-			intent.putExtra("aspectY", height);
-	        intent.putExtra("noFaceDetection", true);
-	        intent.putExtra("return-data", true);
-			startActivityForResult(intent, PICK_CUSTOM_ICON);
+			showDialog(DIALOG_ICON_TYPE);
 		}else if(v.equals(btOk)){
 	        Intent mReturnData = new Intent();
 	        mReturnData.putExtra(Intent.EXTRA_SHORTCUT_INTENT, mIntent);
@@ -212,6 +253,85 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	        }
 			setResult(RESULT_OK,mReturnData);
 			finish();
+		}
+	}
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case DIALOG_ICON_TYPE:
+			return new IconTypeDialog().createDialog();
+		default:
+			break;
+		}
+		return super.onCreateDialog(id);
+	}
+    protected class IconTypeDialog implements DialogInterface.OnClickListener,
+	    DialogInterface.OnCancelListener, DialogInterface.OnDismissListener,
+	    DialogInterface.OnShowListener {
+	
+		private ArrayAdapter<String> mAdapter;
+		
+		Dialog createDialog() {
+		    mAdapter = new ArrayAdapter<String>(CustomShirtcutActivity.this, R.layout.add_list_item);
+		    mAdapter.add(getString(R.string.shirtcuts_select_picture));
+		    mAdapter.add(getString(R.string.shirtcuts_crop_picture));
+		    mAdapter.add(getString(R.string.shirtcuts_icon_packs));
+		
+		    final AlertDialog.Builder builder = new AlertDialog.Builder(CustomShirtcutActivity.this);
+		    builder.setTitle(getString(R.string.shirtcuts_select_icon_type));
+		    builder.setAdapter(mAdapter, this);
+		
+		    builder.setInverseBackgroundForced(false);
+		
+		    AlertDialog dialog = builder.create();
+		    dialog.setOnCancelListener(this);
+		    dialog.setOnDismissListener(this);
+		    dialog.setOnShowListener(this);
+		    return dialog;
+		}
+		public void onCancel(DialogInterface dialog) {
+		    cleanup();
+		}
+		public void onDismiss(DialogInterface dialog) {
+		}
+		private void cleanup() {
+		}
+		public void onClick(DialogInterface dialog, int which) {
+			switch (which) {
+			case 0:
+				//Select icon
+				Intent pickerIntent=new Intent(Intent.ACTION_PICK);
+				pickerIntent.setType("image/*");
+				startActivityForResult(Intent.createChooser(pickerIntent, "Select icon"), PICK_CUSTOM_ICON);
+				break;
+			case 1:
+				//Crop picture
+				int width;
+				int height;
+			    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+			    intent.setType("image/*");
+				width = height=mIconSize;
+		        intent.putExtra("crop", true);
+				intent.putExtra("outputX", width);
+				intent.putExtra("outputY", height);
+				intent.putExtra("aspectX", width);
+				intent.putExtra("aspectY", height);
+		        intent.putExtra("noFaceDetection", true);
+		        intent.putExtra("return-data", true);
+				startActivityForResult(intent, PICK_CUSTOM_PICTURE);
+				break;
+			case 2:
+				//Icon packs
+				Intent packIntent=new Intent(ACTION_ADW_PICK_ICON);
+				startActivityForResult(Intent.createChooser(packIntent, getString(R.string.shirtcuts_select_icon_pack)), PICK_FROM_ICON_PACK);
+				break;
+
+			default:
+				break;
+			}
+			cleanup();
+		}
+		public void onShow(DialogInterface dialog) {
 		}
 	}
 	
