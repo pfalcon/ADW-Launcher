@@ -490,7 +490,7 @@ class IconShader {
         
         // build drawable
         Bitmap.Config c = (icon_bitmap.getConfig()==null) ?
-                Bitmap.Config.ARGB_4444 : icon_bitmap.getConfig();
+                Bitmap.Config.ARGB_8888 : icon_bitmap.getConfig();
         Bitmap output_bitmap = Bitmap.createBitmap(pixels, width, height, c);
         BitmapDrawable output_bd = new BitmapDrawable(output_bitmap);
         return output_bd;
