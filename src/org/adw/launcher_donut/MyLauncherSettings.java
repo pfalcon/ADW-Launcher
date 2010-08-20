@@ -31,8 +31,8 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -107,7 +107,28 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
         	orientations.setEnabled(true);
         }
         mContext=this;
-        
+        //ADW: restart and reset preferences
+        Preference restart=findPreference("adw_restart");
+        Preference reset=findPreference("adw_reset");
+        restart.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			public boolean onPreferenceClick(Preference preference) {
+				shouldRestart=true;
+				finish();
+				return false;
+			}
+		});
+        reset.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			public boolean onPreferenceClick(Preference preference) {
+				SharedPreferences sp = getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+				Editor ed=sp.edit();
+				ed.clear();
+				ed.commit();
+				shouldRestart=true;
+				finish();
+				return false;
+			}
+		});
+        //End restart/reset
         Preference exportToXML = findPreference("xml_export");
         exportToXML.setOnPreferenceClickListener(new OnPreferenceClickListener() {        
 			public boolean onPreferenceClick(Preference preference) {
