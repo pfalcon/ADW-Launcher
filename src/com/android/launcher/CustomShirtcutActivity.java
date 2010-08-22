@@ -96,11 +96,15 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 					BitmapFactory.Options ops2 = new BitmapFactory.Options();
 					int width = mIconSize;
 					float w = opts.outWidth;
-					int scale = Math.round(w / width);
+					//int scale = Math.round(w / width);
+					int scale = (int) (w / width);
 					ops2.inSampleSize = scale;
 					is = getContentResolver().openInputStream(photoUri);
 					mBitmap = BitmapFactory.decodeStream(is, null, ops2);
-					btPickIcon.setImageBitmap(mBitmap);
+					if(mBitmap!=null){
+						if(mBitmap.getWidth()>mIconSize)mBitmap=Utilities.createBitmapThumbnail(mBitmap, this);
+						btPickIcon.setImageBitmap(mBitmap);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
