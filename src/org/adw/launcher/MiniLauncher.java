@@ -86,32 +86,35 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
         return null;
     }
     
-    private int FindItemDropPosByScreenX(int x) {
+    private int FindItemDropPos(int x, int y) {
     	final int count=getChildCount();
-    	Log.d("BOOMBULER", "count: "+count);
-    	final int marginLeft=((getMeasuredWidth())/2)-(((count*mCellWidth)/2));
+    	final int marginLeft = ((getMeasuredWidth())/2)-(((count*mCellWidth)/2));
+    	final int marginTop  = ((getMeasuredHeight())/2)-(((count*mCellHeight)/2));
     	// check for drop on an item
+    	int dropPos = (mOrientation==HORIZONTAL) ? x : y;
 	    for (int i = 0; i < count; i++) {
 	        View child = getChildAt(i);
 	        ItemInfo item=(ItemInfo) child.getTag();
 	        if (child.getVisibility() != GONE) {
-	            int childLeft=(mOrientation==HORIZONTAL)?marginLeft+(item.cellX*mCellWidth):0;
-	            int childRight = childLeft+mCellWidth;
-	            if (x < childLeft && item.cellX == 0) // before the first item
+                
+	        	int bound1 = (mOrientation==HORIZONTAL)?marginLeft+(item.cellX*mCellWidth):marginTop+(item.cellX*mCellHeight);
+                int bound2 = (mOrientation==HORIZONTAL)?bound1+mCellWidth:bound1+mCellHeight;
+                
+	            if (dropPos < bound1 && item.cellX == 0) // before the first item
 	            	return 0;
-	            if (x > childRight && item.cellX == (count - 1))
+	            if (dropPos > bound2 && item.cellX == (count - 1))
 	            	return count;
 	            
-	            if (x >= childLeft && x < childRight) {
+	            if (dropPos >= bound1 && dropPos < bound2) {
 	            	int pos = item.cellX;
-	            	for (int y = 0; y < item.cellX; y++) {
-	            		View chld = getChildAt(y);
+	            	for (int j = 0; j < item.cellX; j++) {
+	            		View chld = getChildAt(j);
 	            		if (chld.getVisibility() == GONE)
 	            			pos++;
 	            	}
 	            	
-	            	int middle = childLeft + (mCellWidth / 2);
-	            	if (x >= middle)
+	            	int middle = bound1 + ((mOrientation==HORIZONTAL) ? mCellWidth : mCellHeight);
+	            	if (dropPos >= middle)
 	            		return pos + 1;
 	            	return pos;
 	            }
@@ -157,7 +160,7 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
         	accept=false;
         	return;
         }
-        info.cellX=FindItemDropPosByScreenX(x);        
+        info.cellX=FindItemDropPos(x, y);        
         //add it to launcher database
         if (info instanceof LauncherAppWidgetInfo) {
             model.removeDesktopAppWidget((LauncherAppWidgetInfo) info);
@@ -265,7 +268,7 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
             }
         }
 		requestLayout();
-		mLauncher.getModel().removeDesktopItem(item);
+		Launcher.getModel().removeDesktopItem(item);
         mDragger.startDrag(v, this, item, DragController.DRAG_ACTION_COPY);
         detachViewFromParent(v);
         removeView(v);
