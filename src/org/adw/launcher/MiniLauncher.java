@@ -113,7 +113,7 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
 	            			pos++;
 	            	}
 	            	
-	            	int middle = bound1 + ((mOrientation==HORIZONTAL) ? mCellWidth : mCellHeight);
+	            	int middle = bound1 + (((mOrientation==HORIZONTAL) ? mCellWidth : mCellHeight) / 2);
 	            	if (dropPos >= middle)
 	            		return pos + 1;
 	            	return pos;
