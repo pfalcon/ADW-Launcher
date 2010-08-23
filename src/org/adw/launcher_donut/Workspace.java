@@ -1849,7 +1849,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         	mCurrentScreen=0;
         	setCurrentScreen(mCurrentScreen);
         }
-        if(getChildCount()<mDefaultScreen){
+        if(getChildCount()<=mDefaultScreen){
         	AlmostNexusSettingsHelper.setDefaultScreen(mLauncher, 0);
         	mDefaultScreen=0;
         }
