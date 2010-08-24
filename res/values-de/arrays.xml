@@ -16,11 +16,15 @@
     <item>Desktop-Punkte oben</item>
     <item>Wechselanzeige oben</item>
     <item>Wechselanzeige unten</item>
-
   </string-array>
   <string-array name="home_orientation_entries">
     <item>Autom./Sensor</item>
     <item>Hochformat</item>
     <item>Querformat</item>
   </string-array>
+  <string-array name="screen_cache_entries">
+    <item>Geringe Qualität</item>
+    <item>Automatisch</item>
+    <item>deaktiviert</item>
+  </string-array> 
 </resources>
