@@ -309,4 +309,43 @@
     <string name="pref_summary_theme_icons">Abwählen um die Standard-Icons zu nutzen</string>
     <string name="pref_themes_apply_theme">Theme anwenden!</string>
     <string name="pref_themes_get_themes">Themes beziehen!</string>
+	
+	<string name="pref_title_wallpaper_scrolling">Wallpaper Scrolling</string>
+	<string name="pref_summary_wallpaper_scrolling">Das Wallpaper scrollt mit, wenn die Screens gewechselt werden</string>
+    <string name="message_delete_desktop_screen">Diesen Screen und all seine Elemente löschen?</string>
+    <string name="message_cannot_delete_desktop_screen">Der letzte Screen kann nicht gelöscht werden</string>
+    <string name="message_cannot_add_desktop_screen">Es können nicht nocht mehr Screens hinzugefügt werden</string>
+    <string name="message_cannot_swap_desktop_screen">Screens können nicht getauscht werden</string>
+    
+    <string name="menu_edit">Bearbeiten</string>
+
+	<string name="pref_label_shirtcuts">Benutzerdefinierte Verknüpfung</string>
+	<string name="pref_label_activities">Activities</string>
+	<string name="pref_label_activities_loading">Lade Activity Liste...</string>
+	<string name="shirtcut_header">Wähle eine beliebige Anwendungs-Activity\nund ein beliebiges Icon.</string>
+	<string name="shirtcut_pick_activity">Activity auswählen</string>
+	<string name="shirtcut_label">Bezeichnung</string>
+	<string name="shirtcuts_select_picture">Bild auswählen</string>
+	<string name="shirtcuts_crop_picture">Bild auswählen und zuschneiden</string>
+	<string name="shirtcuts_icon_packs">ADWTheme IconPacks</string>
+	<string name="shirtcuts_select_icon_type">Icon Typ auswählen</string>
+	<string name="shirtcuts_select_icon_pack">Icon Pack auswählen</string>
+
+	<string name="selectAll">Alle auswählen</string>
+	<string name="AppGroupAll">"ALLE"</string>
+	<string name="AppGroupAdd">"Neuer Katalog"</string>
+	<string name="AppGroupDel">"Katalog löschen"</string>
+    <string name="AppGroupDelLong">"Soll der aktuelle Katalog\nwirklich gelöscht werden?"</string>
+	<string name="AppGroupChoose">"Katalog auswählen"</string>
+	<string name="AppGroupConfig">"Katalog bearbeiten"</string>
+	<string name="AppGroupRename">"Neuer Katalog"</string>
+	<string name="AppGroupConfigError">"Dieser Katalog kann nicht bearbeitet werden"</string>
+	<string name="AppGroupAddError">"Es konnte kein weiterer Katalog angelegt werden"</string>
+	<string name="rename_group_title">Neuer Katalog</string>
+	<string name="rename_group_label">Katalog Name</string>
+	
+	<string name="pref_title_adw_restart">ADW neustarten</string>
+	<string name="pref_summary_adw_restart">Beendet ADW.Launcher und startet ihn neu</string>
+	<string name="pref_title_adw_reset">ADW zurücksetzten</string>
+	<string name="pref_summary_adw_reset">Löscht alle ADW.Launcher Einstellungen and startet ihn neu</string>	
 </resources>
