@@ -2073,6 +2073,16 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         }
 
         mDesktopLocked = false;
+        //ADW: Show the changelog screen if needed
+        if(AlmostNexusSettingsHelper.shouldShowChangelog(this)){
+	        try {
+	        	AlertDialog builder = AlmostNexusSettingsHelper.ChangelogDialogBuilder.create(this);
+	        	builder.show();
+	        } catch (Exception e) {
+	        	e.printStackTrace();
+	        }
+        }
+        
     }
 
     private void bindDrawer(Launcher.DesktopBinder binder,
