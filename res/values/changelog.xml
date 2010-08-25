@@ -11,5 +11,6 @@
 -Fixed dockbar reordering (again).&lt;br>
 -Added this changelog window.&lt;br>
 -Added confirmation popup to "reset settings" preference.&lt;br>
+-Added "set default screen" button into the screens editor.&lt;br>
 </string>
 </resources>
