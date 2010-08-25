@@ -117,11 +117,11 @@
 
     <string name="pref_title_drawer_columns_landscape">Colunas da grade em paisagem</string>
     <string name="pref_summary_drawer_columns_landscape">Selecione o número de colunas para usar no layout paisagem</string>
-    <string name="pref_dialog_drawer_columns_landscape">Selecione o número de colunas para usar no layout paisagem<</string>
+    <string name="pref_dialog_drawer_columns_landscape">Selecione o número de colunas para usar no layout paisagem</string>
 
     <string name="pref_title_drawer_rows_landscape">Linhas da grade em paisagem</string>
-    <string name="pref_summary_drawer_rows_landscape">Selecione o número de linhas para usar no layout paisagem<</string>
-    <string name="pref_dialog_drawer_rows_landscape">Selecione o número de linhas para usar no layout paisagem<</string>
+    <string name="pref_summary_drawer_rows_landscape">Selecione o número de linhas para usar no layout paisagem</string>
+    <string name="pref_dialog_drawer_rows_landscape">Selecione o número de linhas para usar no layout paisagem</string>
 
     <!-- Previews preferences -->
     <string name="pref_title_previews_preferences">Configurações de visualização</string>
@@ -183,7 +183,7 @@
     <string name="pref_title_hide_icon_labels">Ocultar título ícones</string>
     <string name="pref_summary_hide_icon_labels">Ocultar título dos ícones do desktop</string>
 
- <!-- Continuar tradução------------------------------------------------------ -->
+ <!-- Continuar tradução -->
 
 
     <string name="pref_title_build_info">Build Information</string>
