@@ -3992,6 +3992,18 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 					}
 				}
 			});
+	        final View setDefaultButton=mScreensEditor.findViewById(R.id.set_default);
+	        setDefaultButton.setOnClickListener(new android.view.View.OnClickListener() {
+				public void onClick(View v) {
+					int currentScreen=gal.getSelectedItemPosition();
+					if(currentScreen<mWorkspace.getChildCount()){
+						mWorkspace.setDefaultScreen(currentScreen);
+						AlmostNexusSettingsHelper.setDefaultScreen(Launcher.this, currentScreen);
+						Toast t=Toast.makeText(Launcher.this, R.string.pref_title_default_screen, Toast.LENGTH_LONG);
+						t.show();
+					}
+				}
+			});
 	        gal.setOnItemSelectedListener(new OnItemSelectedListener() {
 				public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 					if(position<=0){
