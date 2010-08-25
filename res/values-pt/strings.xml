@@ -82,109 +82,109 @@
     <string name="pref_dialog_default_screen">Selecione a tela para definir como padrão</string>
 
     <string name="pref_title_desktop_scrolling_speed">Velocidade de rolagem do Desktop</string>
-    <string name="pref_summary_desktop_scrolling_speed">Defina a velocidade usada para lançar as telas do desktop</string>
-    <string name="pref_dialog_desktop_scrolling_speed">Quanto valor mais baixo, mais rápido a tela será lançada</string>
+    <string name="pref_summary_desktop_scrolling_speed">Defina a velocidade usada para iniciar as telas do desktop</string>
+    <string name="pref_dialog_desktop_scrolling_speed">Quanto menor o valor, mais rápido o desktop será iniciado</string>
 
-  <!-- Continuar tradução -->
-
-
-    <string name="pref_title_desktop_overshoot">Desktop overshoot</string>
-    <string name="pref_summary_desktop_overshoot">Allows bouncy scrolling desktop screens</string>
-    <string name="pref_dialog_desktop_overshoot">Set it to 0 to disable overshooting</string>
+     <string name="pref_title_desktop_overshoot">Desktop overshoot</string>
+    <string name="pref_summary_desktop_overshoot">Permite pular telas na rolagem do desktop</string>
+    <string name="pref_dialog_desktop_overshoot">Defina isto como 0 para desativar o overshoot</string>
 
     <!-- Drawer Settings -->
-    <string name="pref_title_drawer_settings">Drawer Settings</string>
-    <string name="pref_summary_drawer_settings">App drawer grid preferences</string>
+    <string name="pref_title_drawer_settings">Configurações da grade</string>
+    <string name="pref_summary_drawer_settings">Configurador de preferências da grade</string>
 
-    <string name="pref_title_zoom_effect_speed">Zoom effect speed</string>
-    <string name="pref_summary_zoom_effect_speed">Set the time in milliseconds for the zoom effect</string>
-    <string name="pref_dialog_zoom_effect_speed">Set the time in milliseconds for the zoom effect</string>
+    <string name="pref_title_zoom_effect_speed">Velocidade do Zoom</string>
+    <string name="pref_summary_zoom_effect_speed">Defina o tempo em milissegundos para o efeito zoon</string>
+    <string name="pref_dialog_zoom_effect_speed">Defina o tempo em milissegundos para o efeito zoont</string>
 
-    <string name="pref_title_page_horizontal_margin">Page Horizontal Margin</string>
-    <string name="pref_summary_page_horizontal_margin">Set the horizontal margin between each pages of Drawer</string>
-    <string name="pref_dialog_page_horizontal_margin">Set the horizontal margin between each pages of Drawer</string>
+    <string name="pref_title_page_horizontal_margin">Magem horizontal das páginas</string>
+    <string name="pref_summary_page_horizontal_margin">Define a margem horizontal entre páginas da grade</string>
+    <string name="pref_dialog_page_horizontal_margin">Define a margem horizontal entre páginas da grade</string>
 
-    <string name="pref_title_new_drawer">Horizontal Drawer</string>
-    <string name="pref_summary_new_drawer">Use the Samsung Galaxy S implementation</string>
+    <string name="pref_title_new_drawer">Grade horizontal</string>
+    <string name="pref_summary_new_drawer">Usar a implementação do Samsung Galaxy S</string>
 
-    <string name="pref_title_animated_drawer">Animated Drawer</string>
-    <string name="pref_summary_animated_drawer">Turns whether App Drawer should display animations</string>
+    <string name="pref_title_animated_drawer">Grade animadada</string>
+    <string name="pref_summary_animated_drawer">Exibe as animações na grade</string>
 
-    <string name="pref_title_drawer_columns_portrait">Drawer Columns Portrait</string>
-    <string name="pref_summary_drawer_columns_portrait">Select the number of drawer columns to use on portrait layout</string>
-    <string name="pref_dialog_drawer_columns_portrait">Select the number of drawer columns to use on portrait layout</string>
+    <string name="pref_title_drawer_columns_portrait">Colunas da grade em retrato</string>
+    <string name="pref_summary_drawer_columns_portrait">Selecione o número de colunas para usar no layout retrato</string>
+    <string name="pref_dialog_drawer_columns_portrait">Selecione o número de colunas para usar no layout retrato</string>
 
-    <string name="pref_title_drawer_rows_portrait">Drawer Rows Portrait</string>
-    <string name="pref_summary_drawer_rows_portrait">Select the number of drawer rows to use on portrait layout</string>
-    <string name="pref_dialog_drawer_rows_portrait">Select the number of drawer rows to use on portrait layout</string>
+    <string name="pref_title_drawer_rows_portrait">Linhas da grade em retrato</string>
+    <string name="pref_summary_drawer_rows_portrait">Selecione o número de linhas para usar no layout retrato</string>
+    <string name="pref_dialog_drawer_rows_portrait">Selecione o número de linhas para usar no layout retrato</string>
 
-    <string name="pref_title_drawer_columns_landscape">Drawer Columns Landscape</string>
-    <string name="pref_summary_drawer_columns_landscape">Select the number of drawer columns to use on landscape layout</string>
-    <string name="pref_dialog_drawer_columns_landscape">Select the number of drawer columns to use on landscape layout</string>
+    <string name="pref_title_drawer_columns_landscape">Colunas da grade em paisagem</string>
+    <string name="pref_summary_drawer_columns_landscape">Selecione o número de colunas para usar no layout paisagem</string>
+    <string name="pref_dialog_drawer_columns_landscape">Selecione o número de colunas para usar no layout paisagem<</string>
 
-    <string name="pref_title_drawer_rows_landscape">Drawer Rows Landscape</string>
-    <string name="pref_summary_drawer_rows_landscape">Select the number of drawer rows to use on landscape layout</string>
-    <string name="pref_dialog_drawer_rows_landscape">Select the number of drawer rows to use on landscape layout</string>
+    <string name="pref_title_drawer_rows_landscape">Linhas da grade em paisagem</string>
+    <string name="pref_summary_drawer_rows_landscape">Selecione o número de linhas para usar no layout paisagem<</string>
+    <string name="pref_dialog_drawer_rows_landscape">Selecione o número de linhas para usar no layout paisagem<</string>
 
     <!-- Previews preferences -->
-    <string name="pref_title_previews_preferences">Previews Settings</string>
-    <string name="pref_summary_previews_preferences">Desktop previews preferences</string>
+    <string name="pref_title_previews_preferences">Configurações de visualização</string>
+    <string name="pref_summary_previews_preferences">Preferências de visualização do Desktop</string>
 
-    <string name="pref_title_sense_previews">Sense previews</string>
-    <string name="pref_summary_sense_previews">Use the new sense-like implementation</string>
+    <string name="pref_title_sense_previews">Visualizações Sence</string>
+    <string name="pref_summary_sense_previews">Usar a nova implementação Sence</string>
 
-    <string name="pref_title_clean_screen_mode">Clean Screen Mode</string>
-    <string name="pref_summary_clean_screen_mode">Hide home icons/widgets when opening previews</string>
+    <string name="pref_title_clean_screen_mode">Limpar modos de tela</string>
+    <string name="pref_summary_clean_screen_mode">Ocultar icones/widget da home quando abrir visualização</string>
 
     <!-- Button preferences -->
-    <string name="pref_title_ui_settings">UI Settings</string>
-    <string name="pref_summary_ui_settings">Enable/disable ui elements</string>
+    <string name="pref_title_ui_settings">Configurações da UI</string>
+    <string name="pref_summary_ui_settings">Ativar/desativar elementos da UI</string>
 
-    <string name="pref_title_home_button_binding">Home button binding</string>
-    <string name="pref_summary_home_button_binding">Select action for home button binding</string>
+    <string name="pref_title_home_button_binding">Ação do botão Home</string>
+    <string name="pref_summary_home_button_binding">Selecione a ação para o botão Home</string>
 
-    <string name="pref_title_swipedown_actions">Swipe down actions</string>
-    <string name="pref_summary_swipedown_actions">Select action for Swipe down gesture</string>
+    <string name="pref_title_swipedown_actions">Deslizar para baixo</string>
+    <string name="pref_summary_swipedown_actions">Selecione a ação para o gesto de deslizar para baixo</string>
 
-    <string name="pref_title_swipeup_actions">Swipe up actions</string>
-    <string name="pref_summary_swipeup_actions">Select action for Swipe up gesture</string>
+    <string name="pref_title_swipeup_actions">Deslizar para cima</string>
+    <string name="pref_summary_swipeup_actions">Selecione a ação para o gesto de deslizar para cima</string>
 
     <string name="pref_title_desktop_dots">Desktop dots</string>
-    <string name="pref_summary_desktop_dots">Show/hide the nexus style pagination dots</string>
+    <string name="pref_summary_desktop_dots">Exibir/ocultar paginação estilo nexus desktop dots</string>
 
     <string name="pref_title_dockbar">Dockbar</string>
-    <string name="pref_summary_dockbar">Enable/disable the new dockbar for your shortcuts</string>
+    <string name="pref_summary_dockbar">Ativar/desativar a nova dockbar para seus atalhos</string>
 
-    <string name="pref_title_closing_dockbar">Closing dockbar</string>
-    <string name="pref_summary_closing_dockbar">Auto-close dockbar after app-launch</string>
+    <string name="pref_title_closing_dockbar">Fechamento dockbar</string>
+    <string name="pref_summary_closing_dockbar">Fechar automaticamente dockbar após iniciar desktop</string>
 
-    <string name="pref_title_closing_folder">Closing folder</string>
-    <string name="pref_summary_closing_folder">Auto-close folder after app-launch</string>
+    <string name="pref_title_closing_folder">Fechamento pasta</string>
+    <string name="pref_summary_closing_folder">Fechar automaticamente pasta após iniciar desktop</string>
 
     <string name="pref_title_lab">LAB</string>
-    <string name="pref_summary_lab">Enable/disable the customizable Left Action Button</string>
+    <string name="pref_summary_lab">Ativar/desativar botão esquerdo personalizado</string>
 
     <string name="pref_title_rab">RAB</string>
-    <string name="pref_summary_rab">Enable/disable the customizable Right Action Button</string>
+    <string name="pref_summary_rab">Ativar/desativar botão direito personalizado</string>
 
-    <string name="pref_title_ab2">Secondary ActionButtons</string>
-    <string name="pref_summary_ab2">Enable/disable the secondary Action Buttons (disable Desktop dots)</string>
+    <string name="pref_title_ab2">Botões ação secundários</string>
+    <string name="pref_summary_ab2">Ativar/desativar botões de ação secundários (desative o Desktop dots)</string>
 
-    <string name="pref_title_tint_ab">Tint AB</string>
-    <string name="pref_summary_tint_ab">Enable/disable icon tint effect on Action Buttons</string>
+    <string name="pref_title_tint_ab">Efeitos botões ação</string>
+    <string name="pref_summary_tint_ab">Ativar/desativar efeitos do tom nos icones dos botões de ação</string>
 
-    <string name="pref_title_ab_scale_factor">AB scale factor</string>
-    <string name="pref_summary_ab_scale_factor">Set the scaling size for the ActionButton icons</string>
-    <string name="pref_dialog_ab_scale_factor">Set the scaling size for the ActionButton icons</string>
+    <string name="pref_title_ab_scale_factor">Tamanho botões ação</string>
+    <string name="pref_summary_ab_scale_factor">Defina o tamanho dos icones do botões de ação</string>
+    <string name="pref_dialog_ab_scale_factor">Defina o tamanho dos icones do botões de ação</string>
 
-    <string name="pref_title_hide_allapps_ab">Hide AllApps Bg</string>
-    <string name="pref_summary_hide_allapps_ab">Hide the background for the App-Drawer button</string>
+    <string name="pref_title_hide_allapps_ab">Ocultar fundo grade apps</string>
+    <string name="pref_summary_hide_allapps_ab">Ocultar fundo do botão iniciar desktop de apps</string>
 
-    <string name="pref_title_hide_ab_bg">Hide AB Bg</string>
-    <string name="pref_summary_hide_ab_bg">Hide the background for the Action Buttons</string>
+    <string name="pref_title_hide_ab_bg">Ocultar fundo botões ação</string>
+    <string name="pref_summary_hide_ab_bg">Ocultar fundo dos botões de ação</string>
 
-    <string name="pref_title_hide_icon_labels">Hide icon labels</string>
-    <string name="pref_summary_hide_icon_labels">Hide desktop icon labels</string>
+    <string name="pref_title_hide_icon_labels">Ocultar título ícones</string>
+    <string name="pref_summary_hide_icon_labels">Ocultar título dos ícones do desktop</string>
+
+ <!-- Continuar tradução------------------------------------------------------ -->
+
 
     <string name="pref_title_build_info">Build Information</string>
     <string name="pref_title_adw_version">ADW Version</string>
