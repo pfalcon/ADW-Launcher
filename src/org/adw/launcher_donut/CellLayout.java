@@ -1143,6 +1143,13 @@ out:            for (int i = x; i < x + spanX - 1 && x < xCount; i++) {
                     ", y=" + cellY + "]";
         }
     }
+    protected void setScreen(int screen) {
+        mCellInfo.screen = screen;
+    }
+    protected int getScreen() {
+        return mCellInfo.screen;
+    }
+    
 }
 
 
