@@ -351,8 +351,8 @@
 	<string name="pref_title_system_preferences">System Preferences</string>
 	<string name="pref_summary_system_preferences">General system preferences for ADW.Launcher</string>
 	<string name="pref_title_screens_preferencecategory">Desktop screens</string>
-	<string name="pref_title_screens_layout_preferencecategory">Dekstop layout</string>
-	<string name="pref_title_screens_behaviour_preferencecategory">Dekstop behaviour</string>
+	<string name="pref_title_screens_layout_preferencecategory">Desktop layout</string>
+	<string name="pref_title_screens_behaviour_preferencecategory">Desktop behavior</string>
 	<string name="pref_title_drawer_preferencecategory">Applications drawer</string>
 	<string name="pref_title_drawer_visuals_preferencecategory">Application drawer visuals</string>
 	<string name="pref_title_highlights_preferencecategory">Icon highlights</string>
