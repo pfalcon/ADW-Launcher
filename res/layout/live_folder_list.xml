@@ -17,7 +17,7 @@
  */
 -->
 
-<org.adw.launcher_donut.LiveFolder xmlns:android="http://schemas.android.com/apk/res/android"
+<com.android.launcher.LiveFolder xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical">
     
     <Button
@@ -39,4 +39,4 @@
         android:cacheColorHint="#00000000"
         android:background="@drawable/box_launcher_bottom" />
 
-</org.adw.launcher_donut.LiveFolder>
+</com.android.launcher.LiveFolder>

@@ -13,9 +13,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
- <org.adw.launcher_donut.AllAppsGridView
+ <com.android.launcher.AllAppsGridView
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:launcher="http://schemas.android.com/apk/res/org.adw.launcher_donut"
+	xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
 	launcher:texture="@drawable/pattern_carbon_fiber_dark"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"

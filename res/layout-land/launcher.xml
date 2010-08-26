@@ -14,23 +14,23 @@
      limitations under the License.
 -->
 
-<org.adw.launcher_donut.DragLayer
+<com.android.launcher.DragLayer
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res/org.adw.launcher_donut"
+    xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
 
     android:id="@+id/drag_layer"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
     <!-- The workspace contains 5 screens of cells -->
-    <org.adw.launcher_donut.Workspace
+    <com.android.launcher.Workspace
         android:id="@+id/workspace"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
 
         launcher:defaultScreen="2">
 
-    </org.adw.launcher_donut.Workspace>
+    </com.android.launcher.Workspace>
 
     <ViewStub
         android:id="@+id/stub_drawer"
@@ -45,7 +45,7 @@
 		android:layout_height="fill_parent"
 		android:gravity="center_horizontal|center_vertical"
 		android:layout_gravity="right|center_vertical">
-	    <org.adw.launcher_donut.ActionButton
+	    <com.android.launcher.ActionButton
 	        android:src="@drawable/rab_empty"
 	        android:background="@drawable/rab_bg"
 	        android:scaleType="center"
@@ -54,7 +54,7 @@
 	        launcher:ident="RAB"
 	        android:layout_height="60dip" 
 	        />
-	    <org.adw.launcher_donut.ActionButton
+	    <com.android.launcher.ActionButton
 	        android:src="@drawable/rab_empty"
 	        android:background="@drawable/rab2_bg"
 	        android:scaleType="center"
@@ -69,7 +69,7 @@
 			android:layout_width="50dip"
 			android:layout_height="50dip"
 			/>
-	    <org.adw.launcher_donut.ActionButton
+	    <com.android.launcher.ActionButton
 	        android:src="@drawable/lab_empty"
 	        android:background="@drawable/lab2_bg"
 	        android:scaleType="center"
@@ -78,7 +78,7 @@
 	        launcher:ident="LAB2"
 	        android:layout_height="60dip" 
 	        />
-	    <org.adw.launcher_donut.ActionButton
+	    <com.android.launcher.ActionButton
 	        android:src="@drawable/lab_empty"
 	        android:background="@drawable/lab_bg"
 	        android:scaleType="center"
@@ -102,7 +102,7 @@
         android:layout_width="wrap_content" 
         android:layout_gravity="top|right"
         android:onClick="nextScreen"/>
-    <org.adw.launcher_donut.SliderView
+    <com.android.launcher.SliderView
     	android:src="@drawable/handle_icon"
         android:id="@+id/all_apps"
         android:layout_width="wrap_content"
@@ -115,7 +115,7 @@
         launcher:slideDirections="left"
         launcher:targetDistance="45dip" />
 
-    <org.adw.launcher_donut.DeleteZone
+    <com.android.launcher.DeleteZone
     	android:src="@drawable/ic_delete"
     	android:background="@drawable/delete_zone_selector"
         android:id="@+id/delete_zone"
@@ -125,7 +125,7 @@
         android:layout_gravity="right|center_vertical"
         android:visibility="invisible"
         launcher:direction="vertical" />
-    <org.adw.launcher_donut.DockBar
+    <com.android.launcher.DockBar
         android:id="@+id/dockbar"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
@@ -133,7 +133,7 @@
         android:layout_gravity="center_vertical|right"
         launcher:position="right"
         >
-        <org.adw.launcher_donut.MiniLauncher
+        <com.android.launcher.MiniLauncher
         	android:background="@drawable/dockbar_bg"
             android:id="@+id/mini_content"
             android:layout_width="fill_parent"
@@ -144,11 +144,11 @@
             launcher:orientation="vertical"
             android:padding="0dip"		
             />
-    </org.adw.launcher_donut.DockBar>
-	<org.adw.launcher_donut.DesktopIndicator
+    </com.android.launcher.DockBar>
+	<com.android.launcher.DesktopIndicator
 		android:id="@+id/desktop_indicator"
 		android:visibility="gone"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	/>
-</org.adw.launcher_donut.DragLayer>
+</com.android.launcher.DragLayer>

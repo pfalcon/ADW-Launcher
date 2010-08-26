@@ -19,8 +19,10 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.adw.launcher_donut"
-    android:versionCode="25" android:versionName="1.1.3 standalone donut">
+    package="com.android.launcher"
+    android:versionCode="25" android:versionName="1.1.3 System Donut"
+    android:sharedUserId="android.uid.shared"
+    android:sharedUserLabel="@string/uid_name">
 
     <permission
         android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
@@ -35,13 +37,13 @@
         android:label="@string/permlab_uninstall_shortcut"
         android:description="@string/permdesc_uninstall_shortcut"/>
     <permission
-        android:name="org.adw.launcher_donut.permission.READ_SETTINGS"
+        android:name="com.android.launcher.permission.READ_SETTINGS"
         android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
         android:protectionLevel="normal"
         android:label="@string/permlab_read_settings"
         android:description="@string/permdesc_read_settings"/>
     <permission
-        android:name="org.adw.launcher_donut.permission.WRITE_SETTINGS"
+        android:name="com.android.launcher.permission.WRITE_SETTINGS"
         android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
         android:protectionLevel="normal"
         android:label="@string/permlab_write_settings"
@@ -56,8 +58,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.BIND_APPWIDGET" />
-    <uses-permission android:name="org.adw.launcher_donut.permission.READ_SETTINGS" />
-    <uses-permission android:name="org.adw.launcher_donut.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <uses-permission android:name="com.android.launcher.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.PERSISTENT_ACTIVITY" />
@@ -114,11 +116,11 @@
         <!-- The settings provider contains Home's data, like the workspace favorites -->
         <provider
             android:name="LauncherProvider"
-            android:authorities="org.adw.launcher_donut.settings"
-            android:writePermission="org.adw.launcher_donut.permission.WRITE_SETTINGS"
-            android:readPermission="org.adw.launcher_donut.permission.READ_SETTINGS" />
+            android:authorities="com.android.launcher.settings"
+            android:writePermission="com.android.launcher.permission.WRITE_SETTINGS"
+            android:readPermission="com.android.launcher.permission.READ_SETTINGS" />
 		
-		<activity android:name="org.adw.launcher_donut.catalogue.AppInfoMList"></activity>
+		<activity android:name="com.android.launcher.catalogue.AppInfoMList"></activity>
     </application>
     <uses-sdk android:minSdkVersion="4"
     android:targetSdkVersion="4"

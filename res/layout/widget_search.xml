@@ -14,9 +14,9 @@
      limitations under the License.
 -->
 
-<org.adw.launcher_donut.Search 
+<com.android.launcher.Search 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res/org.adw.launcher_donut"
+    xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
     android:id="@+id/widget_search"  
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -58,4 +58,4 @@
 
     </LinearLayout>
 
-</org.adw.launcher_donut.Search>
+</com.android.launcher.Search>

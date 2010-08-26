@@ -17,7 +17,7 @@
 			android:key="wallpaper_scrolling" />
 		<PreferenceCategory
             android:title="@string/pref_title_screens_preferencecategory">
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_default_screen" android:summary="@string/pref_summary_default_screen"
 				android:dialogMessage="@string/pref_dialog_default_screen"
 				android:key="defaultScreen" android:defaultValue="2" android:max="4" />
@@ -28,13 +28,13 @@
 				android:defaultValue="false"
 				android:summary="@string/pref_summary_autosize_icons"
 				android:key="autosizeIcons" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_desktop_columns"
 				android:summary="@string/pref_summary_desktop_columns"
 				android:dialogMessage="@string/pref_dialog_desktop_columns"
 				android:key="desktopColumns" android:defaultValue="@integer/config_desktopColumns"
 				android:max="5" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_desktop_rows"
 				android:summary="@string/pref_summary_desktop_rows"
 				android:dialogMessage="@string/pref_dialog_desktop_rows"
@@ -43,13 +43,13 @@
 		</PreferenceCategory>
 		<PreferenceCategory
             android:title="@string/pref_title_screens_behaviour_preferencecategory">
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_desktop_scrolling_speed"
 				android:summary="@string/pref_summary_desktop_scrolling_speed"
 				android:dialogMessage="@string/pref_dialog_desktop_scrolling_speed"
 				android:key="desktopSpeed" android:defaultValue="@integer/config_desktopSpeed"
 				android:max="2000" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_desktop_overshoot"
 				android:summary="@string/pref_summary_desktop_overshoot"
 				android:dialogMessage="@string/pref_dialog_desktop_overshoot"
@@ -67,26 +67,26 @@
 				android:defaultValue="@bool/config_drawerNew"
 				android:summary="@string/pref_summary_new_drawer"
 				android:key="drawerNew" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_drawer_columns_portrait"
 				android:summary="@string/pref_summary_drawer_columns_portrait"
 				android:dialogMessage="@string/pref_dialog_drawer_columns_portrait"
 				android:key="drawerColumnsPortrait" android:defaultValue="@integer/config_drawerColumnsPortrait"
 				android:max="5" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:dependency="drawerNew"
 				android:title="@string/pref_title_drawer_rows_portrait"
 				android:summary="@string/pref_summary_drawer_rows_portrait"
 				android:dialogMessage="@string/pref_dialog_drawer_rows_portrait"
 				android:key="drawerRowsPortrait" android:defaultValue="@integer/config_drawerRowsPortrait"
 				android:max="5" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_drawer_columns_landscape"
 				android:summary="@string/pref_summary_drawer_columns_landscape"
 				android:dialogMessage="@string/pref_dialog_drawer_columns_landscape"
 				android:key="drawerColumnsLandscape" android:defaultValue="@integer/config_drawerColumnsLandscape"
 				android:max="7" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:dependency="drawerNew"
 				android:title="@string/pref_title_drawer_rows_landscape"
 				android:summary="@string/pref_summary_drawer_rows_landscape"
@@ -100,7 +100,7 @@
 				android:defaultValue="true"
 				android:summary="@string/pref_summary_animated_drawer"
 				android:key="drawerAnimated" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:dependency="drawerAnimated"
 				android:title="@string/pref_title_zoom_effect_speed"
 				android:summary="@string/pref_summary_zoom_effect_speed"
@@ -120,7 +120,7 @@
 				android:title="@string/pref_title_drawer_color"
 				android:summary="@string/pref_summary_drawer_color"
 		        android:defaultValue="-16777216" />
-			<org.adw.launcher_donut.DialogSeekBarPreference
+			<com.android.launcher.DialogSeekBarPreference
 				android:dependency="drawerNew"
 				android:title="@string/pref_title_page_horizontal_margin"
 				android:summary="@string/pref_summary_page_horizontal_margin"
@@ -237,7 +237,7 @@
 			android:defaultValue="false"
 			android:summary="@string/pref_summary_tint_ab"
 			android:key="uiTint" />
-		<org.adw.launcher_donut.DialogSeekBarPreference
+		<com.android.launcher.DialogSeekBarPreference
 			android:title="@string/pref_title_ab_scale_factor"
 			android:summary="@string/pref_summary_ab_scale_factor"
 			android:dialogMessage="@string/pref_dialog_ab_scale_factor"
@@ -306,7 +306,7 @@
 			  android:title="@string/pref_title_theme_package"
 			  android:summary="@string/pref_summary_theme_package"
 			  />
-    		<org.adw.launcher_donut.PreviewPreference
+    		<com.android.launcher.PreviewPreference
     			android:layout="@layout/theme_preview"
 	    		android:key="themePreview" />
 		

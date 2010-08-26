@@ -14,9 +14,9 @@
      limitations under the License.
 -->
 
-<org.adw.launcher_donut.AllAppsSlidingView 
+<com.android.launcher.AllAppsSlidingView 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:launcher="http://schemas.android.com/apk/res/org.adw.launcher_donut"
+    xmlns:launcher="http://schemas.android.com/apk/res/com.android.launcher"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:scrollbarStyle="insideInset"

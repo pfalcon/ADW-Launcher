@@ -78,10 +78,6 @@
     <string name="pref_title_hide_statusbar">Statuszeile ausblenden</string>
     <string name="pref_summary_hide_statusbar">Obere Statuszeile ausblenden</string>
 
-    <string name="pref_title_desktop_screens">Anzahl Bildschirme</string>
-    <string name="pref_summary_desktop_screens">Anzahl zu verwendender Bildschirme auswählen</string>
-    <string name="pref_dialog_desktop_screen">Anzahl zu verwendender Bildschirme</string>
-
     <string name="pref_title_default_screen">Standardbildschirm</string>
     <string name="pref_summary_default_screen">Den Standardbildschirm auswählen</string>
     <string name="pref_dialog_default_screen">Standardbildschirm</string>
