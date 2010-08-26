@@ -2134,6 +2134,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             ApplicationsAdapter drawerAdapter) {
         int currCatalog=AlmostNexusSettingsHelper.getCurrentAppCatalog(this);
         AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(currCatalog);
+        drawerAdapter.buildViewCache((ViewGroup)mAllAppsGrid);
         mAllAppsGrid.setAdapter(drawerAdapter);
         mAllAppsGrid.updateAppGrp();
         binder.startBindingAppWidgetsWhenIdle();
