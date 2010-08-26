@@ -380,15 +380,20 @@ public final class AlmostNexusSettingsHelper {
 	    editor.commit();
 	}
 	public static boolean shouldShowChangelog(Context context) {
-		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
-		String readV = sp.getString("changelogReadVersion", "0");
-		String actualV=context.getString(R.string.adw_version);
-		boolean ret=!readV.equals(actualV);
-		if(ret){
-			//Once verified and showed, disable it ultill the next update
-			setChangelogVersion(context, actualV);
+		Boolean config=context.getResources().getBoolean(R.bool.config_nagScreen);
+		if(config){
+			SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+			String readV = sp.getString("changelogReadVersion", "0");
+			String actualV=context.getString(R.string.adw_version);
+			boolean ret=!readV.equals(actualV);
+			if(ret){
+				//Once verified and showed, disable it ultill the next update
+				setChangelogVersion(context, actualV);
+			}
+			return ret;
+		}else{
+			return false;
 		}
-		return ret;
 	}
 	/**
 	 * Creates the "changes" dialog to be shown when updating ADW.
