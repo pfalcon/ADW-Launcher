@@ -27,6 +27,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.Scroller;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -1835,6 +1836,9 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
         else if(getAdapter().getCount()<=0)
         	animate=false;
         if(animate){
+            ListAdapter adapter = getAdapter();
+            if (adapter instanceof ApplicationsAdapter)
+                ((ApplicationsAdapter)adapter).setChildDrawingCacheEnabled(true);
         	mPager.setVisibility(INVISIBLE);
     		mBgAlpha=0;
     	}else{
