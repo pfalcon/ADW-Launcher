@@ -1872,6 +1872,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     protected void swapScreens(int screen_a, int screen_b){
     	//Swap database positions for both screens
         CellLayout layout = (CellLayout) getChildAt(screen_a);
+        layout.setScreen(screen_b);
         int childCount = layout.getChildCount();
         for (int j = 0; j < childCount; j++) {
             final View view = layout.getChildAt(j);
@@ -1882,6 +1883,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             }
         }
         layout = (CellLayout) getChildAt(screen_b);
+        layout.setScreen(screen_a);
         childCount = layout.getChildCount();
         for (int j = 0; j < childCount; j++) {
             final View view = layout.getChildAt(j);
@@ -1902,6 +1904,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         //MOVE THE REMAINING ITEMS FROM OTHER SCREENS
         for (int i=screen+1;i<getChildCount();i++){
             final CellLayout layout = (CellLayout) getChildAt(i);
+            layout.setScreen(layout.getScreen()+diff);
             int childCount = layout.getChildCount();
             for (int j = 0; j < childCount; j++) {
                 final View view = layout.getChildAt(j);
