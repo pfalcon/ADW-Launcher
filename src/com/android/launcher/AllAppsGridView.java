@@ -277,7 +277,7 @@ public class AllAppsGridView extends GridView implements
 		mDrawLabels = AlmostNexusSettingsHelper.getDrawerLabels(mLauncher);
 		mFadeDrawLabels = AlmostNexusSettingsHelper
 				.getFadeDrawerLabels(mLauncher);
-		if (animate  && getChildCount()>0) {
+		if (animate  && getAdapter().getCount()>0) {
 			if (mFadeDrawLabels && mDrawLabels) {
 				for (int i = 0; i < getChildCount(); i++) {
 					getChildAt(i).setDrawingCacheEnabled(true);
@@ -297,7 +297,7 @@ public class AllAppsGridView extends GridView implements
 	}
 
 	public void close(boolean animate) {
-		if (animate && getChildCount()>0) {
+		if (animate && getAdapter().getCount()>0) {
 			mStatus = CLOSING;
 			isAnimating = true;
 		} else {
