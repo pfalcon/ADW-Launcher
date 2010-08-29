@@ -122,7 +122,7 @@ public class ApplicationInfo extends ItemInfo {
         }
     }
 
-	@Override
+	/*@Override
 	public String toString() {
 		return title.toString();
 	}
@@ -159,5 +159,5 @@ public class ApplicationInfo extends ItemInfo {
 			hashCode = this.intent.getComponent().flattenToString().hashCode();
 		}
 		return hashCode;
-	}
+	}*/
 }
