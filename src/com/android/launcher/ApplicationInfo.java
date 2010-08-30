@@ -122,12 +122,12 @@ public class ApplicationInfo extends ItemInfo {
         }
     }
 
-	/*@Override
+	@Override
 	public String toString() {
 		return title.toString();
 	}
 
-	@Override
+	/*@Override
 	public boolean equals(Object aThat) {
 		// check for self-comparison
 		if (this == aThat)
