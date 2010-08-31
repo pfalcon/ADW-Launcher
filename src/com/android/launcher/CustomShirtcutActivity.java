@@ -309,7 +309,7 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 			    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 			    intent.setType("image/*");
 				width = height=mIconSize;
-		        intent.putExtra("crop", true);
+		        intent.putExtra("crop", "true");
 				intent.putExtra("outputX", width);
 				intent.putExtra("outputY", height);
 				intent.putExtra("aspectX", width);
