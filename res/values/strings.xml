@@ -333,7 +333,7 @@
     <string name="pref_summary_fade_drawer_labels">Labels fade instead of just appear. Uses more ram/cpu</string>
 
 	<string name="widget_config_dialog_title">Widget span config</string>
-	<string name="widget_config_dialog_summary">Home many rows/columns will the widget take?</string>
+	<string name="widget_config_dialog_summary">How many rows/columns will the widget take?</string>
 	<string name="widget_columns">Columns</string>
 	<string name="widget_rows">Rows</string>
     
