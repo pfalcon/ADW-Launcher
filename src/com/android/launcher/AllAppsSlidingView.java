@@ -1823,7 +1823,11 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
 		setVisibility(View.VISIBLE);
 		findCurrentHolder();
         final HolderLayout holder=(HolderLayout) getChildAt(mCurrentHolder);
-        if(animate && getAdapter().getCount()>0){
+        if(getAdapter()==null)
+        	animate=false;
+        else if(getAdapter().getCount()<=0)
+        	animate=false;
+        if(animate){
         	mPager.setVisibility(INVISIBLE);
     		mBgAlpha=0;
     	}else{
@@ -1834,6 +1838,7 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
 			isAnimating=animate;
 		}else{
 			if(mBlockLayouts){
+				snapToDestination();
 				holder.open(animate, mAnimationDuration);
 			}else{
 				isAnimating=animate;
@@ -1843,7 +1848,11 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
 	public void close(boolean animate){
 		setPressed(false);
 		mPager.setVisibility(INVISIBLE);
-    	if(animate && getAdapter().getCount()>0){
+        if(getAdapter()==null)
+        	animate=false;
+        else if(getAdapter().getCount()<=0)
+        	animate=false;		
+    	if(animate){
     		findCurrentHolder();
     		HolderLayout holder=(HolderLayout) getChildAt(mCurrentHolder);
     		if(holder!=null){
