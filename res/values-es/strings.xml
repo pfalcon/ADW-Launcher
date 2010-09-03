@@ -211,7 +211,7 @@
     <string name="pref_title_db">Configuración del escritorio</string>
     <string name="pref_title_db_import">Restaurar escritorio</string>
     <string name="pref_summary_db_import">Restaurar desde /sdcard/adw_launcher.db</string>
-    <string name="pref_title_db_export">Exportat escritorio</string>
+    <string name="pref_title_db_export">Exportar escritorio</string>
     <string name="pref_summary_db_export">Guardar en /sdcard/adw_launcher.db</string>
     
     <string name="title_dialog_xml">ADW Launcher Settings</string>
