@@ -130,7 +130,7 @@
     <!-- Text to show user in place of a gadget when we can't display it properly -->
     <string name="gadget_error_text">Problem loading widget</string>
     <!-- ADW Version Information -->
-    <string name="adw_version">Version 1.1.4 System</string>
+    <string name="adw_version">Version 1.1.5 System</string>
     <!-- ADW Settings -->
     <string name="pref_label_settings">AlmostNexus Settings</string>
     <!-- Screen preferences -->
