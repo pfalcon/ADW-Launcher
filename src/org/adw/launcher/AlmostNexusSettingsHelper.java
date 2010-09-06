@@ -286,6 +286,12 @@ public final class AlmostNexusSettingsHelper {
 		boolean newD = sp.getBoolean("uiScrollableWidgets", context.getResources().getBoolean(R.bool.config_uiScrollableWidgets));
 		return newD;
 	}
+	public static void setUIScrollableWidgets(Context context, boolean value) {
+		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+	    SharedPreferences.Editor editor = sp.edit();
+		editor.putBoolean("uiScrollableWidgets", value);
+	    editor.commit();
+	}
 	public static boolean getDrawerLabels(Context context) {
 		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
 		boolean newD = sp.getBoolean("drawerLabels", context.getResources().getBoolean(R.bool.config_drawerLabels));
