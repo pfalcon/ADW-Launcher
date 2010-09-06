@@ -178,7 +178,7 @@ public class BoundRemoteViews extends SimpleRemoteViews {
                  srcRect.right = srcRect.left + v.getWidth();
                  srcRect.bottom = srcRect.top + v.getHeight();
                  Intent intent = new Intent(mIntent);
-                 intent.setSourceBounds(srcRect);        
+                 //intent.setSourceBounds(srcRect);        
                  intent.setComponent(BoundRemoteViews.this.mComponentName);
                  mCursor.moveToPosition(mCursorPos);
                  prepareIntent(intent);
