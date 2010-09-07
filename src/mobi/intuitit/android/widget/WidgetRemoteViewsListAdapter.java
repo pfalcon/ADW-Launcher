@@ -17,10 +17,9 @@ import android.widget.BaseAdapter;
  * 
  */
 public class WidgetRemoteViewsListAdapter extends BaseAdapter {
-
+	
     private BoundRemoteViews mRemoteViews = null;
     private Context mContext;
-    private Cursor mCursor;
     private Intent mIntent;
 
     ComponentName mAppWidgetProvider;
@@ -45,29 +44,29 @@ public class WidgetRemoteViewsListAdapter extends BaseAdapter {
         mIntent = intent;
 
         mRemoteViews = (BoundRemoteViews)intent.getParcelableExtra(LauncherIntent.Extra.Scroll.EXTRA_ITEM_LAYOUT_REMOTEVIEWS);
-    	mCursor = mContext.getContentResolver().query(Uri.parse(mIntent
+    	Cursor cursor = mContext.getContentResolver().query(Uri.parse(mIntent
                 .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_DATA_URI)), mIntent
                 .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_PROJECTION), mIntent
                 .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION), mIntent
                 .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION_ARGUMENTS),
                 mIntent.getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SORT_ORDER));
-    	mRemoteViews.setBindingCursor(mCursor);
+    	mRemoteViews.setBindingCursor(cursor, mContext);
         mRemoteViews.setIntentComponentName(mAppWidgetProvider);
+        cursor.close();
     }
 
     final Handler mHandler = new Handler();
 	// Create runnable for posting
 	final Runnable mQueryDataRunnable = new Runnable() {
 		public void run() {
-	    	if (mCursor != null)
-	    		mCursor.close();
-	    	mCursor = mContext.getContentResolver().query(Uri.parse(mIntent
+	    	Cursor cursor = mContext.getContentResolver().query(Uri.parse(mIntent
 	                .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_DATA_URI)), mIntent
 	                .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_PROJECTION), mIntent
 	                .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION), mIntent
 	                .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION_ARGUMENTS),
 	                mIntent.getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SORT_ORDER));
-	    	mRemoteViews.setBindingCursor(mCursor);
+	    	mRemoteViews.setBindingCursor(cursor, mContext);
+	    	cursor.close();
 			System.gc();
 			notifyDataSetInvalidated();
 		}
@@ -80,13 +79,13 @@ public class WidgetRemoteViewsListAdapter extends BaseAdapter {
     
     @Override
     public int getCount() {
-    	return mCursor.getCount();
+    	return mRemoteViews.getCursorCacheSize();
     }
 
     @Override
     public Object getItem(int position) {
-    	mCursor.moveToPosition(position);
-    	return mCursor;
+    	mRemoteViews.moveCursor(position);
+    	return mRemoteViews;
     }
 
     @Override
@@ -96,11 +95,11 @@ public class WidgetRemoteViewsListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-    	mCursor.moveToPosition(position);
+    	mRemoteViews.moveCursor(position);
     	if (convertView == null)
     		convertView = mRemoteViews.apply(mContext, null);
     	else
-    		mRemoteViews.reapply(convertView);
+    		mRemoteViews.reapplyBinding(convertView);
     	return convertView;
     }
 }
