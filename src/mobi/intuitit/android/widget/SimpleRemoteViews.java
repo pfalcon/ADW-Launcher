@@ -56,7 +56,7 @@ public class SimpleRemoteViews implements Parcelable {
     * An array of actions to perform on the view tree once it has been
     * inflated
     */
-   private ArrayList<Action> mActions;
+   protected ArrayList<Action> mActions;
    
 
    /**
@@ -899,13 +899,18 @@ public class SimpleRemoteViews implements Parcelable {
    }
 
    private void performApply(View v) {
-       if (mActions != null) {
-           final int count = mActions.size();
-           for (int i = 0; i < count; i++) {
-               Action a = mActions.get(i);
-               a.apply(v);
-           }
-       }
+	   try
+	   {
+	       if (mActions != null) {
+	           final int count = mActions.size();
+	           for (int i = 0; i < count; i++) {
+	               Action a = mActions.get(i);
+	               a.apply(v);
+	           }
+	       }
+	   } catch (OutOfMemoryError e) {
+           System.gc();
+	   }
    }
 
    
