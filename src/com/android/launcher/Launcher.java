@@ -288,7 +288,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private boolean uiHideLabels=false;
 	private boolean showAB2=false;
 	private boolean scrollableSupport=false;
-	private boolean shouldEnableScrollableSupport=false;
 	private DesktopIndicator mDesktopIndicator;
 	private int savedOrientation;
 	/**
@@ -1594,7 +1593,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 							
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								shouldEnableScrollableSupport = true;
+								AlmostNexusSettingsHelper.setUIScrollableWidgets(Launcher.this, true);
 								configureOrAddAppWidget(data);
 							}
 						});
@@ -3570,7 +3569,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		if(AlmostNexusSettingsHelper.needsRestart(key)){
 			setPersistent(false);
 			mShouldRestart=true;
-			shouldEnableScrollableSupport=false;
 		}else{
 			//TODO: ADW Move here all the updates instead on updateAlmostNexusUI() 
 			updateAlmostNexusUI();
@@ -3597,6 +3595,15 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 					setPersistent(false);
 	        		changeOrientation(AlmostNexusSettingsHelper.getDesktopOrientation(this),false);
 				}
+			}else if(key.equals("uiScrollableWidgets")){
+				boolean scroll=AlmostNexusSettingsHelper.getUIScrollableWidgets(this);
+				scrollableSupport=scroll;
+				if(scroll){
+					mWorkspace.registerProvider();
+				}else{
+					mWorkspace.unregisterProvider();
+				}
+				sModel.loadUserItems(false, Launcher.this, false, false);
 			}
 				
 		}
@@ -3772,11 +3779,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                     launcherInfo.spanX, launcherInfo.spanY, insertAtFirst);
         } else if (sModel.isDesktopLoaded()) {
             sModel.addDesktopAppWidget(launcherInfo);
-        }
-        // maybe we need to enable the scrollable support        
-        if (shouldEnableScrollableSupport) {
-        	AlmostNexusSettingsHelper.setUIScrollableWidgets(this, true);
-        	shouldRestart();
         }
         // finish load a widget, send it an intent
         if(appWidgetInfo!=null)
