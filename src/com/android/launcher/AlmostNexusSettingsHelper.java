@@ -24,7 +24,7 @@ public final class AlmostNexusSettingsHelper {
 	private static final String ALMOSTNEXUS_PREFERENCES = "launcher.preferences.almostnexus";
 	private static final String[] restart_keys={"drawerNew","uiHideLabels","highlights_color",
 		"highlights_color_focus","uiNewSelectors","desktopRows","desktopColumns","autosizeIcons","uiDesktopIndicatorType",
-		"uiScrollableWidgets","screenCache","uiDesktopIndicator","themePackageName","themeIcons"};
+		"screenCache","uiDesktopIndicator","themePackageName","themeIcons"};
 
 	public static boolean needsRestart(String key){
 		for(int i=0;i<restart_keys.length;i++){
