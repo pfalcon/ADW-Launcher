@@ -1,10 +1,12 @@
 package mobi.intuitit.android.widget;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -15,6 +17,57 @@ import android.view.View.OnClickListener;
 
 public class BoundRemoteViews extends SimpleRemoteViews {
 
+	class CursorCache {
+		
+		final ArrayList<HashMap<Action, Object>> mCache;
+		final HashMap<Action, Object> mDefaults;
+		
+		public Object getValueOrDefault(int index, Action target) {
+			HashMap<Action, Object> row = mCache.get(index);
+			Object result = null;
+			if (row.containsKey(target))
+				 result = row.get(target);
+			if (result == null)
+				result = mDefaults.get(target);
+			return result;
+		}
+		
+		public CursorCache(Cursor cursor, Context context) {
+			mCache = new ArrayList<HashMap<Action,Object>>(cursor.getCount());
+			mDefaults = new HashMap<Action, Object>();
+
+			final ArrayList<Action> actions = BoundRemoteViews.this.mActions;
+			
+			for (int i = 0; i < actions.size(); i++) {
+				Action act = actions.get(i);
+				if (act instanceof BindingAction)
+					mDefaults.put(act, ((BindingAction)act).getDefault(context));
+				else if (act instanceof SetBoundOnClickIntent)
+					mDefaults.put(act, null);
+			}
+			
+			cursor.moveToFirst();
+			
+			while(!cursor.isAfterLast()) {
+			
+				HashMap<Action, Object> row = new HashMap<Action, Object>();
+				
+				
+				for (int i = 0; i < actions.size(); i++) {
+					Action act = actions.get(i);
+					if (act instanceof BindingAction)
+						row.put(act, ((BindingAction)act).readValue(cursor, context));
+					else if (act instanceof SetBoundOnClickIntent)
+						row.put(act, ((SetBoundOnClickIntent)act).readValue(cursor));
+				}
+				
+				mCache.add(row);
+				cursor.moveToNext();
+			}
+		}
+	}
+	
+	
 	protected class BindingAction extends SimpleRemoteViews.ReflectionAction
 	{
 		public static final int tag = 99;
@@ -51,69 +104,59 @@ public class BoundRemoteViews extends SimpleRemoteViews {
 		
 		@Override
 		protected Object getValue(Context context) {
-			switch(this.type) {
-				case STRING:
-				case CHAR_SEQUENCE:
-					String value;
-					try
-					{
-						value = BoundRemoteViews.this.mCursor.getString(mCursorIndex);
-						if (value == null && mDefaultResource > 0)
-							value = context.getString(mDefaultResource);						
-					}
-					catch(Exception ex) {
-						if (mDefaultResource > 0)
-							value = context.getString(mDefaultResource);
-						else
-							value = null;
-					}
-					return value;
-				// BOOLEAN ?!?
-				case BYTE:
-					return (byte)BoundRemoteViews.this.mCursor.getInt(mCursorIndex);
-				case SHORT:
-					return (short)BoundRemoteViews.this.mCursor.getInt(mCursorIndex);
-				case INT:
-					return BoundRemoteViews.this.mCursor.getInt(mCursorIndex);
-				case LONG:
-					return BoundRemoteViews.this.mCursor.getLong(mCursorIndex);
-				case FLOAT:
-					return BoundRemoteViews.this.mCursor.getFloat(mCursorIndex);
-				case DOUBLE:
-					return BoundRemoteViews.this.mCursor.getDouble(mCursorIndex);			
-				case CHAR:
-					return BoundRemoteViews.this.mCursor.getString(mCursorIndex).charAt(0);
-				case URI:
-					return Uri.parse(BoundRemoteViews.this.mCursor.getString(mCursorIndex));
-				case BITMAP:
-					Bitmap bmp_value = null;
-					try
-					{
-						byte[] blob = BoundRemoteViews.this.mCursor.getBlob(mCursorIndex);
-						if (blob != null) 
-							bmp_value = BitmapFactory.decodeByteArray(blob, 0, blob.length);
-						else if (mDefaultResource > 0)
-							bmp_value = BitmapFactory.decodeResource(context.getResources(), mDefaultResource);
-						else
-							bmp_value = null;						
-					}
-					catch(Exception ex)
-					{
-						if (mDefaultResource > 0)
-							bmp_value = BitmapFactory.decodeResource(context.getResources(), mDefaultResource);
-						else
-							bmp_value = null;
-					}
-	                return bmp_value;
-			}
-		   //    static final int BUNDLE = 13;
-
-			
-			
-			// TODO Auto-generated method stub
-			return super.getValue(context);
+			return mCursor.getValueOrDefault(mCursorPos, this);
 		}
 		
+		public Object readValue(Cursor cursor, Context context) {
+			try
+			{
+				switch(this.type) {
+					case STRING:
+					case CHAR_SEQUENCE:
+						return cursor.getString(mCursorIndex);
+					case BYTE:
+						return (byte)cursor.getInt(mCursorIndex);
+					case SHORT:
+						return (short)cursor.getInt(mCursorIndex);
+					case INT:
+						return cursor.getInt(mCursorIndex);
+					case LONG:
+						return cursor.getLong(mCursorIndex);
+					case FLOAT:
+						return cursor.getFloat(mCursorIndex);
+					case DOUBLE:
+						return cursor.getDouble(mCursorIndex);			
+					case CHAR:
+						return cursor.getString(mCursorIndex).charAt(0);
+					case URI:
+						return Uri.parse(cursor.getString(mCursorIndex));
+					case BITMAP:
+						byte[] blob = cursor.getBlob(mCursorIndex);
+		                return BitmapFactory.decodeByteArray(blob, 0, blob.length);
+				}
+			}
+			catch(Exception e) {
+				return null;
+			}
+			return null;
+		}
+		
+		public Object getDefault(Context context) {
+			try
+			{
+				switch(this.type) {
+					case STRING:
+					case CHAR_SEQUENCE:
+						return context.getString(mDefaultResource);
+					case BITMAP:
+						return BitmapFactory.decodeResource(context.getResources(), mDefaultResource);
+				}
+			}
+			catch(Exception e) {
+				return null;
+			}
+			return null;
+		}
 		
 		public void apply(View root) {
 			super.apply(root);
@@ -155,49 +198,52 @@ public class BoundRemoteViews extends SimpleRemoteViews {
         public void apply(View root) {
             final View target = root.findViewById(mViewId);           
             if (target != null && mIntent != null) {
-                target.setOnClickListener(new BoundOnClickListener(BoundRemoteViews.this.mCursor.getPosition()));
+                target.setOnClickListener(new BoundOnClickListener(mCursorPos));
             }
         }
         
         private class BoundOnClickListener implements OnClickListener {
         	
-        	private int mCursorPos;
-        	 
+        	private final int myCursorPos;
+        	
         	public BoundOnClickListener(int cursorPos) {
-        		mCursorPos = cursorPos;
+        		myCursorPos = cursorPos;
         	}
         	
         	public void onClick(View v) {
-                 // Find target view location in screen coordinates and
-                 // fill into PendingIntent before sending.
-          	   final int[] location = new int[2];
-                 v.getLocationOnScreen(location);
-                 Rect srcRect = new Rect();
-                 srcRect.left = location[0];
-                 srcRect.top = location[1];
-                 srcRect.right = srcRect.left + v.getWidth();
-                 srcRect.bottom = srcRect.top + v.getHeight();
-                 Intent intent = new Intent(mIntent);
-                 intent.setSourceBounds(srcRect);        
-                 intent.setComponent(BoundRemoteViews.this.mComponentName);
-                 mCursor.moveToPosition(mCursorPos);
-                 prepareIntent(intent);
-                 try {
-                 	v.getContext().sendBroadcast(intent);
-                 } catch (Exception e) {
-                     android.util.Log.e("SetBoundOnClickIntent", "Cannot send intent: ", e);
-                 }
-             }
+                // Find target view location in screen coordinates and
+                // fill into PendingIntent before sending.
+          	    final int[] location = new int[2];
+                v.getLocationOnScreen(location);
+                Rect srcRect = new Rect();
+                srcRect.left = location[0];
+                srcRect.top = location[1];
+                srcRect.right = srcRect.left + v.getWidth();
+                srcRect.bottom = srcRect.top + v.getHeight();
+                Intent intent = new Intent(mIntent);
+                intent.setSourceBounds(srcRect);        
+                intent.setComponent(BoundRemoteViews.this.mComponentName);
+                prepareIntent(intent);
+                try {
+                	v.getContext().sendBroadcast(intent);
+                } catch (Exception e) {
+                    android.util.Log.e("SetBoundOnClickIntent", "Cannot send intent: ", e);
+                }
+            }
+        	
+            protected void prepareIntent(Intent intent) {
+            	String value = (String)mCursor.getValueOrDefault(myCursorPos, SetBoundOnClickIntent.this);
+            	intent.putExtra(mExtraName, value);
+            }
         }
         
-
-        protected void prepareIntent(Intent intent) {
-        	String value = BoundRemoteViews.this.mCursor.getString(mExtraCursorIndex);
-        	intent.putExtra(mExtraName, value);
+        public String readValue(Cursor cursor) {
+        	return cursor.getString(mExtraCursorIndex);
         }
 	}
 	
-	private Cursor mCursor;
+	private CursorCache mCursor;
+	private int mCursorPos;
 	private ComponentName mComponentName;
 	
 	public BoundRemoteViews(Parcel parcel) {
@@ -208,8 +254,19 @@ public class BoundRemoteViews extends SimpleRemoteViews {
 		super(layoutId);
 	}
 	
-	public void setBindingCursor(Cursor cursor) {
-		mCursor = cursor;
+	public void setBindingCursor(Cursor cursor, Context context) {
+		mCursor = new CursorCache(cursor,context);
+	}
+	
+	public int getCursorCacheSize() {
+		if (mCursor != null)
+			return mCursor.mCache.size();
+		else
+			return 0;
+	}
+	
+	public void moveCursor(int newPosition) {
+		mCursorPos = newPosition;
 	}
 	
 	public void setIntentComponentName(ComponentName componenName) {
@@ -223,6 +280,22 @@ public class BoundRemoteViews extends SimpleRemoteViews {
 			return new SetBoundOnClickIntent(parcel);
 		else
 			return super.loadActionFromParcel(tag, parcel);
+	}
+	
+	public void reapplyBinding(View v) {
+	    try
+	    {
+	        if (mActions != null) {
+	            final int count = mActions.size();
+	            for (int i = 0; i < count; i++) {
+	                Action a = mActions.get(i);
+	                if (a instanceof BindingAction || a instanceof SetBoundOnClickIntent)
+	             	   a.apply(v);
+	            }
+	        }
+	    } catch (OutOfMemoryError e) {
+            System.gc();
+	    }
 	}
 	
     public void setBoundString(int viewId, String methodName, int cursorIndex, int defaultResource) {
