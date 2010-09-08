@@ -19,7 +19,6 @@ package mobi.intuitit.android.widget;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -264,12 +263,8 @@ public class SimpleRemoteViews implements Parcelable {
                        final Intent intent = new Intent();
                        intent.setSourceBounds(srcRect);
                        try {
-                           // TODO: Unregister this handler if PendingIntent.FLAG_ONE_SHOT?
-                           v.getContext().startIntentSender(
-                                   pendingIntent.getIntentSender(), intent,
-                                   Intent.FLAG_ACTIVITY_NEW_TASK,
-                                   Intent.FLAG_ACTIVITY_NEW_TASK, 0);
-                       } catch (IntentSender.SendIntentException e) {
+                       	pendingIntent.send(v.getContext(), 0, intent, null, null);
+                       } catch (PendingIntent.CanceledException e) {
                            android.util.Log.e("SetOnClickPendingIntent", "Cannot send pending intent: ", e);
                        }
                    }
