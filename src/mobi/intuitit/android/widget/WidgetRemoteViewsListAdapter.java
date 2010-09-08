@@ -51,7 +51,6 @@ public class WidgetRemoteViewsListAdapter extends BaseAdapter {
                 .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION_ARGUMENTS),
                 mIntent.getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SORT_ORDER));
     	mRemoteViews.setBindingCursor(cursor, mContext);
-        mRemoteViews.setIntentComponentName(mAppWidgetProvider);
         cursor.close();
     }
 
