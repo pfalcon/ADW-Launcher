@@ -1569,7 +1569,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             			{
             				onActivityResult(REQUEST_CREATE_APPWIDGET, Activity.RESULT_CANCELED, data);
             				// Show a nice toast here to tell the user why the widget is rejected.            				
-            				Toast.makeText(this, "Can not add widget cause of FOOBAR", Toast.LENGTH_SHORT);
+            				new AlertDialog.Builder(this)
+            					.setTitle(R.string.adw_version)
+            					.setCancelable(true)
+            					.setIcon(R.drawable.ic_launcher_home)
+            					.setPositiveButton(getString(android.R.string.ok), null)
+            					.setMessage(getString(R.string.scrollable_api_required))
+            					.create().show();
             				return;
             			}
             	}
@@ -1580,7 +1586,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             		if (!isScrollableAllowed() && requiresScrolling) {
             			// ask the user what to do
             			AlertDialog.Builder dlg = new AlertDialog.Builder(this);
-            			dlg.setPositiveButton(getString(R.string.action_yes), new DialogInterface.OnClickListener() {
+            			dlg.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 							
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -1588,7 +1594,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 								configureOrAddAppWidget(data);
 							}
 						});
-            			dlg.setNegativeButton(getString(R.string.action_no), new DialogInterface.OnClickListener() {
+            			dlg.setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								onActivityResult(REQUEST_CREATE_APPWIDGET, Activity.RESULT_CANCELED, data);
