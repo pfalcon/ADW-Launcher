@@ -3,7 +3,7 @@ package mobi.intuitit.android.widget;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.content.ComponentName;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -169,9 +169,9 @@ public class BoundRemoteViews extends SimpleRemoteViews {
 		private String mExtraName;
 		private int mExtraCursorIndex;
 		private int mViewId;
-		private Intent mIntent;
+		private PendingIntent mIntent;
 		
-        public SetBoundOnClickIntent(int id, Intent intent, 
+        public SetBoundOnClickIntent(int id, PendingIntent intent, 
         		String extraName, int extraCursorIndex) {
         	mViewId = id;
         	mIntent = intent;
@@ -183,7 +183,7 @@ public class BoundRemoteViews extends SimpleRemoteViews {
         	mViewId = parcel.readInt();
         	mExtraName = parcel.readString();
         	mExtraCursorIndex = parcel.readInt();
-        	mIntent = Intent.CREATOR.createFromParcel(parcel);
+        	mIntent = PendingIntent.CREATOR.createFromParcel(parcel);
         }
         
         public void writeToParcel(Parcel dest, int flags) {
@@ -191,7 +191,7 @@ public class BoundRemoteViews extends SimpleRemoteViews {
             dest.writeInt(mViewId);
             dest.writeString(mExtraName);
             dest.writeInt(mExtraCursorIndex);
-            mIntent.writeToParcel(dest, 0);
+            mIntent.writeToParcel(dest, 0 /* no flags */);
         }
         
         @Override
@@ -220,14 +220,12 @@ public class BoundRemoteViews extends SimpleRemoteViews {
                 srcRect.top = location[1];
                 srcRect.right = srcRect.left + v.getWidth();
                 srcRect.bottom = srcRect.top + v.getHeight();
-                Intent intent = new Intent(mIntent);
-                //intent.setSourceBounds(srcRect);        
-                intent.setComponent(BoundRemoteViews.this.mComponentName);
+                Intent intent = new Intent();
                 prepareIntent(intent);
                 try {
-                	v.getContext().sendBroadcast(intent);
-                } catch (Exception e) {
-                    android.util.Log.e("SetBoundOnClickIntent", "Cannot send intent: ", e);
+                	mIntent.send(v.getContext(), 0, intent, null, null);
+                } catch (PendingIntent.CanceledException e) {
+                    android.util.Log.e("SetOnClickPendingIntent", "Cannot send pending intent: ", e);
                 }
             }
         	
@@ -244,7 +242,6 @@ public class BoundRemoteViews extends SimpleRemoteViews {
 	
 	private CursorCache mCursor;
 	private int mCursorPos;
-	private ComponentName mComponentName;
 	
 	public BoundRemoteViews(Parcel parcel) {
 		super(parcel);
@@ -267,10 +264,6 @@ public class BoundRemoteViews extends SimpleRemoteViews {
 	
 	public void moveCursor(int newPosition) {
 		mCursorPos = newPosition;
-	}
-	
-	public void setIntentComponentName(ComponentName componenName) {
-		mComponentName = componenName;
 	}
 
 	protected Action loadActionFromParcel(int tag, Parcel parcel) {
@@ -353,7 +346,7 @@ public class BoundRemoteViews extends SimpleRemoteViews {
     								cursorIndex, defaultResource));
     }
     
-    public void SetBoundOnClickIntent(int viewId, Intent intent,
+    public void SetBoundOnClickIntent(int viewId, PendingIntent intent,
     		String extraName, int extraCursorIndex) {
         addAction(new SetBoundOnClickIntent(viewId, intent, extraName, extraCursorIndex));
     }

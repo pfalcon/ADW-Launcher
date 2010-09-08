@@ -19,7 +19,6 @@ package mobi.intuitit.android.widget;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -227,7 +226,7 @@ public class SimpleRemoteViews implements Parcelable {
     * {@link android.view.View#setOnClickListener(android.view.View.OnClickListener)}
     * to launch the provided {@link PendingIntent}.
     */
-   /*protected class SetOnClickPendingIntent extends Action {
+   protected class SetOnClickPendingIntent extends Action {
        public SetOnClickPendingIntent(int id, PendingIntent pendingIntent) {
            this.viewId = id;
            this.pendingIntent = pendingIntent;
@@ -242,7 +241,7 @@ public class SimpleRemoteViews implements Parcelable {
        public void writeToParcel(Parcel dest, int flags) {
            dest.writeInt(TAG);
            dest.writeInt(viewId);
-           pendingIntent.writeToParcel(dest, 0);
+           pendingIntent.writeToParcel(dest, 0 /* no flags */);
        }
        
        @Override
@@ -262,14 +261,9 @@ public class SimpleRemoteViews implements Parcelable {
                        srcRect.bottom = srcRect.top + v.getHeight();
 
                        final Intent intent = new Intent();
-                       //intent.setSourceBounds(srcRect);
                        try {
-                           // TODO: Unregister this handler if PendingIntent.FLAG_ONE_SHOT?
-                           v.getContext().startIntentSender(
-                                   pendingIntent.getIntentSender(), intent,
-                                   Intent.FLAG_ACTIVITY_NEW_TASK,
-                                   Intent.FLAG_ACTIVITY_NEW_TASK, 0);
-                       } catch (IntentSender.SendIntentException e) {
+                       	pendingIntent.send(v.getContext(), 0, intent, null, null);
+                       } catch (PendingIntent.CanceledException e) {
                            android.util.Log.e("SetOnClickPendingIntent", "Cannot send pending intent: ", e);
                        }
                    }
@@ -282,7 +276,7 @@ public class SimpleRemoteViews implements Parcelable {
        PendingIntent pendingIntent;
 
        public final static int TAG = 1;
-   }*/
+   }
    
    /**
     * Base class for the reflection actions.
@@ -537,8 +531,8 @@ public class SimpleRemoteViews implements Parcelable {
        switch (tag) {
        		case SetLayoutSize.TAG:
        			return new SetLayoutSize(parcel);
-       		//case SetOnClickPendingIntent.TAG:
-           		//return new SetOnClickPendingIntent(parcel);
+       		case SetOnClickPendingIntent.TAG:
+           		return new SetOnClickPendingIntent(parcel);
        		case SetDrawableParameters.TAG:
        			return new SetDrawableParameters(parcel);
        		case ReflectionAction.TAG:
@@ -664,9 +658,9 @@ public class SimpleRemoteViews implements Parcelable {
     * @param viewId The id of the view that will trigger the {@link PendingIntent} when clicked
     * @param pendingIntent The {@link PendingIntent} to send when user clicks
     */
-   /*public void setOnClickPendingIntent(int viewId, PendingIntent pendingIntent) {
+   public void setOnClickPendingIntent(int viewId, PendingIntent pendingIntent) {
        addAction(new SetOnClickPendingIntent(viewId, pendingIntent));
-   }*/
+   }
 
    /**
     * @hide
