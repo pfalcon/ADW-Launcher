@@ -6,7 +6,6 @@ import java.util.HashMap;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -225,11 +224,8 @@ public class BoundRemoteViews extends SimpleRemoteViews {
                 intent.setSourceBounds(srcRect);                        
                 prepareIntent(intent);
                 try {
-                    v.getContext().startIntentSender(
-                            mIntent.getIntentSender(), intent,
-                            Intent.FLAG_ACTIVITY_NEW_TASK,
-                            Intent.FLAG_ACTIVITY_NEW_TASK, 0);
-                } catch (IntentSender.SendIntentException e) {
+                	mIntent.send(v.getContext(), 0, intent, null, null);
+                } catch (PendingIntent.CanceledException e) {
                     android.util.Log.e("SetOnClickPendingIntent", "Cannot send pending intent: ", e);
                 }
             }
