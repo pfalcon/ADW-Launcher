@@ -1562,47 +1562,49 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             {
             	Bundle metadata = getPackageManager().getReceiverInfo(appWidget.provider, 
             			PackageManager.GET_META_DATA).metaData;
-            	if (metadata.containsKey(LauncherMetadata.Requirements.APIVersion))
-            	{
+            	if(metadata!=null){
+            		if (metadata.containsKey(LauncherMetadata.Requirements.APIVersion))
+            		{
             			int requiredApiVersion = metadata.getInt(LauncherMetadata.Requirements.APIVersion);
             			if (requiredApiVersion > LauncherMetadata.CurrentAPIVersion)
             			{
             				onActivityResult(REQUEST_CREATE_APPWIDGET, Activity.RESULT_CANCELED, data);
             				// Show a nice toast here to tell the user why the widget is rejected.            				
             				new AlertDialog.Builder(this)
-            					.setTitle(R.string.adw_version)
-            					.setCancelable(true)
-            					.setIcon(R.drawable.ic_launcher_home)
-            					.setPositiveButton(getString(android.R.string.ok), null)
-            					.setMessage(getString(R.string.scrollable_api_required))
-            					.create().show();
+            				.setTitle(R.string.adw_version)
+            				.setCancelable(true)
+            				.setIcon(R.drawable.ic_launcher_home)
+            				.setPositiveButton(getString(android.R.string.ok), null)
+            				.setMessage(getString(R.string.scrollable_api_required))
+            				.create().show();
             				return;
             			}
-            	}
-    			// If there are Settings for scrollable or animations test them here too!
-            	if (metadata.containsKey(LauncherMetadata.Requirements.Scrollable)) 
-            	{
-            		boolean requiresScrolling = metadata.getBoolean(LauncherMetadata.Requirements.Scrollable);
-            		if (!isScrollableAllowed() && requiresScrolling) {
-            			// ask the user what to do
-            			AlertDialog.Builder dlg = new AlertDialog.Builder(this);
-            			dlg.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								AlmostNexusSettingsHelper.setUIScrollableWidgets(Launcher.this, true);
-								configureOrAddAppWidget(data);
-							}
-						});
-            			dlg.setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								onActivityResult(REQUEST_CREATE_APPWIDGET, Activity.RESULT_CANCELED, data);
-							}
-						});
-            			dlg.setMessage(getString(R.string.need_scrollable));
-            			dlg.create().show();
-            			return;
+            		}
+            		// If there are Settings for scrollable or animations test them here too!
+            		if (metadata.containsKey(LauncherMetadata.Requirements.Scrollable)) 
+            		{
+            			boolean requiresScrolling = metadata.getBoolean(LauncherMetadata.Requirements.Scrollable);
+            			if (!isScrollableAllowed() && requiresScrolling) {
+            				// ask the user what to do
+            				AlertDialog.Builder dlg = new AlertDialog.Builder(this);
+            				dlg.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
+
+            					@Override
+            					public void onClick(DialogInterface dialog, int which) {
+            						AlmostNexusSettingsHelper.setUIScrollableWidgets(Launcher.this, true);
+            						configureOrAddAppWidget(data);
+            					}
+            				});
+            				dlg.setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
+            					@Override
+            					public void onClick(DialogInterface dialog, int which) {
+            						onActivityResult(REQUEST_CREATE_APPWIDGET, Activity.RESULT_CANCELED, data);
+            					}
+            				});
+            				dlg.setMessage(getString(R.string.need_scrollable));
+            				dlg.create().show();
+            				return;
+            			}
             		}
             	}
             }
