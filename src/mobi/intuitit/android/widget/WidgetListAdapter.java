@@ -21,16 +21,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * 
+ *
  * @author Francois DESLANDES
- * 
+ *
  */
-public class WidgetListAdapter extends BaseAdapter {
+public class WidgetListAdapter extends ScrollableBaseAdapter {
 
 	static final String LOG_TAG = "LauncherPP_WLA";
 
@@ -46,8 +45,8 @@ public class WidgetListAdapter extends BaseAdapter {
 	final int mListViewId;
 	ItemMapping[] mItemMappings;
 	boolean mAllowRequery = true;
-	private ContentResolver mContentResolver;
-	private Intent mIntent;
+	private final ContentResolver mContentResolver;
+	private final Intent mIntent;
 
 	static ListViewImageManager mImageManager = ListViewImageManager.getInstance();
 
@@ -75,7 +74,7 @@ public class WidgetListAdapter extends BaseAdapter {
 		boolean clickable;
 
 		/**
-		 * 
+		 *
 		 * @param t
 		 *            view type
 		 * @param l
@@ -131,7 +130,7 @@ public class WidgetListAdapter extends BaseAdapter {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param context
 	 *            remote context
 	 * @param c
@@ -177,7 +176,7 @@ public class WidgetListAdapter extends BaseAdapter {
 
 	/**
 	 * Collect arrays and put them together
-	 * 
+	 *
 	 * @param t
 	 * @param ids
 	 * @param c
@@ -507,11 +506,18 @@ public class WidgetListAdapter extends BaseAdapter {
 		}
 	}
 
+	@Override
 	public void notifyToRegenerate() {
 		if (LOGD)
 			Log.d(LOG_TAG, "notifyToRegenerate widgetId = " + mAppWidgetId);
 
 		mHandler.post(mGenerateDataCacheRunnable);
+	}
+
+	@Override
+	public void dropCache(Context context) {
+		mImageManager.clearCacheForWidget(context, mAppWidgetId);
+		rowsElementsList.clear();
 	}
 
 }
