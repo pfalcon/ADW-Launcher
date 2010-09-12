@@ -9,23 +9,22 @@ import android.net.Uri;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 
 /**
- * 
+ *
  * @author Florian Sundermann
- * 
+ *
  */
-public class WidgetRemoteViewsListAdapter extends BaseAdapter {
-	
+public class WidgetRemoteViewsListAdapter extends ScrollableBaseAdapter {
+
     private BoundRemoteViews mRemoteViews = null;
-    private Context mContext;
+    private final Context mContext;
     private Intent mIntent;
 
     ComponentName mAppWidgetProvider;
-    
+
     /**
-     * 
+     *
      * @param context
      *            remote context
      * @param c
@@ -54,6 +53,23 @@ public class WidgetRemoteViewsListAdapter extends BaseAdapter {
         cursor.close();
     }
 
+    public void updateFromIntent(Intent intent) {
+    	if (intent.hasExtra(LauncherIntent.Extra.Scroll.EXTRA_ITEM_LAYOUT_REMOTEVIEWS)) {
+    		if (mRemoteViews != null) {
+    			mRemoteViews.dropCache();
+    		}
+    		mIntent = intent;
+    		mRemoteViews = (BoundRemoteViews)intent.getParcelableExtra(LauncherIntent.Extra.Scroll.EXTRA_ITEM_LAYOUT_REMOTEVIEWS);
+        	Cursor cursor = mContext.getContentResolver().query(Uri.parse(mIntent
+                    .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_DATA_URI)), mIntent
+                    .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_PROJECTION), mIntent
+                    .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION), mIntent
+                    .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION_ARGUMENTS),
+                    mIntent.getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SORT_ORDER));
+        	mRemoteViews.setBindingCursor(cursor, mContext);
+    	}
+    }
+
     final Handler mHandler = new Handler();
 	// Create runnable for posting
 	final Runnable mQueryDataRunnable = new Runnable() {
@@ -70,12 +86,12 @@ public class WidgetRemoteViewsListAdapter extends BaseAdapter {
 			notifyDataSetInvalidated();
 		}
 	};
-    
-    
+
+    @Override
     public synchronized void notifyToRegenerate() {
     	mHandler.post(mQueryDataRunnable);
     }
-    
+
     @Override
     public int getCount() {
     	return mRemoteViews.getCursorCacheSize();
@@ -101,4 +117,13 @@ public class WidgetRemoteViewsListAdapter extends BaseAdapter {
     		mRemoteViews.reapplyBinding(convertView);
     	return convertView;
     }
+
+	@Override
+	public void dropCache(Context context) {
+		dropCache();
+	}
+
+	public void dropCache() {
+		mRemoteViews.dropCache();
+	}
 }
