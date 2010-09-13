@@ -17,6 +17,7 @@
 package org.adw.launcher;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetProviderInfo;
@@ -31,11 +32,14 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Debug;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -177,6 +181,10 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	//And as those devices can perform pretty well without cache... let's add an option... one more...
 	private int mDesktopCacheType=AlmostNexusSettingsHelper.CACHE_LOW;
 	private boolean mWallpaperScroll=true;
+    ActivityManager activityManager;
+    int[] pids;
+    Debug.MemoryInfo[] memoryInfoArray;
+    float debugTextSize;
     /**
      * Used to inflate the Workspace from XML.
      *
@@ -616,6 +624,19 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             for (int i = 0; i < count; i++) {
                 drawChild(canvas, getChildAt(i), getDrawingTime());
             }
+        }
+        float x = getScrollX();
+        mPaint.setTextSize(debugTextSize);
+        mPaint.setAntiAlias(true);
+        mPaint.setColor(0xff000000);
+        canvas.drawRect(x, 0, x+getWidth(), 70, mPaint);
+        mPaint.setColor(0xffffffff);
+        memoryInfoArray= activityManager.getProcessMemoryInfo(pids);
+        for(Debug.MemoryInfo pidMemoryInfo: memoryInfoArray)
+        {
+        	canvas.drawText("getTotalPrivateDirty: " + pidMemoryInfo.getTotalPrivateDirty(), x, debugTextSize, mPaint);
+        	canvas.drawText("getTotalPss: " + pidMemoryInfo.getTotalPss(), x, debugTextSize*2, mPaint);
+        	canvas.drawText("getTotalSharedDirty: " + pidMemoryInfo.getTotalSharedDirty(), x, debugTextSize*3, mPaint);
         }
         if (restore) {
             canvas.restore();
@@ -1272,6 +1293,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         mLauncher = launcher;
         if(mLauncher.isScrollableAllowed())registerProvider();
         if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().setItems(mHomeScreens);
+        activityManager =(ActivityManager) mLauncher.getSystemService(Context.ACTIVITY_SERVICE);
+        pids=new int[]{android.os.Process.myPid()};
+        debugTextSize=DisplayMetrics.DENSITY_DEFAULT/10;
     }
 
     public void setDragger(DragController dragger) {
