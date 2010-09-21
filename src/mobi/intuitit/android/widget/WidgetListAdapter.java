@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import mobi.intuitit.android.content.LauncherIntent;
 import android.appwidget.AppWidgetManager;
+import android.content.AsyncQueryHandler;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -47,7 +48,7 @@ public class WidgetListAdapter extends ScrollableBaseAdapter {
 	boolean mAllowRequery = true;
 	private final ContentResolver mContentResolver;
 	private final Intent mIntent;
-
+	private MyQueryHandler mAsyncQuery;
 	static ListViewImageManager mImageManager = ListViewImageManager.getInstance();
 
 	class RowElement {
@@ -116,8 +117,6 @@ public class WidgetListAdapter extends ScrollableBaseAdapter {
 			if (LOGD)
 				Log.d(LOG_TAG, "mGenerateDataCacheRunnable start");
 			generateDataCache();
-			System.gc();
-			notifyDataSetInvalidated();
 			if (LOGD)
 				Log.d(LOG_TAG, "mGenerateDataCacheRunnable end");
 		}
@@ -169,9 +168,9 @@ public class WidgetListAdapter extends ScrollableBaseAdapter {
 		// Generate item mapping
 		generateItemMapping(intent);
 
+        mAsyncQuery=new MyQueryHandler(mContentResolver);
 		// Generate data cache from content provider
 		mHandler.post(mGenerateDataCacheRunnable);
-
 	}
 
 	/**
@@ -222,78 +221,15 @@ public class WidgetListAdapter extends ScrollableBaseAdapter {
 	}
 
 	private void generateDataCache() {
-
-		if (mItemMappings == null)
-			return;
-		final int size = mItemMappings.length;
-
-        Cursor cursor = mContentResolver.query(Uri.parse(mIntent
-                .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_DATA_URI)), mIntent
-                .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_PROJECTION), mIntent
-                .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION), mIntent
-                .getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION_ARGUMENTS),
+        if (mItemMappings == null)
+            return;
+        android.util.Log.d("LAUNCHER","API v1 START QUERY");
+        mAsyncQuery.startQuery(1, "cookie",
+                Uri.parse(mIntent.getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_DATA_URI)) ,
+                mIntent.getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_PROJECTION),
+                mIntent.getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION),
+                mIntent.getStringArrayExtra(LauncherIntent.Extra.Scroll.EXTRA_SELECTION_ARGUMENTS),
                 mIntent.getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_SORT_ORDER));
-
-		rowsElementsList.clear();
-
-		while ((cursor != null) && (cursor.moveToNext())) {
-
-			RowElementsList singleRowElem = new RowElementsList(size);
-
-			ItemMapping itemMapping;
-			try {
-				// bind children views
-				for (int i = size - 1; i >= 0; i--) {
-
-					RowElement re = new RowElement();
-
-					itemMapping = mItemMappings[i];
-
-					switch (itemMapping.type) {
-					case LauncherIntent.Extra.Scroll.Types.TEXTVIEW:
-						re.data = cursor.getString(itemMapping.index);
-						break;
-					case LauncherIntent.Extra.Scroll.Types.TEXTVIEWHTML:
-						re.data = Html.fromHtml(cursor.getString(itemMapping.index));
-						break;
-					case LauncherIntent.Extra.Scroll.Types.IMAGEBLOB:
-						byte[] localData = cursor.getBlob(itemMapping.index);
-						re.data = localData;
-						break;
-					case LauncherIntent.Extra.Scroll.Types.IMAGEURI:
-						re.data = cursor.getString(itemMapping.index);
-						break;
-					case LauncherIntent.Extra.Scroll.Types.IMAGERESOURCE:
-						re.data = cursor.getInt(itemMapping.index);
-						break;
-					}
-
-					// Prepare tag
-					if (mItemChildrenClickable && itemMapping.clickable) {
-						if (mItemActionUriIndex >= 0)
-							re.tag = cursor.getString(mItemActionUriIndex);
-						else
-							re.tag = Integer.toString(cursor.getPosition());
-					} else {
-						if (mItemActionUriIndex >= 0) {
-							re.tag = cursor.getString(mItemActionUriIndex);
-						}
-					}
-
-					singleRowElem.singleRowElementsList[i] = re;
-
-				}
-
-				rowsElementsList.add(singleRowElem);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		if (cursor != null)
-			cursor.close();
-
 	}
 
 	public void bindView(ViewHolder holder, View view, Context context, int itemPosition) {
@@ -519,7 +455,88 @@ public class WidgetListAdapter extends ScrollableBaseAdapter {
 		mImageManager.clearCacheForWidget(context, mAppWidgetId);
 		rowsElementsList.clear();
 	}
+	/**
+	 * AsyncQueryHandler helper class to do async queries
+	 * instead of blocking the UI thread
+	 * (yeah, don't know why but the runnable was not avoiding
+	 * the UI lock
+	 * @author adw
+	 *
+	 */
+    private class MyQueryHandler extends AsyncQueryHandler {
+        public MyQueryHandler(ContentResolver cr) {
+            super(cr);
+        }
 
+        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            super.onQueryComplete(token, cookie, cursor);
+            android.util.Log.d("LAUNCHER", "API v1 QUERY COMPLETE");
+            rowsElementsList.clear();
+            final int size = mItemMappings.length;
+
+            while ((cursor != null) && (cursor.moveToNext())) {
+
+                RowElementsList singleRowElem = new RowElementsList(size);
+
+                ItemMapping itemMapping;
+                try {
+                    // bind children views
+                    for (int i = size - 1; i >= 0; i--) {
+
+                        RowElement re = new RowElement();
+
+                        itemMapping = mItemMappings[i];
+
+                        switch (itemMapping.type) {
+                        case LauncherIntent.Extra.Scroll.Types.TEXTVIEW:
+                            re.data = cursor.getString(itemMapping.index);
+                            break;
+                        case LauncherIntent.Extra.Scroll.Types.TEXTVIEWHTML:
+                            re.data = Html.fromHtml(cursor
+                                    .getString(itemMapping.index));
+                            break;
+                        case LauncherIntent.Extra.Scroll.Types.IMAGEBLOB:
+                            byte[] localData = cursor
+                                    .getBlob(itemMapping.index);
+                            re.data = localData;
+                            break;
+                        case LauncherIntent.Extra.Scroll.Types.IMAGEURI:
+                            re.data = cursor.getString(itemMapping.index);
+                            break;
+                        case LauncherIntent.Extra.Scroll.Types.IMAGERESOURCE:
+                            re.data = cursor.getInt(itemMapping.index);
+                            break;
+                        }
+
+                        // Prepare tag
+                        if (mItemChildrenClickable && itemMapping.clickable) {
+                            if (mItemActionUriIndex >= 0)
+                                re.tag = cursor.getString(mItemActionUriIndex);
+                            else
+                                re.tag = Integer.toString(cursor.getPosition());
+                        } else {
+                            if (mItemActionUriIndex >= 0) {
+                                re.tag = cursor.getString(mItemActionUriIndex);
+                            }
+                        }
+
+                        singleRowElem.singleRowElementsList[i] = re;
+
+                    }
+
+                    rowsElementsList.add(singleRowElem);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (cursor != null)
+                cursor.close();
+            System.gc();
+            notifyDataSetInvalidated();
+        }
+    }
 }
 
 // if (RECYCLE) {
