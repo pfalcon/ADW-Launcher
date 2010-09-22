@@ -572,11 +572,12 @@ public abstract class WidgetSpace extends ViewGroup {
 
                     if (LOGD)
                         Log.d(TAG, "makeScrollable : recreate listview adapter");
-                } else if (LOGD) {
-                    Log.d(TAG, "makeScrollable : restore listview adapter");
+                } else {
+                	if (LOGD)
+                		Log.d(TAG, "makeScrollable : restore listview adapter");
+                	if (listViewInfos.lvAdapter instanceof WidgetRemoteViewsListAdapter)
+                		((WidgetRemoteViewsListAdapter)listViewInfos.lvAdapter).updateFromIntent(intent);
                 }
-                if (listViewInfos.lvAdapter instanceof WidgetRemoteViewsListAdapter)
-                	((WidgetRemoteViewsListAdapter)listViewInfos.lvAdapter).updateFromIntent(intent);
 
                 lv.setAdapter(listViewInfos.lvAdapter);
 
