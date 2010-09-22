@@ -538,9 +538,9 @@ public abstract class WidgetSpace extends ViewGroup {
                 String cursorDataUriString = intent
                         .getStringExtra(LauncherIntent.Extra.Scroll.EXTRA_DATA_URI);
                 ScrollViewInfos listViewInfos = mScrollViewCursorInfos.get(cursorDataUriString);
-
+                final boolean newListView = listViewInfos == null;
                 // new widget, initialize observer
-                if (listViewInfos == null) {
+                if (newListView) {
 
                     listViewInfos = new ScrollViewInfos();
 
@@ -601,7 +601,7 @@ public abstract class WidgetSpace extends ViewGroup {
                 if (position >= 0)
                     lv.setSelection(position);
 
-                if (CLEAR_DATA_CACHE) {
+                if (!newListView && CLEAR_DATA_CACHE) {
                     listViewInfos.lvAdapter.notifyToRegenerate();
                 }
 
