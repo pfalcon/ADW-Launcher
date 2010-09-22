@@ -601,7 +601,8 @@ public abstract class WidgetSpace extends ViewGroup {
                 if (position >= 0)
                     lv.setSelection(position);
 
-                if (!newListView && CLEAR_DATA_CACHE) {
+                if (!newListView && CLEAR_DATA_CACHE &&
+                		(listViewInfos.lvAdapter instanceof WidgetListAdapter)) {
                     listViewInfos.lvAdapter.notifyToRegenerate();
                 }
 
