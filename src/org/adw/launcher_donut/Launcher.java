@@ -43,6 +43,7 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
 import android.app.SearchManager;
+import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ActivityNotFoundException;
@@ -65,6 +66,7 @@ import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -319,6 +321,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private Typeface themeFont=null;
 	private boolean mIsEditMode=false;
 	private View mScreensEditor=null;
+	private boolean mIsWidgetEditMode=false;
+	private LauncherAppWidgetInfo mlauncherAppWidgetInfo=null;
 	///TODO:ADW. Current code fully ready for upto 9
 	//but need to add more drawables for the desktop dots...
 	//or completely redo the desktop dots implementation
@@ -1170,7 +1174,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 if(!isAllAppsVisible() || mHomeBinding==BIND_APPS)
                 	fireHomeBinding(mHomeBinding, 1);
             	if(mHomeBinding!=BIND_APPS){
-                	closeDrawer(false);
+                	closeDrawer(true);
                 }
                 final View v = getWindow().peekDecorView();
                 if (v != null && v.getWindowToken() != null) {
@@ -1449,7 +1453,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if(mIsEditMode)return false;
+        if(mIsEditMode || mIsWidgetEditMode)return false;
         // We can't trust the view state here since views we may not be done binding.
         // Get the vacancy state from the model instead.
 		mMenuAddInfo = mWorkspace.findAllVacantCellsFromModel();
@@ -1885,6 +1889,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                     }
                     if(mIsEditMode){
                     	stopDesktopEdit();
+                    }
+                    if(mIsWidgetEditMode){
+                        stopWidgetEdit();
                     }
                     return true;
                 case KeyEvent.KEYCODE_HOME:
@@ -3006,7 +3013,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      * ADW: Refresh UI status variables and elements after changing settings.
      */
     private void updateAlmostNexusUI(){
-    	if(mIsEditMode)return;
+    	if(mIsEditMode || mIsWidgetEditMode)return;
     	updateAlmostNexusVars();
 		boolean tint=AlmostNexusSettingsHelper.getUITint(this);
 		float scale=AlmostNexusSettingsHelper.getuiScaleAB(this);
@@ -3633,7 +3640,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	 */
 	private void fireHomeBinding(int bindingValue, int type){
     	//ADW: switch home button binding user selection
-		if(mIsEditMode)return;
+		if(mIsEditMode || mIsWidgetEditMode)return;
         switch (bindingValue) {
 		case BIND_DEFAULT:
 			dismissPreviews();
@@ -4048,5 +4055,92 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	}
 	protected boolean isEditMode(){
 		return mIsEditMode;
+	}
+	protected void editWidget(final View widget){
+        if(mWorkspace!=null){
+            mIsWidgetEditMode=true;
+            final CellLayout screen=(CellLayout) mWorkspace.getChildAt(mWorkspace.getCurrentScreen());
+            if(screen!=null){
+                mlauncherAppWidgetInfo = (LauncherAppWidgetInfo) widget.getTag();
+                
+                
+                final Intent motosize = new Intent("com.motorola.blur.home.ACTION_SET_WIDGET_SIZE");
+                final int appWidgetId = ((AppWidgetHostView)widget).getAppWidgetId();
+                final AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+                motosize.setComponent(appWidgetInfo.provider);
+                motosize.putExtra("appWidgetId",appWidgetId );
+                motosize.putExtra("com.motorola.blur.home.EXTRA_NEW_WIDGET", true);
+                
+                final int minw=(mWorkspace.getWidth()-screen.getLeftPadding()-screen.getRightPadding())/screen.getCountX();
+                final int minh=(mWorkspace.getHeight()-screen.getBottomPadding()-screen.getTopPadding())/screen.getCountY();
+                mScreensEditor=new ResizeViewHandler(this);
+                // Create a default HightlightView if we found no face in the picture.
+                int width = (mlauncherAppWidgetInfo.spanX*minw);
+                int height = (mlauncherAppWidgetInfo.spanY*minh);
+
+                final Rect screenRect = new Rect(screen.getLeftPadding(), screen.getTopPadding(), screen.getWidth()-screen.getLeftPadding()-screen.getRightPadding(), screen.getHeight()-screen.getTopPadding()-screen.getBottomPadding());
+                final int x=mlauncherAppWidgetInfo.cellX*minw;
+                final int y=mlauncherAppWidgetInfo.cellY*minh;
+                final int[]spans=new int[]{1,1};
+                final int[] position=new int[]{1,1};
+                final CellLayout.LayoutParams lp = (CellLayout.LayoutParams) widget.getLayoutParams();
+                RectF widgetRect = new RectF(x,y, x + width, y + height);
+                ((ResizeViewHandler)mScreensEditor).setup(null, screenRect, widgetRect, false,false,minw-10,minh-10);
+                mDragLayer.addView(mScreensEditor);
+                ((ResizeViewHandler)mScreensEditor).setOnSizeChangedListener(new ResizeViewHandler.OnSizeChangedListener() {
+                    @Override
+                    public void onTrigger(RectF r) {
+                        int[]tmpspans={
+                                Math.max(Math.round(r.width()/(minw)),1),
+                                Math.max(Math.round(r.height()/(minh)),1)
+                        };
+                        int[] tmpposition={
+                                Math.round(r.left/minw),
+                                Math.round(r.top/minh)
+                        };
+                        if(tmpposition[0]!=position[0] ||tmpposition[1]!=position[1]||
+                                        tmpspans[0]!=spans[0]||tmpspans[1]!=spans[1]){
+                            position[0]=tmpposition[0];
+                            position[1]=tmpposition[1];
+                            spans[0]=tmpspans[0];
+                            spans[1]=tmpspans[1];
+                            lp.cellX = position[0];
+                            lp.cellY = position[1];
+                            lp.cellHSpan = spans[0];
+                            lp.cellVSpan = spans[1];
+                            widget.setLayoutParams(lp);
+                            mlauncherAppWidgetInfo.cellX=lp.cellX;
+                            mlauncherAppWidgetInfo.cellY=lp.cellY;
+                            mlauncherAppWidgetInfo.spanX=lp.cellHSpan;
+                            mlauncherAppWidgetInfo.spanY=lp.cellVSpan;
+                            widget.setTag(mlauncherAppWidgetInfo);
+                            //send the broadcast
+                            motosize.putExtra("spanX", spans[0]);
+                            motosize.putExtra("spanY", spans[1]);
+                            Launcher.this.sendBroadcast(motosize);
+                            d("RESIZEHANDLER","sent resize broadcast");
+                        }
+                    }
+                });
+            }
+        }
+	}
+	private void stopWidgetEdit(){
+	    mIsWidgetEditMode=false;
+	    if(mlauncherAppWidgetInfo!=null){
+            LauncherModel.resizeItemInDatabase(this, mlauncherAppWidgetInfo,
+                    LauncherSettings.Favorites.CONTAINER_DESKTOP,
+                    mlauncherAppWidgetInfo.screen,
+                    mlauncherAppWidgetInfo.cellX,
+                    mlauncherAppWidgetInfo.cellY,
+                    mlauncherAppWidgetInfo.spanX,
+                    mlauncherAppWidgetInfo.spanY);
+            mlauncherAppWidgetInfo=null;
+	    }
+	    //Remove the resizehandler view
+        if(mScreensEditor!=null){
+            mDragLayer.removeView(mScreensEditor);
+            mScreensEditor=null;
+        }
 	}
 }
