@@ -1141,21 +1141,33 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         } else {
             // Move internally
             if (mDragInfo != null) {
+                boolean moved=false;
                 final View cell = mDragInfo.cell;
                 int index = mScroller.isFinished() ? mCurrentScreen : mNextScreen;
                 if (index != mDragInfo.screen) {
                     final CellLayout originalCellLayout = (CellLayout) getChildAt(mDragInfo.screen);
                     originalCellLayout.removeView(cell);
                     cellLayout.addView(cell);
+                    moved=true;
                 }
                 mTargetCell = estimateDropCell(x - xOffset, y - yOffset,
                         mDragInfo.spanX, mDragInfo.spanY, cell, cellLayout, mTargetCell);
                 cellLayout.onDropChild(cell, mTargetCell);
-
+                if(mTargetCell[0]!=mDragInfo.cellX || mTargetCell[1]!=mDragInfo.cellY)
+                    moved=true;
                 final ItemInfo info = (ItemInfo)cell.getTag();
-                CellLayout.LayoutParams lp = (CellLayout.LayoutParams) cell.getLayoutParams();
-                LauncherModel.moveItemInDatabase(mLauncher, info,
-                        LauncherSettings.Favorites.CONTAINER_DESKTOP, index, lp.cellX, lp.cellY);
+                if(moved){
+                    CellLayout.LayoutParams lp = (CellLayout.LayoutParams) cell.getLayoutParams();
+                    LauncherModel.moveItemInDatabase(mLauncher, info,
+                            LauncherSettings.Favorites.CONTAINER_DESKTOP, index, lp.cellX, lp.cellY);
+                }else{
+                    //guess if it's a widget
+                    if (info instanceof LauncherAppWidgetInfo) {
+                        final LauncherAppWidgetInfo launcherAppWidgetInfo = (LauncherAppWidgetInfo) info;
+                        int id = ((AppWidgetHostView)cell).getAppWidgetId();
+                        mLauncher.editWidget(cell);
+                    }
+                }
             }
         }
     }
@@ -1307,7 +1319,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     public void onDropCompleted(View target, boolean success) {
         // This is a bit expensive but safe
         clearVacantCache();
-
         if (success){
             if (target != this && mDragInfo != null) {
                 final CellLayout cellLayout = (CellLayout) getChildAt(mDragInfo.screen);

@@ -1570,5 +1570,29 @@ public class LauncherModel {
         }
         return icon;
     }
+    /**
+     * Resize an item in the DB to a new <container, screen, cellX, cellY>
+     */
+    static void resizeItemInDatabase(Context context, ItemInfo item, long container, int screen,
+            int cellX, int cellY, int spanX, int spanY) {
+        item.container = container;
+        item.screen = screen;
+        item.cellX = cellX;
+        item.cellY = cellY;
+        item.spanX = spanX;
+        item.spanY = spanY;
+
+        final ContentValues values = new ContentValues();
+        final ContentResolver cr = context.getContentResolver();
+
+        values.put(LauncherSettings.Favorites.CONTAINER, item.container);
+        values.put(LauncherSettings.Favorites.CELLX, item.cellX);
+        values.put(LauncherSettings.Favorites.CELLY, item.cellY);
+        values.put(LauncherSettings.Favorites.SPANX, item.spanX);
+        values.put(LauncherSettings.Favorites.SPANY, item.spanY);
+        values.put(LauncherSettings.Favorites.SCREEN, item.screen);
+
+        cr.update(LauncherSettings.Favorites.getContentUri(item.id, false), values, null, null);
+    }
     
 }
