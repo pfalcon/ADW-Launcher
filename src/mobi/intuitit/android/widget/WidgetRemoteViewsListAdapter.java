@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -48,7 +47,6 @@ public class WidgetRemoteViewsListAdapter extends ScrollableBaseAdapter {
         mRemoteViews = (BoundRemoteViews)intent.getParcelableExtra(LauncherIntent.Extra.Scroll.EXTRA_ITEM_LAYOUT_REMOTEVIEWS);
         mAsyncQuery=new MyQueryHandler(mContext.getContentResolver());
         mHandler.post(mQueryDataRunnable);
-        Log.d("BOOMBULER", "from constructor");
     }
 
     public void updateFromIntent(Intent intent) {
@@ -59,7 +57,6 @@ public class WidgetRemoteViewsListAdapter extends ScrollableBaseAdapter {
     		mIntent = intent;
     		mRemoteViews = (BoundRemoteViews)intent.getParcelableExtra(LauncherIntent.Extra.Scroll.EXTRA_ITEM_LAYOUT_REMOTEVIEWS);
             mHandler.post(mQueryDataRunnable);
-            Log.d("BOOMBULER", "from updateFromIntent");
     	}
     }
 
@@ -80,7 +77,6 @@ public class WidgetRemoteViewsListAdapter extends ScrollableBaseAdapter {
 
     @Override
     public synchronized void notifyToRegenerate() {
-    	Log.d("BOOMBULER", "from notify");
     	mHandler.post(mQueryDataRunnable);
     }
 
