@@ -144,7 +144,6 @@
 
     <string name="pref_title_hide_statusbar">κρυψιμο status bar</string>
     <string name="pref_summary_hide_statusbar">κρυβει το status bar</string>
-    
     <string name="pref_title_default_screen">κεντρικη οθονη </string>
     <string name="pref_summary_default_screen">διαλεξτε την οθονη που θα ορισετε ως κεντρικη</string>
     <string name="pref_dialog_default_screen">διαλεξτε την οθονη που θα ορισετε ως κεντρικη</string>
