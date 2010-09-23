@@ -423,6 +423,7 @@ class ResizeViewHandler extends View {
     private float mMinWidth=25F;
     private float mMinHeight=25F;
     private OnSizeChangedListener mOnTriggerListener=null;
+    private OnSizeChangedListener mOnValidateSizingListener=null;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -441,6 +442,7 @@ class ResizeViewHandler extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 setMode(ModifyMode.None);
+                dispatchValidateSizingRect();
                 break;
             case MotionEvent.ACTION_MOVE:
                 handleMotion(mMotionEdge,
@@ -452,6 +454,18 @@ class ResizeViewHandler extends View {
         }
         return true;
     }
+
+    public void setOnValidateSizingRect(OnSizeChangedListener listener) {
+    	mOnValidateSizingListener = listener;
+    }
+
+    private void dispatchValidateSizingRect() {
+    	if (mOnValidateSizingListener != null) {
+    		mOnValidateSizingListener.onTrigger(mCropRect);
+    		invalidate();
+    	}
+    }
+
     public void setOnSizeChangedListener(OnSizeChangedListener listener) {
         mOnTriggerListener = listener;
     }
