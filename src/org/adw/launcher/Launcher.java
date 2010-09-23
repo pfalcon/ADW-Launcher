@@ -4160,6 +4160,19 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 RectF widgetRect = new RectF(x,y, x + width, y + height);
                 ((ResizeViewHandler)mScreensEditor).setup(null, screenRect, widgetRect, false,false,minw-10,minh-10);
                 mDragLayer.addView(mScreensEditor);
+                ((ResizeViewHandler)mScreensEditor).setOnValidateSizingRect(new ResizeViewHandler.OnSizeChangedListener() {
+
+					@Override
+					public void onTrigger(RectF r) {
+						final float left = Math.round(r.left/minw) * minw;
+						final float top = Math.round(r.top/minh) * minh;
+						final float right = left + (Math.max(Math.round(r.width()/(minw)),1) * minw);
+						final float bottom = top + (Math.max(Math.round(r.height()/(minh)),1) * minh);
+
+						r.set(left, top, right, bottom);
+					}
+				});
+
                 ((ResizeViewHandler)mScreensEditor).setOnSizeChangedListener(new ResizeViewHandler.OnSizeChangedListener() {
                     @Override
                     public void onTrigger(RectF r) {
