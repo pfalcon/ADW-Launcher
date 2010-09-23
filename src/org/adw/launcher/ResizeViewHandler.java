@@ -16,9 +16,6 @@
 
 package org.adw.launcher;
 
-import org.adw.launcher.CellLayout.CellInfo;
-import org.adw.launcher.SliderView.OnTriggerListener;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -28,7 +25,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
-import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -65,7 +61,8 @@ class ResizeViewHandler extends View {
     boolean mIsFocused;
     boolean mHidden;
 
-    public boolean hasFocus() {
+    @Override
+	public boolean hasFocus() {
         return mIsFocused;
     }
 
@@ -77,7 +74,8 @@ class ResizeViewHandler extends View {
         mHidden = hidden;
     }
 
-    public void draw(Canvas canvas) {
+    @Override
+	public void draw(Canvas canvas) {
         if (mHidden) {
             return;
         }
@@ -104,65 +102,63 @@ class ResizeViewHandler extends View {
         canvas.restore();
         canvas.drawPath(path, mOutlinePaint);
 
-        if (mMode == ModifyMode.Grow) {
-            if (mCircle) {
-                int width  = mResizeDrawableDiagonal.getIntrinsicWidth();
-                int height = mResizeDrawableDiagonal.getIntrinsicHeight();
+        if (mCircle) {
+            int width  = mResizeDrawableDiagonal.getIntrinsicWidth();
+            int height = mResizeDrawableDiagonal.getIntrinsicHeight();
 
-                int d  = (int) Math.round(Math.cos(/*45deg*/Math.PI / 4D)
-                        * (mDrawRect.width() / 2D));
-                int x  = mDrawRect.left
-                        + (mDrawRect.width() / 2) + d - width / 2;
-                int y  = mDrawRect.top
-                        + (mDrawRect.height() / 2) - d - height / 2;
-                mResizeDrawableDiagonal.setBounds(x, y,
-                        x + mResizeDrawableDiagonal.getIntrinsicWidth(),
-                        y + mResizeDrawableDiagonal.getIntrinsicHeight());
-                mResizeDrawableDiagonal.draw(canvas);
-            } else {
-                int left    = mDrawRect.left   + 1;
-                int right   = mDrawRect.right  + 1;
-                int top     = mDrawRect.top    + 4;
-                int bottom  = mDrawRect.bottom + 3;
+            int d  = (int) Math.round(Math.cos(/*45deg*/Math.PI / 4D)
+                    * (mDrawRect.width() / 2D));
+            int x  = mDrawRect.left
+                    + (mDrawRect.width() / 2) + d - width / 2;
+            int y  = mDrawRect.top
+                    + (mDrawRect.height() / 2) - d - height / 2;
+            mResizeDrawableDiagonal.setBounds(x, y,
+                    x + mResizeDrawableDiagonal.getIntrinsicWidth(),
+                    y + mResizeDrawableDiagonal.getIntrinsicHeight());
+            mResizeDrawableDiagonal.draw(canvas);
+        } else {
+            int left    = mDrawRect.left   + 1;
+            int right   = mDrawRect.right  + 1;
+            int top     = mDrawRect.top    + 4;
+            int bottom  = mDrawRect.bottom + 3;
 
-                int widthWidth   =
-                        mResizeDrawableWidth.getIntrinsicWidth() / 2;
-                int widthHeight  =
-                        mResizeDrawableWidth.getIntrinsicHeight() / 2;
-                int heightHeight =
-                        mResizeDrawableHeight.getIntrinsicHeight() / 2;
-                int heightWidth  =
-                        mResizeDrawableHeight.getIntrinsicWidth() / 2;
+            int widthWidth   =
+                    mResizeDrawableWidth.getIntrinsicWidth() / 2;
+            int widthHeight  =
+                    mResizeDrawableWidth.getIntrinsicHeight() / 2;
+            int heightHeight =
+                    mResizeDrawableHeight.getIntrinsicHeight() / 2;
+            int heightWidth  =
+                    mResizeDrawableHeight.getIntrinsicWidth() / 2;
 
-                int xMiddle = mDrawRect.left
-                        + ((mDrawRect.right  - mDrawRect.left) / 2);
-                int yMiddle = mDrawRect.top
-                        + ((mDrawRect.bottom - mDrawRect.top) / 2);
+            int xMiddle = mDrawRect.left
+                    + ((mDrawRect.right  - mDrawRect.left) / 2);
+            int yMiddle = mDrawRect.top
+                    + ((mDrawRect.bottom - mDrawRect.top) / 2);
 
-                mResizeDrawableWidth.setBounds(left - widthWidth,
-                                               yMiddle - widthHeight,
-                                               left + widthWidth,
-                                               yMiddle + widthHeight);
-                mResizeDrawableWidth.draw(canvas);
+            mResizeDrawableWidth.setBounds(left - widthWidth,
+                                           yMiddle - widthHeight,
+                                           left + widthWidth,
+                                           yMiddle + widthHeight);
+            mResizeDrawableWidth.draw(canvas);
 
-                mResizeDrawableWidth.setBounds(right - widthWidth,
-                                               yMiddle - widthHeight,
-                                               right + widthWidth,
-                                               yMiddle + widthHeight);
-                mResizeDrawableWidth.draw(canvas);
+            mResizeDrawableWidth.setBounds(right - widthWidth,
+                                           yMiddle - widthHeight,
+                                           right + widthWidth,
+                                           yMiddle + widthHeight);
+            mResizeDrawableWidth.draw(canvas);
 
-                mResizeDrawableHeight.setBounds(xMiddle - heightWidth,
-                                                top - heightHeight,
-                                                xMiddle + heightWidth,
-                                                top + heightHeight);
-                mResizeDrawableHeight.draw(canvas);
+            mResizeDrawableHeight.setBounds(xMiddle - heightWidth,
+                                            top - heightHeight,
+                                            xMiddle + heightWidth,
+                                            top + heightHeight);
+            mResizeDrawableHeight.draw(canvas);
 
-                mResizeDrawableHeight.setBounds(xMiddle - heightWidth,
-                                                bottom - heightHeight,
-                                                xMiddle + heightWidth,
-                                                bottom + heightHeight);
-                mResizeDrawableHeight.draw(canvas);
-            }
+            mResizeDrawableHeight.setBounds(xMiddle - heightWidth,
+                                            bottom - heightHeight,
+                                            xMiddle + heightWidth,
+                                            bottom + heightHeight);
+            mResizeDrawableHeight.draw(canvas);
         }
     }
 
@@ -368,7 +364,8 @@ class ResizeViewHandler extends View {
                         Math.round(r.right), Math.round(r.bottom));
     }
 
-    public void invalidate() {
+    @Override
+	public void invalidate() {
         mDrawRect = computeLayout();
         super.invalidate();
     }
@@ -468,7 +465,7 @@ class ResizeViewHandler extends View {
             mOnTriggerListener.onTrigger(r);
         }
     }
-    
+
     /**
      * Interface definition for a callback to be invoked when a resize triggered
      * by moving the handlers beyond a threshold.
@@ -477,7 +474,7 @@ class ResizeViewHandler extends View {
         /**
          * Called when the user moves a handle beyond the threshold.
          *
-         * @param r: the resulting Rect 
+         * @param r: the resulting Rect
          */
         void onTrigger(RectF r);
     }
