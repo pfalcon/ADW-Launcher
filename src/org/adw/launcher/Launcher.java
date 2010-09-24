@@ -4172,7 +4172,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 						r.set(left, top, right, bottom);
 					}
 				});
-
+                final Rect checkRect=new Rect();
                 ((ResizeViewHandler)mScreensEditor).setOnSizeChangedListener(new ResizeViewHandler.OnSizeChangedListener() {
                     @Override
                     public void onTrigger(RectF r) {
@@ -4184,27 +4184,36 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                                 Math.round(r.left/minw),
                                 Math.round(r.top/minh)
                         };
+                        checkRect.set(tmpposition[0],tmpposition[1],tmpposition[0]+tmpspans[0],tmpposition[1]+tmpspans[1]);
+                        boolean ocupada=getModel().ocuppiedArea(screen.getScreen(), appWidgetId,checkRect);
+                        if(!ocupada){
+                            ((ResizeViewHandler)mScreensEditor).setColliding(false);
+                        }else{
+                            ((ResizeViewHandler)mScreensEditor).setColliding(true);
+                        }
                         if(tmpposition[0]!=position[0] ||tmpposition[1]!=position[1]||
                                         tmpspans[0]!=spans[0]||tmpspans[1]!=spans[1]){
-                            position[0]=tmpposition[0];
-                            position[1]=tmpposition[1];
-                            spans[0]=tmpspans[0];
-                            spans[1]=tmpspans[1];
-                            lp.cellX = position[0];
-                            lp.cellY = position[1];
-                            lp.cellHSpan = spans[0];
-                            lp.cellVSpan = spans[1];
-                            widget.setLayoutParams(lp);
-                            mlauncherAppWidgetInfo.cellX=lp.cellX;
-                            mlauncherAppWidgetInfo.cellY=lp.cellY;
-                            mlauncherAppWidgetInfo.spanX=lp.cellHSpan;
-                            mlauncherAppWidgetInfo.spanY=lp.cellVSpan;
-                            widget.setTag(mlauncherAppWidgetInfo);
-                            //send the broadcast
-                            motosize.putExtra("spanX", spans[0]);
-                            motosize.putExtra("spanY", spans[1]);
-                            Launcher.this.sendBroadcast(motosize);
-                            Log.d("RESIZEHANDLER","sent resize broadcast");
+                            if(!ocupada){
+                                position[0]=tmpposition[0];
+                                position[1]=tmpposition[1];
+                                spans[0]=tmpspans[0];
+                                spans[1]=tmpspans[1];
+                                lp.cellX = position[0];
+                                lp.cellY = position[1];
+                                lp.cellHSpan = spans[0];
+                                lp.cellVSpan = spans[1];
+                                widget.setLayoutParams(lp);
+                                mlauncherAppWidgetInfo.cellX=lp.cellX;
+                                mlauncherAppWidgetInfo.cellY=lp.cellY;
+                                mlauncherAppWidgetInfo.spanX=lp.cellHSpan;
+                                mlauncherAppWidgetInfo.spanY=lp.cellVSpan;
+                                widget.setTag(mlauncherAppWidgetInfo);
+                                //send the broadcast
+                                motosize.putExtra("spanX", spans[0]);
+                                motosize.putExtra("spanY", spans[1]);
+                                Launcher.this.sendBroadcast(motosize);
+                                Log.d("RESIZEHANDLER","sent resize broadcast");
+                            }
                         }
                     }
                 });

@@ -30,6 +30,7 @@ import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import static android.util.Log.*;
@@ -1593,6 +1594,34 @@ public class LauncherModel {
         values.put(LauncherSettings.Favorites.SCREEN, item.screen);
 
         cr.update(LauncherSettings.Favorites.getContentUri(item.id, false), values, null, null);
+    }
+    boolean ocuppiedArea(int screen,int id,Rect rect){
+        final ArrayList<ItemInfo>desktopItems=mDesktopItems;
+        int count =desktopItems.size();
+        Rect r=new Rect();
+        for (int i=0;i<count;i++){
+            if(desktopItems.get(i).screen==screen){
+                ItemInfo it=desktopItems.get(i);
+                r.set(it.cellX,it.cellY,it.cellX+it.spanX,it.cellY+it.spanY);
+                if(rect.contains(r)){
+                    return true;
+                }
+            }
+        }
+        final ArrayList<LauncherAppWidgetInfo>desktopWidgets=mDesktopAppWidgets;
+        count=desktopWidgets.size();
+        for (int i=0;i<count;i++){
+            if(desktopWidgets.get(i).screen==screen){
+                LauncherAppWidgetInfo it=desktopWidgets.get(i);
+                if(id!=it.appWidgetId){
+                    r.set(it.cellX,it.cellY,it.cellX+it.spanX,it.cellY+it.spanY);
+                    if(rect.contains(r)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     
 }

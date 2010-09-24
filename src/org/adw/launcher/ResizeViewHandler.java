@@ -96,8 +96,11 @@ class ResizeViewHandler extends View {
             mOutlinePaint.setColor(0xFFFF8A00);
         }
         canvas.clipPath(path, Region.Op.DIFFERENCE);
-        canvas.drawRect(viewDrawingRect,
-                hasFocus() ? mFocusPaint : mNoFocusPaint);
+        canvas.drawRect(viewDrawingRect,mNoFocusPaint);
+        if(mCollision){
+            canvas.clipPath(path, Region.Op.REVERSE_DIFFERENCE);
+            canvas.drawRect(viewDrawingRect,mFocusPaint);
+        }
 
         canvas.restore();
         canvas.drawPath(path, mOutlinePaint);
@@ -385,7 +388,7 @@ class ResizeViewHandler extends View {
         mInitialAspectRatio = mCropRect.width() / mCropRect.height();
         mDrawRect = computeLayout();
 
-        mFocusPaint.setARGB(125, 50, 50, 50);
+        mFocusPaint.setARGB(125, 255, 50, 50);
         mNoFocusPaint.setARGB(125, 50, 50, 50);
         mOutlinePaint.setStrokeWidth(3F);
         mOutlinePaint.setStyle(Paint.Style.STROKE);
@@ -424,6 +427,7 @@ class ResizeViewHandler extends View {
     private float mMinHeight=25F;
     private OnSizeChangedListener mOnTriggerListener=null;
     private OnSizeChangedListener mOnValidateSizingListener=null;
+    private boolean mCollision=false;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -455,6 +459,9 @@ class ResizeViewHandler extends View {
         return true;
     }
 
+    public void setColliding(boolean colliding){
+        mCollision=colliding;
+    }
     public void setOnValidateSizingRect(OnSizeChangedListener listener) {
     	mOnValidateSizingListener = listener;
     }

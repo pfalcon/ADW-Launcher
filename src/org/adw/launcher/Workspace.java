@@ -1099,6 +1099,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         current.onDragChild(child);
         mDragger.startDrag(child, this, child.getTag(), DragController.DRAG_ACTION_MOVE);
         invalidate();
+        clearVacantCache();
     }
 
     @Override
