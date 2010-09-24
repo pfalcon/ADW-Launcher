@@ -4140,10 +4140,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 final Intent motosize = new Intent("com.motorola.blur.home.ACTION_SET_WIDGET_SIZE");
                 final int appWidgetId = ((AppWidgetHostView)widget).getAppWidgetId();
                 final AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-                motosize.setComponent(appWidgetInfo.provider);
+                if(appWidgetInfo!=null){
+                    motosize.setComponent(appWidgetInfo.provider);
+                }
                 motosize.putExtra("appWidgetId",appWidgetId );
                 motosize.putExtra("com.motorola.blur.home.EXTRA_NEW_WIDGET", true);
-
                 final int minw=(mWorkspace.getWidth()-screen.getLeftPadding()-screen.getRightPadding())/screen.getCountX();
                 final int minh=(mWorkspace.getHeight()-screen.getBottomPadding()-screen.getTopPadding())/screen.getCountY();
                 mScreensEditor=new ResizeViewHandler(this);
