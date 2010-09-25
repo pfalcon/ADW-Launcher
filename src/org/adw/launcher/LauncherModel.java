@@ -1603,7 +1603,7 @@ public class LauncherModel {
             if(desktopItems.get(i).screen==screen){
                 ItemInfo it=desktopItems.get(i);
                 r.set(it.cellX,it.cellY,it.cellX+it.spanX,it.cellY+it.spanY);
-                if(rect.contains(r)){
+                if(rect.intersect(r)){
                     return true;
                 }
             }
@@ -1615,7 +1615,7 @@ public class LauncherModel {
                 LauncherAppWidgetInfo it=desktopWidgets.get(i);
                 if(id!=it.appWidgetId){
                     r.set(it.cellX,it.cellY,it.cellX+it.spanX,it.cellY+it.spanY);
-                    if(rect.contains(r)){
+                    if(rect.intersect(r)){
                         return true;
                     }
                 }
