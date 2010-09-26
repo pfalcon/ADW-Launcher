@@ -1164,8 +1164,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 }else{
                     //guess if it's a widget
                     if (info instanceof LauncherAppWidgetInfo) {
-                        final LauncherAppWidgetInfo launcherAppWidgetInfo = (LauncherAppWidgetInfo) info;
-                        int id = ((AppWidgetHostView)cell).getAppWidgetId();
                         mLauncher.editWidget(cell);
                     }
                 }
