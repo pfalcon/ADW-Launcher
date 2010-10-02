@@ -16,13 +16,19 @@
 
 package org.adw.launcher;
 
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+import org.adw.launcher.catalogue.AppCatalogueFilter;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +36,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
-import org.adw.launcher.catalogue.AppGrpUtils;
 
 /**
  * GridView adapter to show the list of applications and shortcuts
@@ -47,12 +47,15 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	private boolean useThemeTextColor = false;
     private Typeface themeFont=null;
 	// TODO: Check if allItems is used somewhere else!
-	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();	
+	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();
 	private CatalogueFilter filter;
     private static final Collator sCollator = Collator.getInstance();
+    private final AppCatalogueFilter mCatalogueFilter;
 
-	public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps) {
+	public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps, AppCatalogueFilter filter) {
 		super(context, 0, apps);
+
+		mCatalogueFilter = filter;
 
 		mInflater = LayoutInflater.from(context);
 		// ADW: Load textcolor and bubble color from theme
@@ -117,7 +120,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	@Override
 	public void add(ApplicationInfo info) {
 		boolean changed = false;
-		//check allItems before added. It is a fix for all of the multi-icon issue, but will 
+		//check allItems before added. It is a fix for all of the multi-icon issue, but will
 		//lose performance. Anyway, we do not expected to have many applications.
 		synchronized (allItems) {
 			/*if (!allItems.contains(info)) {
@@ -153,11 +156,11 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 		if(info!=null)
 			super.add(info);
 	}
-	
+
 	void superClear() {
 		super.clear();
 	}
-	
+
 	@Override
 	public void remove(ApplicationInfo info) {
 		boolean changed=false;
@@ -180,16 +183,16 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 				allItems.remove(found);
 				Collections.sort(allItems,new ApplicationInfoComparator());
 				changed=true;
-			}			
+			}
 		}
 		if(changed)
 			updateDataSet();
 	}
 
 	private boolean appInGroup(String s) {
-		return AppGrpUtils.checkAppInGroup(s);
+		return mCatalogueFilter.checkAppInGroup(s);
 	}
-	
+
 	private String getComponentName(ApplicationInfo info) {
 		if (info == null || info.intent == null)
 			return null;
@@ -209,7 +212,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			for (int i = 0; i < length; i++) {
 				ApplicationInfo info = theItems.get(i);
 				String s = getComponentName(info);
-				
+
 				if (s != null && appInGroup(s)) {
 					theFiltered.add(info);
 				}
@@ -221,7 +224,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	{
         getFilter().filter(null);
 	}
-    
+
 	@Override
 	public Filter getFilter() {
 		if (filter == null)
@@ -268,5 +271,5 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
         public final int compare(ApplicationInfo a, ApplicationInfo b) {
             return sCollator.compare(a.title.toString(), b.title.toString());
         }
-    }	
+    }
 }

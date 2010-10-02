@@ -16,11 +16,27 @@
 
 package org.adw.launcher;
 
+import static android.util.Log.d;
+import static android.util.Log.e;
+import static android.util.Log.w;
+
+import java.lang.ref.WeakReference;
+import java.net.URISyntaxException;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.adw.launcher.IconShader.CompiledIconShader;
+import org.adw.launcher.catalogue.AppCatalogueFilters;
+
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -33,21 +49,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import static android.util.Log.*;
 import android.os.Process;
-//import android.os.SystemProperties;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Comparator;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.lang.ref.WeakReference;
-import java.text.Collator;
-import java.net.URISyntaxException;
-
-import org.adw.launcher.IconShader.CompiledIconShader;
-import org.adw.launcher.IconShader;
 
 
 /**
@@ -73,7 +75,7 @@ public class LauncherModel {
     private HashMap<Long, FolderInfo> mFolders;
 
     public static ArrayList<ApplicationInfo> mApplications;
-    
+
     public static ApplicationsAdapter mApplicationsAdapter;
     private ApplicationsLoader mApplicationsLoader;
     private DesktopItemsLoader mDesktopItemsLoader;
@@ -83,10 +85,10 @@ public class LauncherModel {
     private int mDesktopRows;
     private final HashMap<ComponentName, ApplicationInfo> mAppInfoCache =
             new HashMap<ComponentName, ApplicationInfo>(INITIAL_ICON_CACHE_CAPACITY);
-    
+
     private static String compiledIconShaderName;
     private static CompiledIconShader compiledIconShader;
-    
+
     synchronized void abortLoaders() {
         if (DEBUG_LOADERS) d(LOG_TAG, "aborting loaders");
 
@@ -123,7 +125,8 @@ public class LauncherModel {
         if (DEBUG_LOADERS) d(LOG_TAG, "load applications");
 
         if (isLaunching && mApplicationsLoaded && !localeChanged) {
-            mApplicationsAdapter = new ApplicationsAdapter(launcher, mApplications);
+            mApplicationsAdapter = new ApplicationsAdapter(launcher, mApplications,
+            		AppCatalogueFilters.getInstance().getDrawerFilter());
             if (DEBUG_LOADERS) d(LOG_TAG, "  --> applications loaded, return");
             return false;
         }
@@ -136,7 +139,8 @@ public class LauncherModel {
 
         if (mApplicationsAdapter == null || isLaunching || localeChanged) {
             mApplications = new ArrayList<ApplicationInfo>(DEFAULT_APPLICATIONS_NUMBER);
-            mApplicationsAdapter = new ApplicationsAdapter(launcher, mApplications);
+            mApplicationsAdapter = new ApplicationsAdapter(launcher, mApplications,
+            		AppCatalogueFilters.getInstance().getDrawerFilter());
         }
 
         mApplicationsLoaded = false;
@@ -209,7 +213,7 @@ public class LauncherModel {
 
     synchronized void removePackage(Launcher launcher, String packageName) {
     	// for add/remove Package, we need use applications adapter's "full" list.
-    	
+
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
             dropApplicationCache(); // TODO: this could be optimized
             startApplicationsLoaderLocked(launcher, false);
@@ -303,7 +307,7 @@ public class LauncherModel {
                 final ApplicationsAdapter adapter = mApplicationsAdapter;
 				adapter.updateDataSet();
                 //adapter.sort(new ApplicationInfoComparator());
-                //adapter.notifyDataSetChanged();                
+                //adapter.notifyDataSetChanged();
             }
         }
     }
@@ -489,12 +493,12 @@ public class LauncherModel {
         if (application.title == null) {
             application.title = info.activityInfo.name;
         }
-        
+
         application.icon = getIcon(manager, context, info.activityInfo);
-        
+
         application.filtered = false;
     }
- 
+
     private static final AtomicInteger sAppsLoaderCount = new AtomicInteger(1);
     private static final AtomicInteger sWorkspaceLoaderCount = new AtomicInteger(1);
 
@@ -697,7 +701,7 @@ public class LauncherModel {
         private final boolean mLocaleChanged;
         private final boolean mLoadApplications;
         private final boolean mIsLaunching;
-        private final int mId;        
+        private final int mId;
 
         DesktopItemsLoader(Launcher launcher, boolean localeChanged, boolean loadApplications,
                 boolean isLaunching) {
@@ -842,9 +846,9 @@ public class LauncherModel {
                                 case LauncherSettings.Favorites.CONTAINER_DESKTOP:
                                 case LauncherSettings.Favorites.CONTAINER_DOCKBAR:
                                 case LauncherSettings.Favorites.CONTAINER_LAB:
-                                case LauncherSettings.Favorites.CONTAINER_RAB:                                	
+                                case LauncherSettings.Favorites.CONTAINER_RAB:
                                 case LauncherSettings.Favorites.CONTAINER_LAB2:
-                                case LauncherSettings.Favorites.CONTAINER_RAB2:                                	
+                                case LauncherSettings.Favorites.CONTAINER_RAB2:
                                     desktopItems.add(folderInfo);
                                     break;
                             }
@@ -882,9 +886,9 @@ public class LauncherModel {
                                 case LauncherSettings.Favorites.CONTAINER_DESKTOP:
                                 case LauncherSettings.Favorites.CONTAINER_DOCKBAR:
                                 case LauncherSettings.Favorites.CONTAINER_LAB:
-                                case LauncherSettings.Favorites.CONTAINER_RAB:                                	
+                                case LauncherSettings.Favorites.CONTAINER_RAB:
                                 case LauncherSettings.Favorites.CONTAINER_LAB2:
-                                case LauncherSettings.Favorites.CONTAINER_RAB2:                                	
+                                case LauncherSettings.Favorites.CONTAINER_RAB2:
                                     desktopItems.add(liveFolderInfo);
                                     break;
                             }
@@ -1186,7 +1190,7 @@ public class LauncherModel {
 
     /**
      * Fills in the occupied structure with all of the shortcuts, apps, folders and widgets in
-     * the model. 
+     * the model.
      */
     void findAllOccupiedCells(boolean[][] occupied, int countX, int countY, int screen) {
         final ArrayList<ItemInfo> desktopItems = mDesktopItems;
@@ -1194,12 +1198,12 @@ public class LauncherModel {
             final int count = desktopItems.size();
             for (int i = 0; i < count; i++) {
                 //ADW: Don't load items outer current columns/rows limits
-                if((desktopItems.get(i).cellX+(desktopItems.get(i).spanX-1))<mDesktopColumns && 
+                if((desktopItems.get(i).cellX+(desktopItems.get(i).spanX-1))<mDesktopColumns &&
                 		(desktopItems.get(i).cellY+(desktopItems.get(i).spanY-1))<mDesktopRows)
                 addOccupiedCells(occupied, screen, desktopItems.get(i));
             }
         }
-        
+
         final ArrayList<LauncherAppWidgetInfo> desktopAppWidgets = mDesktopAppWidgets;
         if (desktopAppWidgets != null) {
             final int count = desktopAppWidgets.size();
@@ -1223,7 +1227,7 @@ public class LauncherModel {
             }
         }
     }
-    
+
     /**
      * @return The current list of applications
      */
@@ -1273,15 +1277,15 @@ public class LauncherModel {
         if (componentName == null) {
             return null;
         }
-    	
+
         final ResolveInfo resolveInfo = manager.resolveActivity(intent, 0);
-        
+
         final ApplicationInfo info = new ApplicationInfo();
         if(resolveInfo!=null){
 	        final ActivityInfo activityInfo = resolveInfo.activityInfo;
-	        
+
 	        info.icon = getIcon(manager, context, activityInfo);
-	        
+
 	        if (info.title == null || info.title.length() == 0) {
 	            info.title = activityInfo.loadLabel(manager);
 	        }
@@ -1515,7 +1519,7 @@ public class LauncherModel {
         cr.delete(LauncherSettings.Favorites.CONTENT_URI,
                 LauncherSettings.Favorites.CONTAINER + "=" + info.id, null);
     }
-    
+
     /**
      * Get an the icon for an activity
      * Accounts for theme and icon shading
@@ -1540,7 +1544,7 @@ public class LauncherModel {
                     if(resource_id!=0){
                         icon=themeResources.getDrawable(resource_id);
                     }
-                    
+
                     // use IconShader
                     if(icon==null){
                         if (compiledIconShaderName==null ||
@@ -1552,7 +1556,7 @@ public class LauncherModel {
                                 compiledIconShader = IconShader.parseXml(xpp);
                             }
                         }
-                        
+
                         if(compiledIconShader!=null){
                             icon = Utilities.createIconThumbnail(activityInfo.loadIcon(manager), context);
                             try {
@@ -1562,7 +1566,7 @@ public class LauncherModel {
                     }
                 }
             }
-            
+
             if(icon==null){
                 icon = Utilities.createIconThumbnail(activityInfo.loadIcon(manager), context);
             }else{
@@ -1623,5 +1627,5 @@ public class LauncherModel {
         }
         return false;
     }
-    
+
 }
