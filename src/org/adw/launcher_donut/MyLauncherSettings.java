@@ -43,7 +43,6 @@ import java.util.Calendar;
 import java.util.List;
 
 public class MyLauncherSettings extends PreferenceActivity implements OnPreferenceChangeListener {
-    
 	private static final String ALMOSTNEXUS_PREFERENCES = "launcher.preferences.almostnexus";
     private boolean shouldRestart=false;
     private String mMsg;
