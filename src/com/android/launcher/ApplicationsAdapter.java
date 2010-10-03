@@ -50,7 +50,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 	public static ArrayList<ApplicationInfo> allItems = new ArrayList<ApplicationInfo>();
 	private CatalogueFilter filter;
     private static final Collator sCollator = Collator.getInstance();
-    private final AppCatalogueFilter mCatalogueFilter;
+    private AppCatalogueFilter mCatalogueFilter;
 
 	public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps, AppCatalogueFilter filter) {
 		super(context, 0, apps);
@@ -231,6 +231,14 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			filter = new CatalogueFilter();
 		return filter;
 	}
+
+	public synchronized void setCatalogueFilter(AppCatalogueFilter filter) {
+		if (filter != mCatalogueFilter) {
+			mCatalogueFilter = filter;
+			updateDataSet();
+		}
+	}
+
 
 	private class CatalogueFilter extends Filter {
         @Override
