@@ -7,6 +7,7 @@ package org.adw.launcher;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -30,17 +31,19 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListAdapter;
 
 public class CustomShirtcutActivity extends Activity implements OnClickListener {
 	private static final String ACTION_ADW_PICK_ICON="org.adw.launcher.icons.ACTION_PICK_ICON";
-	
+	public static final String ACTION_LAUNCHERACTION = "org.adw.launcher.action.launcheraction";
+
 	private static final int PICK_CUSTOM_ICON=1;
 	private static final int PICK_STANDARD_MENU=2;
 	private static final int PICK_STANDARD_SHORTCUT=3;
 	private static final int PICK_STANDARD_APPLICATION=4;
 	private static final int PICK_CUSTOM_PICTURE=5;
 	private static final int PICK_FROM_ICON_PACK=6;
-	
+
 	private static final int DIALOG_ICON_TYPE=1;
 	private Button btPickActivity;
 	private ImageButton btPickIcon;
@@ -56,6 +59,12 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Intent intent = getIntent();
+		if (intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_LAUNCHERACTION)) {
+			LauncherActions.getInstance().launch(intent);
+			finish();
+		}
+
 		setContentView(R.layout.custom_shirtcuts);
 		btPickActivity=(Button) findViewById(R.id.pick_activity);
 		btPickActivity.setOnClickListener(this);
@@ -120,8 +129,9 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 			case PICK_STANDARD_MENU:
 		        String applicationName = getResources().getString(R.string.group_applications);
 		        String activitiesName=getResources().getString(R.string.pref_label_activities);
+		        String launcheractionsName = getResources().getString(R.string.launcher_actions);
 		        String shortcutName = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
-		        
+
 		        if (applicationName != null && applicationName.equals(shortcutName)) {
 		            Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
 		            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -133,6 +143,22 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 					Intent picker=new Intent();
 		        	picker.setClass(this, ActivityPickerActivity.class);
 					startActivityForResult(picker,PICK_STANDARD_SHORTCUT);
+		        } else if (launcheractionsName != null && launcheractionsName.equals(shortcutName)) {
+		        	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		        	builder.setTitle(getString(R.string.launcher_actions));
+		        	final ListAdapter adapter = LauncherActions.getInstance().getSelectActionAdapter();
+		        	builder.setAdapter(adapter, new Dialog.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									LauncherActions.Action action = (LauncherActions.Action)adapter.getItem(which);
+									Intent result = new Intent();
+									result.putExtra(Intent.EXTRA_SHORTCUT_NAME, action.getName());
+									result.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
+											LauncherActions.getInstance().getIntentForAction(action));
+									onActivityResult(PICK_STANDARD_SHORTCUT, RESULT_OK, result);
+								}
+							});
+		        	builder.create().show();
 		        } else {
 		            startActivityForResult(data, PICK_STANDARD_SHORTCUT);
 		        }
@@ -164,7 +190,7 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 					} catch (Resources.NotFoundException e) {
 						mIconResource=null;
 					}
-		            
+
 			        mIntent=data;
 					btPickActivity.setText(title);
 					mIcon=activityInfo.loadIcon(mPackageManager);
@@ -225,13 +251,16 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	        ArrayList<String> shortcutNames = new ArrayList<String>();
 	        shortcutNames.add(getString(R.string.group_applications));
 	        shortcutNames.add(getString(R.string.pref_label_activities));
+	        shortcutNames.add(getString(R.string.launcher_actions));
 	        bundle.putStringArrayList(Intent.EXTRA_SHORTCUT_NAME, shortcutNames);
-	        
+
 	        ArrayList<ShortcutIconResource> shortcutIcons = new ArrayList<ShortcutIconResource>();
 	        shortcutIcons.add(ShortcutIconResource.fromContext(CustomShirtcutActivity.this,
 	                        R.drawable.ic_launcher_application));
 	        shortcutIcons.add(ShortcutIconResource.fromContext(CustomShirtcutActivity.this,
                     R.drawable.ic_launcher_home));
+	        shortcutIcons.add(ShortcutIconResource.fromContext(CustomShirtcutActivity.this,
+	        		R.drawable.ic_launcher_home));
 	        bundle.putParcelableArrayList(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, shortcutIcons);
 
 	        Intent pickIntent = new Intent(Intent.ACTION_PICK_ACTIVITY);
@@ -266,21 +295,21 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
     protected class IconTypeDialog implements DialogInterface.OnClickListener,
 	    DialogInterface.OnCancelListener, DialogInterface.OnDismissListener,
 	    DialogInterface.OnShowListener {
-	
+
 		private ArrayAdapter<String> mAdapter;
-		
+
 		Dialog createDialog() {
 		    mAdapter = new ArrayAdapter<String>(CustomShirtcutActivity.this, R.layout.add_list_item);
 		    mAdapter.add(getString(R.string.shirtcuts_select_picture));
 		    mAdapter.add(getString(R.string.shirtcuts_crop_picture));
 		    mAdapter.add(getString(R.string.shirtcuts_icon_packs));
-		
+
 		    final AlertDialog.Builder builder = new AlertDialog.Builder(CustomShirtcutActivity.this);
 		    builder.setTitle(getString(R.string.shirtcuts_select_icon_type));
 		    builder.setAdapter(mAdapter, this);
-		
+
 		    builder.setInverseBackgroundForced(false);
-		
+
 		    AlertDialog dialog = builder.create();
 		    dialog.setOnCancelListener(this);
 		    dialog.setOnDismissListener(this);
@@ -332,6 +361,6 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		public void onShow(DialogInterface dialog) {
 		}
 	}
-	
+
 
 }
