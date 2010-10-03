@@ -56,6 +56,8 @@
     <string name="group_applications">Applications</string>
     <!-- Options in "Add to Home" dialog box; Title of the group containing the list of all shortcuts -->
     <string name="group_shortcuts">Shortcuts</string>
+    <!-- Options in "Add to Home" dialog box; Title of the group containing the list of all launcher actions -->
+    <string name="launcher_actions">Launcher Actions</string>
     <!-- Options in "Add to Home" dialog box; Title of the search gadget -->
     <string name="group_search">Search</string>
     <!-- Options in "Add to Home" dialog box; Title of the folder gadget -->

@@ -341,6 +341,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	super.onCreate(savedInstanceState);
         mInflater = getLayoutInflater();
 
+		AppCatalogueFilters.getInstance().init(this);
+		LauncherActions.getInstance().init(this);
+
         mAppWidgetManager = AppWidgetManager.getInstance(this);
 
         mAppWidgetHost = new LauncherAppWidgetHost(this, APPWIDGET_HOST_ID);
@@ -377,9 +380,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         //ADW: register a sharedpref listener
         getSharedPreferences("launcher.preferences.almostnexus", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
-
-		AppCatalogueFilters.getInstance().init(this);
-
     }
 
     private void checkForLocaleChange() {
@@ -3644,7 +3644,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	/**
 	 * ADW: Home binding actions
 	 */
-	private void fireHomeBinding(int bindingValue, int type){
+	public void fireHomeBinding(int bindingValue, int type){
     	//ADW: switch home button binding user selection
 		if(mIsEditMode || mIsWidgetEditMode)return;
         switch (bindingValue) {
