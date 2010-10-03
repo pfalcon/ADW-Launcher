@@ -537,10 +537,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			if (requestCode== REQUEST_SHOW_APP_LIST)
 				if(newDrawer){
 					((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
-					showAllApps(true);
+					showAllApps(true, null);
 				}else{
 					((AllAppsGridView)mAllAppsGrid).updateAppGrp();
-					showAllApps(true);
+					showAllApps(true, null);
 				}
         }
 		else if ((requestCode == REQUEST_PICK_APPWIDGET ||
@@ -756,7 +756,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	            if (allAppsOpen) {
 	                closeAllApps(true);
 	            } else {
-	                showAllApps(true);
+	                showAllApps(true, null);
 	            }
 			}
 		});
@@ -2118,7 +2118,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
             final boolean allApps = mSavedState.getBoolean(RUNTIME_STATE_ALL_APPS_FOLDER, false);
             if (allApps) {
-                showAllApps(false);
+                showAllApps(false, null);
             }
             final boolean dockOpen=mSavedState.getBoolean(RUNTIME_STATE_DOCKBAR, false);
             if(dockOpen){
@@ -3520,7 +3520,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	/************************************************
 	 * ADW: Functions to handle Apps Grid
 	 */
-    private void showAllApps(boolean animated){
+    public void showAllApps(boolean animated, AppCatalogueFilter filter){
 		if(!allAppsOpen){
 			if(getWindow().getDecorView().getWidth()>getWindow().getDecorView().getHeight()){
 				mHandleView.setNextFocusUpId(R.id.drag_layer);
@@ -3533,8 +3533,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			allAppsOpen=true;
 			mWorkspace.enableChildrenCache();
 	        mWorkspace.lock();
+	        if (filter != null)
+	        	sModel.getApplicationsAdapter().setCatalogueFilter(filter);
+	        else
+	        	sModel.getApplicationsAdapter().setCatalogueFilter(AppCatalogueFilters.getInstance().getDrawerFilter());
 	        //mDesktopLocked=true;
 	        mWorkspace.invalidate();
+
             if(newDrawer){
     	        ((AllAppsSlidingView) mAllAppsGrid).open(animated && allowDrawerAnimations);
             }else{
@@ -3744,7 +3749,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			if(isAllAppsVisible()){
 				closeDrawer();
 			}else{
-				showAllApps(true);
+				showAllApps(true, null);
 			}
 			break;
 		case BIND_STATUSBAR:

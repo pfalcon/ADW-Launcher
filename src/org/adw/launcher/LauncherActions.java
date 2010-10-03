@@ -3,11 +3,11 @@ package org.adw.launcher;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import org.adw.launcher.catalogue.AppCatalogueFilter;
+import org.adw.launcher.catalogue.AppCatalogueFilters;
+
 import android.content.Intent;
 import android.database.DataSetObserver;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +20,6 @@ public class LauncherActions {
 
 		public String getName();
 
-		public void setup();
-
 		public void putIntentExtras(Intent intent);
 
 		public boolean runIntent(Intent intent);
@@ -29,7 +27,6 @@ public class LauncherActions {
 
 	private static LauncherActions mInstance = null;
 	private Launcher mLauncher;
-	private final List<Action> mActions = new ArrayList<Action>();
 
 	public static synchronized LauncherActions getInstance() {
 		if (mInstance == null)
@@ -38,32 +35,35 @@ public class LauncherActions {
 	}
 
 	private LauncherActions() {
-		BroadcastReceiver reciever = new BroadcastReceiver() {
-
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				// TODO Auto-generated method stub
-
-			}
-		};
 	}
 
 	public void init(Launcher launcher) {
-		Log.d("BOOMBULER", "init");
-		mActions.clear();
 		mLauncher = launcher;
-		String[] menuBindingsNames = launcher.getResources().getStringArray(R.array.menu_binding_entries);
-		String[] menuBindingsValues = launcher.getResources().getStringArray(R.array.menu_binding_values);
+	}
+
+	private List<Action> getList() {
+		List<Action> result = new ArrayList<Action>();
+		String[] menuBindingsNames = mLauncher.getResources().getStringArray(R.array.menu_binding_entries);
+		String[] menuBindingsValues = mLauncher.getResources().getStringArray(R.array.menu_binding_values);
 
 		for (int i = 0; i < menuBindingsValues.length; i++) {
 			int value = Integer.parseInt(menuBindingsValues[i]);
 			String name = menuBindingsNames[i];
 			if (value != Launcher.BIND_NONE && value != Launcher.BIND_APP_LAUNCHER) {
 				DefaultLauncherAction lact = new DefaultLauncherAction(value, name);
-				mActions.add(lact);
+				result.add(lact);
 			}
 		}
+		AppCatalogueFilters filters = AppCatalogueFilters.getInstance();
+		List<AppCatalogueFilters.Catalogue> catalogues = filters.getAllGroups();
+		for(AppCatalogueFilters.Catalogue cat : catalogues) {
+			ShowGroupAction act = new ShowGroupAction(cat);
+			result.add(act);
+		}
+		return result;
 	}
+
+
 
 	public Intent getIntentForAction(Action action) {
 		Intent result = new Intent(CustomShirtcutActivity.ACTION_LAUNCHERACTION);
@@ -72,9 +72,18 @@ public class LauncherActions {
 		return result;
 	}
 
+	public void launch(Intent intent) {
+		final List<Action> actions = getList();
+		for(Action act : actions) {
+			if (act.runIntent(intent))
+				break;
+		}
+	}
 
 
 	public ListAdapter getSelectActionAdapter() {
+		final List<Action> mActions = getList();
+
 		return new ListAdapter() {
 
 			@Override
@@ -143,18 +152,6 @@ public class LauncherActions {
 		};
 	}
 
-
-
-	public void launch(Intent intent) {
-		for(Action act : mActions) {
-			if (act.runIntent(intent))
-				break;
-		}
-	}
-
-
-
-
 	private class DefaultLauncherAction implements Action {
 
 		private static final String EXTRA_BINDINGVALUE = "DefaultLauncherAction.EXTRA_BINDINGVALUE";
@@ -170,11 +167,6 @@ public class LauncherActions {
 		@Override
 		public String getName() {
 			return mName;
-		}
-
-		@Override
-		public void setup() {
-			// Nothing to do...
 		}
 
 		@Override
@@ -199,5 +191,43 @@ public class LauncherActions {
 
 	}
 
+	private class ShowGroupAction implements Action {
+
+		private final AppCatalogueFilters.Catalogue mCatalogue;
+
+		private static final String EXTRA_CATALOG_INDEX = "EXTRA_CATALOG_INDEX";
+
+ 		public ShowGroupAction(AppCatalogueFilters.Catalogue catalogue) {
+			mCatalogue = catalogue;
+		}
+
+		@Override
+		public String getName() {
+			return String.format(mLauncher.getString(R.string.show_catalog), mCatalogue.getTitle());
+		}
+
+		@Override
+		public void putIntentExtras(Intent intent) {
+			intent.putExtra(EXTRA_CATALOG_INDEX, mCatalogue.getIndex());
+		}
+
+		@Override
+		public boolean runIntent(Intent intent) {
+			if (intent.hasExtra(EXTRA_CATALOG_INDEX)) {
+				int idx = intent.getIntExtra(EXTRA_CATALOG_INDEX, 0);
+				if (idx == mCatalogue.getIndex()) {
+					showDrawer();
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private void showDrawer() {
+			AppCatalogueFilter filter = new AppCatalogueFilter(mCatalogue.getIndex());
+			mLauncher.showAllApps(true, filter);
+		}
+
+	}
 
 }
