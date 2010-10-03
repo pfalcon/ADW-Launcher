@@ -95,13 +95,11 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.WindowManager;
 import android.view.View.OnLongClickListener;
-import android.view.View.OnTouchListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -109,7 +107,6 @@ import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -352,6 +349,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	super.onCreate(savedInstanceState);
         mInflater = getLayoutInflater();
 
+		AppCatalogueFilters.getInstance().init(this);
+		LauncherActions.getInstance().init(this);
+
         mAppWidgetManager = AppWidgetManager.getInstance(this);
 
         mAppWidgetHost = new LauncherAppWidgetHost(this, APPWIDGET_HOST_ID);
@@ -388,9 +388,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         //ADW: register a sharedpref listener
         getSharedPreferences("launcher.preferences.almostnexus", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
-
-		AppCatalogueFilters.getInstance().init(this);
-
     }
 
     private void checkForLocaleChange() {
@@ -3720,7 +3717,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	/**
 	 * ADW: Home binding actions
 	 */
-	private void fireHomeBinding(int bindingValue, int type){
+	public void fireHomeBinding(int bindingValue, int type){
     	//ADW: switch home button binding user selection
 		if(mIsEditMode || mIsWidgetEditMode)return;
         switch (bindingValue) {
