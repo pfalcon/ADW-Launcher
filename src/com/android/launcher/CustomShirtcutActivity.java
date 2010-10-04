@@ -155,6 +155,10 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 									result.putExtra(Intent.EXTRA_SHORTCUT_NAME, action.getName());
 									result.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
 											LauncherActions.getInstance().getIntentForAction(action));
+							        ShortcutIconResource iconResource = new ShortcutIconResource();
+							        iconResource.packageName = CustomShirtcutActivity.this.getPackageName();
+						            iconResource.resourceName = getResources().getResourceName(R.drawable.ic_launcher_home);
+						            result.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
 									onActivityResult(PICK_STANDARD_SHORTCUT, RESULT_OK, result);
 								}
 							});
