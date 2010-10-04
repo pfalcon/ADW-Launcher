@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.adw.launcher_donut;
+package com.android.launcher;
 
 import android.content.Context;
 import android.graphics.Canvas;
