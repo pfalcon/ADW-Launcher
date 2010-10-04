@@ -1688,7 +1688,15 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
             mItemCount = getAdapter().getCount();
             mTotalScreens=getPageCount();
     		mPager.setTotalItems(mTotalScreens);
-
+    		if(mTotalScreens-1<mCurrentScreen){
+                scrollTo(0, 0);
+                mCurrentScreen=0;
+                mCurrentHolder=1;
+                mPager.setCurrentItem(0);
+                mBlockLayouts=false;
+                mScrollToScreen=0;
+                mLayoutMode=LAYOUT_NORMAL;
+    		}
             // Detect the case where a cursor that was previously invalidated has
             // been repopulated with new data.
             if (AllAppsSlidingView.this.getAdapter().hasStableIds() && mInstanceState != null
