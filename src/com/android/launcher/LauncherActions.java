@@ -1,10 +1,10 @@
-package org.adw.launcher;
+package com.android.launcher;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.adw.launcher.catalogue.AppCatalogueFilter;
-import org.adw.launcher.catalogue.AppCatalogueFilters;
+import com.android.launcher.catalogue.AppCatalogueFilter;
+import com.android.launcher.catalogue.AppCatalogueFilters;
 
 import android.content.Intent;
 import android.database.DataSetObserver;
