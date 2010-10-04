@@ -237,6 +237,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 		if (filter != mCatalogueFilter) {
 			mCatalogueFilter = filter;
 			updateDataSet();
+			notifyDataSetChanged();
 		}
 	}
 
