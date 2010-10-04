@@ -1462,10 +1462,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		menu.setGroupVisible(MENU_GROUP_ADD, mMenuAddInfo != null && mMenuAddInfo.valid && (!allAppsOpen) );
 		menu.setGroupVisible(MENU_GROUP_NORMAL, !allAppsOpen);
 		menu.setGroupVisible(MENU_GROUP_CATALOGUE, allAppsOpen);
-<<<<<<< HEAD
-=======
-
->>>>>>> 0fffa1d... * first test on blur-widget resizing
        return true;
     }
 
@@ -1873,13 +1869,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         /*filter = new IntentFilter();
         filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE);
         filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
-<<<<<<< HEAD
         registerReceiver(mApplicationsReceiver, filter);*/
-        
-=======
-        registerReceiver(mApplicationsReceiver, filter);
-
->>>>>>> 0fffa1d... * first test on blur-widget resizing
     }
 
     /**
@@ -3893,12 +3883,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         search.setLauncher(this);
 
         mWorkspace.addInCurrentScreen(view, xy[0], xy[1], spanX, spanY);
-<<<<<<< HEAD
-		
 	}
-=======
-	}*/
->>>>>>> 0fffa1d... * first test on blur-widget resizing
 	public static int getScreenCount(Context context){
 		return AlmostNexusSettingsHelper.getDesktopScreens(context);
 	}
