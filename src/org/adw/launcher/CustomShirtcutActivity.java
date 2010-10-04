@@ -50,12 +50,50 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	private Button btOk;
 	private EditText edLabel;
 	//private ActivityInfo mInfo;
-	private Drawable mIcon;
 	private Bitmap mBitmap;
 	PackageManager mPackageManager;
 	private Intent mIntent;
 	private ShortcutIconResource mIconResource;
 	private int mIconSize;
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable("mBitmap", mBitmap);
+		outState.putParcelable("mIntent", mIntent);
+		outState.putParcelable("mIconResource", mIconResource);
+		outState.putInt("mIconSize", mIconSize);
+		outState.putBoolean("btOk_enabled", btOk.isEnabled());
+		outState.putBoolean("btPickIcon_enabled", btPickIcon.isEnabled());
+		outState.putCharSequence("btPickActivity_text", btPickActivity.getText());
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		if (savedInstanceState != null && savedInstanceState.size() >= 7) {
+			mBitmap = savedInstanceState.getParcelable("mBitmap");
+			mIntent = savedInstanceState.getParcelable("mIntent");
+			mIconResource = savedInstanceState.getParcelable("mIconResource");
+			mIconSize = savedInstanceState.getInt("mIconResource");
+
+			if (mBitmap != null)
+				btPickIcon.setImageBitmap(mBitmap);
+			else if (mIconResource != null) {
+				Resources resources;
+				try {
+					resources = mPackageManager.getResourcesForApplication(mIconResource.packageName);
+	                final int id = resources.getIdentifier(mIconResource.resourceName, null, null);
+	                btPickIcon.setImageDrawable(resources.getDrawable(id));
+				} catch (NameNotFoundException e) {
+				}
+			}
+			btPickActivity.setText(savedInstanceState.getCharSequence("btPickActivity_text"));
+			btPickIcon.setEnabled(savedInstanceState.getBoolean("btPickIcon_enabled"));
+			btOk.setEnabled(savedInstanceState.getBoolean("btOk_enabled"));
+		}
+		super.onRestoreInstanceState(savedInstanceState);
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -197,8 +235,7 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 
 			        mIntent=data;
 					btPickActivity.setText(title);
-					mIcon=activityInfo.loadIcon(mPackageManager);
-					btPickIcon.setImageDrawable(mIcon);
+					btPickIcon.setImageDrawable(activityInfo.loadIcon(mPackageManager));
 					btPickIcon.setEnabled(true);
 					btOk.setEnabled(true);
 					edLabel.setText(title);
@@ -236,8 +273,7 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		        }
 		        mIntent=intent;
 				btPickActivity.setText(name);
-				mIcon=icon;
-				btPickIcon.setImageDrawable(mIcon);
+				btPickIcon.setImageDrawable(icon);
 				btPickIcon.setEnabled(true);
 				btOk.setEnabled(true);
 				edLabel.setText(name);
