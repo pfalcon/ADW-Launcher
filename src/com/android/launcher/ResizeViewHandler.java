@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package org.adw.launcher;
-
-import org.adw.launcher.CellLayout.CellInfo;
-import org.adw.launcher.SliderView.OnTriggerListener;
+package com.android.launcher;
 
 import android.content.Context;
 import android.graphics.Canvas;
