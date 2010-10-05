@@ -28,13 +28,13 @@ import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
-//import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 public class AllAppsGridView extends GridView implements
 		AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener,
-		DragSource {
+		DragSource, Drawer {
 
 	private DragController mDragger;
 	private Launcher mLauncher;
@@ -76,6 +76,7 @@ public class AllAppsGridView extends GridView implements
 		mLabelPaint.setDither(false);
 	}
 
+	@Override
 	public boolean isOpaque() {
 		if (mBgAlpha >= 255)
 			return true;
@@ -118,7 +119,7 @@ public class AllAppsGridView extends GridView implements
 	public void onDropCompleted(View target, boolean success) {
 	}
 
-	void setLauncher(Launcher launcher) {
+	public void setLauncher(Launcher launcher) {
 		mLauncher = launcher;
 		setSelector(IconHighlights.getDrawable(mLauncher,
 				IconHighlights.TYPE_DESKTOP));
@@ -280,7 +281,7 @@ public class AllAppsGridView extends GridView implements
         if(getAdapter()==null)
         	animate=false;
         else if(getAdapter().getCount()<=0)
-        	animate=false;	
+        	animate=false;
 		if (animate) {
 			if (mFadeDrawLabels && mDrawLabels) {
 				for (int i = 0; i < getChildCount(); i++) {
@@ -327,4 +328,14 @@ public class AllAppsGridView extends GridView implements
 			((ApplicationsAdapter) getAdapter()).updateDataSet();
 		}
 	}
+
+
+	public void setAdapter(ApplicationsAdapter adapter) {
+		setAdapter((ListAdapter)adapter);
+	}
+
+	public void setNumRows(int numRows) {}
+
+	public void setPageHorizontalMargin(int margin) {}
+
 }
