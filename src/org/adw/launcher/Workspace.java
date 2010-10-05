@@ -16,6 +16,8 @@
 
 package org.adw.launcher;
 
+import static android.util.Log.d;
+
 import java.util.ArrayList;
 
 import mobi.intuitit.android.widget.WidgetSpace;
@@ -2061,4 +2063,32 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             }
         }
     }
+    void updateCountersForPackage(String packageName,int counter) {
+        final int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final CellLayout layout = (CellLayout) getChildAt(i);
+            int childCount = layout.getChildCount();
+            for (int j = 0; j < childCount; j++) {
+                final View view = layout.getChildAt(j);
+                Object tag = view.getTag();
+                if (tag instanceof ApplicationInfo) {
+                    ApplicationInfo info = (ApplicationInfo) tag;
+                    // We need to check for ACTION_MAIN otherwise getComponent() might
+                    // return null for some shortcuts (for instance, for shortcuts to
+                    // web pages.)
+                    final Intent intent = info.intent;
+                    final ComponentName name = intent.getComponent();
+                    d("WORKSPACE","COMPARAR:"+name.getPackageName()+" CON:"+packageName);
+                    if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
+                        Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
+                        packageName.equals(name.getPackageName())) {
+                        d("WORKSPACE","ENCONTRADO, ACTUALIZANDO COUNTERS!");
+                        ((BubbleTextView) view).setCounter(counter);
+                        view.invalidate();
+                    }
+                }
+            }
+        }
+    }
+
 }

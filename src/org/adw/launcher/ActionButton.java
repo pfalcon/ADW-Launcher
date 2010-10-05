@@ -4,18 +4,13 @@ import org.adw.launcher.DragController.DragListener;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-public class ActionButton extends ImageView implements DropTarget, DragListener {
+public class ActionButton extends CounterImageView implements DropTarget, DragListener {
 	private Launcher mLauncher;
 	private int mIdent=LauncherSettings.Favorites.CONTAINER_LAB;
 	private ItemInfo mCurrentInfo;

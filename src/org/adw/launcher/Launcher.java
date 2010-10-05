@@ -337,6 +337,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	//ADW: NAVIGATION VALUES FOR THE NEXT/PREV CATALOG ACTIONS
 	private final static int ACTION_CATALOG_PREV=1;
 	private final static int ACTION_CATALOG_NEXT=2;
+	//ADW: Custom counter receiver
+	private CounterReceiver mCounterReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 		mMessWithPersistence=AlmostNexusSettingsHelper.getSystemPersistent(this);
@@ -1325,6 +1327,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         getContentResolver().unregisterContentObserver(mWidgetObserver);
         unregisterReceiver(mApplicationsReceiver);
         unregisterReceiver(mCloseSystemDialogsReceiver);
+        unregisterReceiver(mCounterReceiver);
         mWorkspace.unregisterProvider();
     }
 
@@ -1851,6 +1854,15 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      * wallpaper.
      */
     private void registerIntentReceivers() {
+        if(mCounterReceiver == null){
+            mCounterReceiver=new CounterReceiver(this);
+            mCounterReceiver.setCounterListener(new CounterReceiver.OnCounterChangedListener() {
+                public void onTrigger(String pname, int counter) {
+                    updateCountersForPackage(pname, counter);
+                }
+            });
+            registerReceiver(mCounterReceiver, mCounterReceiver.getFilter());
+        }
         if (sWallpaperReceiver == null) {
             final Application application = getApplication();
 
@@ -3158,7 +3170,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      * @return
      */
     View createSmallShortcut(int layoutResId, ViewGroup parent, ApplicationInfo info) {
-        ImageView favorite = (ImageView) mInflater.inflate(layoutResId, parent, false);
+        CounterImageView favorite = (CounterImageView) mInflater.inflate(layoutResId, parent, false);
 
         if (!info.filtered) {
             info.icon = Utilities.createIconThumbnail(info.icon, this);
@@ -4277,4 +4289,45 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         t.show();
 	    
 	}
+	private void updateCounters(View view, String packageName, int counter){
+        Object tag = view.getTag();
+        if (tag instanceof ApplicationInfo) {
+            ApplicationInfo info = (ApplicationInfo) tag;
+            // We need to check for ACTION_MAIN otherwise getComponent() might
+            // return null for some shortcuts (for instance, for shortcuts to
+            // web pages.)
+            final Intent intent = info.intent;
+            final ComponentName name = intent.getComponent();
+            d("WORKSPACE","COMPARAR:"+name.getPackageName()+" CON:"+packageName);
+            if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
+                Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
+                packageName.equals(name.getPackageName())) {
+                d("WORKSPACE","ENCONTRADO, ACTUALIZANDO COUNTERS!");
+                if(view instanceof CounterImageView)
+                    ((CounterImageView) view).setCounter(counter);
+                //else if
+                view.invalidate();
+            }
+        }
+	}
+    private void updateCountersForPackage(String packageName, int counter) {
+        if (packageName != null && packageName.length() > 0) {
+            d("LAUNCHER","UPDATE COUNTERS FOR:"+packageName);
+            mWorkspace.updateCountersForPackage(packageName, counter);
+            //ADW: Update ActionButtons icons
+            updateCounters(mLAB, packageName, counter);
+            updateCounters(mRAB, packageName, counter);
+            updateCounters(mLAB2, packageName, counter);
+            updateCounters(mRAB2, packageName, counter);
+            mMiniLauncher.updateCounters(packageName, counter);
+        }
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        // TODO Auto-generated method stub
+        final ComponentName name = intent.getComponent();
+        updateCountersForPackage(name.getPackageName(),0);
+        super.startActivity(intent);
+    }
 }
