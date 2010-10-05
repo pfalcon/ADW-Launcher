@@ -21,7 +21,11 @@ public class ActionButton extends ImageView implements DropTarget, DragListener 
 	private ItemInfo mCurrentInfo;
 	private Drawable bgResource;
 	private Drawable bgEmpty;
+	private Drawable mIconNormal;
+	private Drawable mIconSpecial;
+	private boolean specialMode=false;
 	private boolean hiddenBg=false;
+	private int specialAction=0;
 	public ActionButton(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
@@ -46,7 +50,7 @@ public class ActionButton extends ImageView implements DropTarget, DragListener 
 	public boolean acceptDrop(DragSource source, int x, int y, int xOffset,
 			int yOffset, Object dragInfo) {
 		// TODO Auto-generated method stub
-		return true;
+		return !specialMode;
 	}
 
 	public Rect estimateDropLocation(DragSource source, int x, int y,
@@ -147,7 +151,7 @@ public class ActionButton extends ImageView implements DropTarget, DragListener 
         	return;
             //throw new IllegalStateException("Unknown item type: " + info.itemType);
         }
-        setImageDrawable(myIcon);
+        setIcon(myIcon);
         invalidate();
 	}
 
@@ -168,7 +172,11 @@ public class ActionButton extends ImageView implements DropTarget, DragListener 
 	@Override
 	public Object getTag() {
 		// TODO Auto-generated method stub
-		return mCurrentInfo;
+		if(!specialMode){
+		    return mCurrentInfo;
+		}else{
+		    return specialAction;
+		}
 	}
 	public void updateIcon(){
     	if(mCurrentInfo!=null){
@@ -197,7 +205,7 @@ public class ActionButton extends ImageView implements DropTarget, DragListener 
 	        	return;
 	            //throw new IllegalStateException("Unknown item type: " + info.itemType);
 	        }
-	        setImageDrawable(myIcon);
+	        setIcon(myIcon);
 	        invalidate();
     	}
 	}
@@ -241,10 +249,41 @@ public class ActionButton extends ImageView implements DropTarget, DragListener 
 	            info.icon = Utilities.createIconThumbnail(icon, mLauncher);
 	            info.filtered = true;
 	            myIcon = mLauncher.createSmallActionButtonIcon(info);
-				setImageDrawable(myIcon);
+				setIcon(myIcon);
 		        invalidate();			
 	        }
 		}
-		
+	}
+	private void setIcon(Drawable d){
+	    if(mIconNormal!=null){
+	        mIconNormal.setCallback(null);
+	        mIconNormal=null;
+	    }
+	    mIconNormal=d;
+	    if(!specialMode){
+	        setImageDrawable(mIconNormal);
+	    }
+	}
+	public void setSpecialIcon(Drawable d){
+        if(mIconSpecial!=null){
+            mIconSpecial.setCallback(null);
+            mIconSpecial=null;
+        }
+        mIconSpecial=d;
+        if(specialMode){
+            setImageDrawable(mIconSpecial);
+        }
+	}
+	public void setSpecialMode(boolean special){
+	    if(special!=specialMode){
+	        specialMode=special;
+	        if(specialMode)
+	            setImageDrawable(mIconSpecial);
+	        else
+	            setImageDrawable(mIconNormal);
+	    }
+	}
+	public void setSpecialAction(int action){
+	    specialAction=action;
 	}
 }

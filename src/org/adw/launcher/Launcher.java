@@ -334,6 +334,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	//but need to add more drawables for the desktop dots...
 	//or completely redo the desktop dots implementation
 	private final static int MAX_SCREENS=7;
+	//ADW: NAVIGATION VALUES FOR THE NEXT/PREV CATALOG ACTIONS
+	private final static int ACTION_CATALOG_PREV=1;
+	private final static int ACTION_CATALOG_NEXT=2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 		mMessWithPersistence=AlmostNexusSettingsHelper.getSystemPersistent(this);
@@ -792,9 +795,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         //ADW: Action Buttons (LAB/RAB)
         mLAB = (ActionButton) dragLayer.findViewById(R.id.btn_lab);
         mLAB.setLauncher(this);
+        mLAB.setSpecialIcon(getResources().getDrawable(R.drawable.btn_pin_item));
+        mLAB.setSpecialAction(ACTION_CATALOG_PREV);
         dragLayer.addDragListener(mLAB);
         mRAB = (ActionButton) dragLayer.findViewById(R.id.btn_rab);
         mRAB.setLauncher(this);
+        mRAB.setSpecialIcon(getResources().getDrawable(R.drawable.btn_pin_item));
+        mRAB.setSpecialAction(ACTION_CATALOG_NEXT);
         dragLayer.addDragListener(mRAB);
         mLAB.setOnClickListener(this);
         mRAB.setOnClickListener(this);
@@ -2212,6 +2219,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      */
     public void onClick(View v) {
         Object tag = v.getTag();
+        //ADW: Check if the tag is a special action (the app drawer category navigation)
+        if(tag instanceof Integer){
+            navigateCatalogs(Integer.parseInt(tag.toString()));
+            return;
+        }
         //TODO:ADW Check whether to display a toast if clicked mLAB or mRAB withount binding
         if(tag instanceof ItemInfo && tag==null && v instanceof ActionButton){
     		Toast t=Toast.makeText(this, R.string.toast_no_application_def, Toast.LENGTH_SHORT);
@@ -3539,7 +3551,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	        	sModel.getApplicationsAdapter().setCatalogueFilter(AppCatalogueFilters.getInstance().getDrawerFilter());
 	        //mDesktopLocked=true;
 	        mWorkspace.invalidate();
-
+	        mLAB.setSpecialMode(true);
+	        mRAB.setSpecialMode(true);
             if(newDrawer){
     	        ((AllAppsSlidingView) mAllAppsGrid).open(animated && allowDrawerAnimations);
             }else{
@@ -3561,6 +3574,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	        mWorkspace.unlock();
 	        //mDesktopLocked=false;
 	        mWorkspace.invalidate();
+            mLAB.setSpecialMode(false);
+            mRAB.setSpecialMode(false);
+
 			mHandleIcon.resetTransition();
 			if(!isDockBarOpen() && showDots){
 				mPreviousView.setVisibility(View.VISIBLE);
@@ -4246,5 +4262,19 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mDragLayer.removeView(mScreensEditor);
             mScreensEditor=null;
         }
+	}
+	private void navigateCatalogs(int direction){
+	    //TODO: Implement the catalog change
+	    switch (direction) {
+        case ACTION_CATALOG_PREV:
+            break;
+        case ACTION_CATALOG_NEXT:
+            break;
+        default:
+            break;
+        }
+        Toast t=Toast.makeText(this, "SWITCH CATALOG", Toast.LENGTH_SHORT);
+        t.show();
+	    
 	}
 }
