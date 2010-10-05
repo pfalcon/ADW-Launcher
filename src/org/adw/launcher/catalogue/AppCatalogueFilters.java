@@ -17,6 +17,7 @@
 package org.adw.launcher.catalogue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +160,15 @@ public final class AppCatalogueFilters {
 		for (Catalogue itm : mAllAppGroups.values()) {
 			result.add(itm);
 		}
+		return result;
+	}
+
+	public List<Integer> getGroupsAndSpecialGroupIndexes() {
+		List<Integer> result = new ArrayList<Integer>();
+		result.add(AppGroupAdapter.APP_GROUP_ALL);
+		for (Integer idx : mAllAppGroups.keySet())
+			result.add(idx);
+		Collections.sort(result);
 		return result;
 	}
 

@@ -28,6 +28,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import mobi.intuitit.android.content.LauncherIntent;
 import mobi.intuitit.android.content.LauncherMetadata;
@@ -4275,20 +4276,49 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mScreensEditor=null;
         }
 	}
+
 	private void navigateCatalogs(int direction){
-	    //TODO: Implement the catalog change
+		List<Integer> filterIndexes = AppCatalogueFilters.getInstance().getGroupsAndSpecialGroupIndexes();
+		int currentFIndex = AppCatalogueFilters.getInstance().getDrawerFilter().getCurrentFilterIndex();
+		// Translate to index of the list
+		currentFIndex = filterIndexes.contains(currentFIndex) ?
+				filterIndexes.indexOf(currentFIndex) :
+				filterIndexes.indexOf(AppGroupAdapter.APP_GROUP_ALL);
 	    switch (direction) {
         case ACTION_CATALOG_PREV:
+        	currentFIndex--;
             break;
         case ACTION_CATALOG_NEXT:
+        	currentFIndex++;
             break;
         default:
             break;
         }
-        Toast t=Toast.makeText(this, "SWITCH CATALOG", Toast.LENGTH_SHORT);
-        t.show();
-	    
+
+	    if (currentFIndex < 0)
+	    	currentFIndex = filterIndexes.size() - 1;
+	    else if (currentFIndex >= filterIndexes.size())
+	    	currentFIndex = 0;
+	    // Translate to "filter index"
+	    currentFIndex = filterIndexes.get(currentFIndex);
+	    AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(currentFIndex);
+
+	    AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, currentFIndex);
+        if(newDrawer){
+		    ((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
+	    }else{
+		    ((AllAppsGridView)mAllAppsGrid).updateAppGrp();
+	    }
+        // Uncomment this to show a toast with the name of the new group...
+	    /*String name = currentFIndex ==  AppGroupAdapter.APP_GROUP_ALL ?
+	    		getString(R.string.AppGroupAll) :
+	    		AppCatalogueFilters.getInstance().getGroupTitle(currentFIndex);
+	    if (name != null) {
+	    	Toast t=Toast.makeText(this, name, Toast.LENGTH_SHORT);
+	    	t.show();
+	    } */
 	}
+
 	private void updateCounters(View view, String packageName, int counter){
         Object tag = view.getTag();
         if (tag instanceof ApplicationInfo) {
