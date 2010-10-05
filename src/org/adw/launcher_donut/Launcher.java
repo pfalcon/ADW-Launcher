@@ -228,7 +228,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      * mAllAppsGrid will be "AllAppsGridView" or "AllAppsSlidingView"
      * depending on user settings, so I cast it later.
      */
-    private View mAllAppsGrid;
+    private Drawer mAllAppsGrid;
 
     private boolean mDesktopLocked = true;
     private Bundle mSavedState;
@@ -551,14 +551,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             }
         }
 		else if (resultCode == RESULT_OK ) {
-			if (requestCode== REQUEST_SHOW_APP_LIST)
-				if(newDrawer){
-					((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
-					showAllApps(true, null);
-				}else{
-					((AllAppsGridView)mAllAppsGrid).updateAppGrp();
-					showAllApps(true, null);
-				}
+			if (requestCode== REQUEST_SHOW_APP_LIST) {
+				mAllAppsGrid.updateAppGrp();
+				showAllApps(true, null);
+			}
         }
 		else if ((requestCode == REQUEST_PICK_APPWIDGET ||
                 requestCode == REQUEST_CREATE_APPWIDGET) && resultCode == RESULT_CANCELED &&
@@ -587,34 +583,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		// SlidingGrid) depending on phone rotation
 		int orientation = getResources().getConfiguration().orientation;
 		if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			if (newDrawer) {
-				((AllAppsSlidingView) mAllAppsGrid)
-						.setNumColumns(AlmostNexusSettingsHelper
-								.getColumnsPortrait(Launcher.this));
-				((AllAppsSlidingView) mAllAppsGrid)
-						.setNumRows(AlmostNexusSettingsHelper
-								.getRowsPortrait(Launcher.this));
-				((AllAppsSlidingView) mAllAppsGrid)
-						.setPageHorizontalMargin(AlmostNexusSettingsHelper
-								.getPageHorizontalMargin(Launcher.this));
-			} else {
-				((AllAppsGridView) mAllAppsGrid)
-						.setNumColumns(AlmostNexusSettingsHelper
-								.getColumnsPortrait(Launcher.this));
-			}
+			mAllAppsGrid.setNumColumns(AlmostNexusSettingsHelper.getColumnsPortrait(Launcher.this));
+			mAllAppsGrid.setNumRows(AlmostNexusSettingsHelper.getRowsPortrait(Launcher.this));
+			mAllAppsGrid.setPageHorizontalMargin(AlmostNexusSettingsHelper.getPageHorizontalMargin(Launcher.this));
 		} else {
-			if (newDrawer) {
-				((AllAppsSlidingView) mAllAppsGrid)
-						.setNumColumns(AlmostNexusSettingsHelper
-								.getColumnsLandscape(Launcher.this));
-				((AllAppsSlidingView) mAllAppsGrid)
-						.setNumRows(AlmostNexusSettingsHelper
-								.getRowsLandscape(Launcher.this));
-			} else {
-				((AllAppsGridView) mAllAppsGrid)
-						.setNumColumns(AlmostNexusSettingsHelper
-								.getColumnsLandscape(Launcher.this));
-			}
+			mAllAppsGrid.setNumColumns(AlmostNexusSettingsHelper.getColumnsLandscape(Launcher.this));
+			mAllAppsGrid.setNumRows(AlmostNexusSettingsHelper.getRowsLandscape(Launcher.this));
 		}
 		mWorkspace.setWallpaper(null);
         if (mRestoring) {
@@ -758,8 +732,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         }else{
         	tmp.setLayoutResource(R.layout.old_drawer);
         }
-        mAllAppsGrid = tmp.inflate();
-        final View grid = mAllAppsGrid;
+        mAllAppsGrid = (Drawer)tmp.inflate();
         final DeleteZone deleteZone = (DeleteZone) dragLayer.findViewById(R.id.delete_zone);
 
         mHandleView = (SliderView) dragLayer.findViewById(R.id.all_apps);
@@ -779,14 +752,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		});
 		mHandleView.setNextFocusUpId(R.id.drag_layer);
 		mHandleView.setNextFocusLeftId(R.id.drag_layer);
-        if(newDrawer){
-        	((AllAppsSlidingView)grid).setDragger(dragLayer);
-        	((AllAppsSlidingView)grid).setLauncher(this);
-        }else{
-        	((AllAppsGridView)grid).setTextFilterEnabled(false);
-        	((AllAppsGridView)grid).setDragger(dragLayer);
-        	((AllAppsGridView)grid).setLauncher(this);
-        }
+		mAllAppsGrid.setTextFilterEnabled(false);
+		mAllAppsGrid.setDragger(dragLayer);
+		mAllAppsGrid.setLauncher(this);
 
         workspace.setOnLongClickListener(this);
         workspace.setDragger(dragLayer);
@@ -796,7 +764,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         deleteZone.setDragController(dragLayer);
         deleteZone.setHandle(mHandleView);
 
-        dragLayer.setIgnoredDropTarget(grid);
+        dragLayer.setIgnoredDropTarget((View)mAllAppsGrid);
         dragLayer.setDragScoller(workspace);
         dragLayer.addDragListener(deleteZone);
         //ADW: Dockbar inner icon viewgroup (MiniLauncher.java)
@@ -1326,12 +1294,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         TextKeyListener.getInstance().release();
 
-        if(newDrawer){
-        	((AllAppsSlidingView)mAllAppsGrid).setAdapter(null);
-        }else{
-        	((AllAppsGridView)mAllAppsGrid).clearTextFilter();
-        	((AllAppsGridView)mAllAppsGrid).setAdapter(null);
-        }
+        mAllAppsGrid.clearTextFilter();
+        mAllAppsGrid.setAdapter(null);
+
         sModel.unbind();
         sModel.abortLoaders();
         mWorkspace.unbindWidgetScrollableViews();
@@ -2163,13 +2128,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             ApplicationsAdapter drawerAdapter) {
         int currCatalog=AlmostNexusSettingsHelper.getCurrentAppCatalog(this);
         AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(currCatalog);
-        if(newDrawer){
-        	((AllAppsSlidingView)mAllAppsGrid).setAdapter(drawerAdapter);
-        	((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
-        }else{
-        	((AllAppsGridView)mAllAppsGrid).setAdapter(drawerAdapter);
-        	((AllAppsGridView)mAllAppsGrid).updateAppGrp();
-        }
+        mAllAppsGrid.setAdapter(drawerAdapter);
+        mAllAppsGrid.updateAppGrp();
         binder.startBindingAppWidgetsWhenIdle();
     }
 
@@ -2410,7 +2370,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     //ADW: we return a View, so classes using this should cast
     // to AllAppsGridView or AllAppsSlidingView if they need to access proper members
     View getApplicationsGrid() {
-        return mAllAppsGrid;
+        return (View)mAllAppsGrid;
     }
 
     @Override
@@ -2619,11 +2579,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		   } else {
 			   AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(action);
 			   AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, action);
-			   if(newDrawer){
-				   ((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
-			   }else{
-				   ((AllAppsGridView)mAllAppsGrid).updateAppGrp();
-			   }
+			   mAllAppsGrid.updateAppGrp();
 		   }
 			//mDrawer.open();
 		}
@@ -3031,12 +2987,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		}
 		int animationSpeed=AlmostNexusSettingsHelper.getZoomSpeed(this);
         if(mAllAppsGrid!=null){
-			if (newDrawer) {
-				((AllAppsSlidingView) mAllAppsGrid)
-						.setAnimationSpeed(animationSpeed);
-			} else{
-		        ((AllAppsGridView) mAllAppsGrid).setAnimationSpeed(animationSpeed);
-	        }
+        	mAllAppsGrid.setAnimationSpeed(animationSpeed);
         }
         scrollableSupport=AlmostNexusSettingsHelper.getUIScrollableWidgets(this);
     }
@@ -3495,11 +3446,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	        mWorkspace.invalidate();
 	        mLAB.setSpecialMode(true);
 	        mRAB.setSpecialMode(true);
-            if(newDrawer){
-    	        ((AllAppsSlidingView) mAllAppsGrid).open(animated && allowDrawerAnimations);
-            }else{
-    	        ((AllAppsGridView) mAllAppsGrid).open(animated && allowDrawerAnimations);
-            }
+            mAllAppsGrid.open(animated && allowDrawerAnimations);
 			mHandleIcon.startTransition(150);
     	    mPreviousView.setVisibility(View.GONE);
     	    mNextView.setVisibility(View.GONE);
@@ -3527,13 +3474,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    	    mNextView.setVisibility(View.GONE);
 			}
 			if(mDesktopIndicator!=null)mDesktopIndicator.show();
-            if(newDrawer){
-    	        ((AllAppsSlidingView) mAllAppsGrid).close(animated && allowDrawerAnimations);
-            }else{
-    	        ((AllAppsGridView) mAllAppsGrid).close(animated && allowDrawerAnimations);
-            	((AllAppsGridView)mAllAppsGrid).clearTextFilter();
-            }
 
+			mAllAppsGrid.close(animated && allowDrawerAnimations);
+            mAllAppsGrid.clearTextFilter();
 		}
     }
     boolean isAllAppsVisible() {
@@ -4234,11 +4177,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(currentFIndex);
 
 	    AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, currentFIndex);
-        if(newDrawer){
-		    ((AllAppsSlidingView)mAllAppsGrid).updateAppGrp();
-	    }else{
-		    ((AllAppsGridView)mAllAppsGrid).updateAppGrp();
-	    }
+        mAllAppsGrid.updateAppGrp();
         // Uncomment this to show a toast with the name of the new group...
 	    /*String name = currentFIndex ==  AppGroupAdapter.APP_GROUP_ALL ?
 	    		getString(R.string.AppGroupAll) :
