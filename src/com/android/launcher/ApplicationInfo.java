@@ -81,6 +81,7 @@ public class ApplicationInfo extends ItemInfo {
         icon = info.icon;
         filtered = info.filtered;
         customIcon = info.customIcon;
+        counter=info.counter;
     }
 
     /**
