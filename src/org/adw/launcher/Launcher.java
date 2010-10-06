@@ -4267,11 +4267,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             // web pages.)
             final Intent intent = info.intent;
             final ComponentName name = intent.getComponent();
-            d("WORKSPACE","COMPARAR:"+name.getPackageName()+" CON:"+packageName);
-            if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
+            if ((info.itemType==LauncherSettings.Favorites.ITEM_TYPE_APPLICATION||
+                    info.itemType==LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT) &&
                 Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
                 packageName.equals(name.getPackageName())) {
-                d("WORKSPACE","ENCONTRADO, ACTUALIZANDO COUNTERS!");
                 if(view instanceof CounterImageView)
                     ((CounterImageView) view).setCounter(counter);
                 //else if
@@ -4281,7 +4280,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	}
     private void updateCountersForPackage(String packageName, int counter) {
         if (packageName != null && packageName.length() > 0) {
-            d("LAUNCHER","UPDATE COUNTERS FOR:"+packageName);
             mWorkspace.updateCountersForPackage(packageName, counter);
             //ADW: Update ActionButtons icons
             updateCounters(mLAB, packageName, counter);
@@ -4297,7 +4295,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     public void startActivity(Intent intent) {
         // TODO Auto-generated method stub
         final ComponentName name = intent.getComponent();
-        updateCountersForPackage(name.getPackageName(),0);
+        if(name!=null)
+            updateCountersForPackage(name.getPackageName(),0);
         super.startActivity(intent);
     }
 }

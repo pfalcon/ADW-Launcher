@@ -2078,11 +2078,10 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                     // web pages.)
                     final Intent intent = info.intent;
                     final ComponentName name = intent.getComponent();
-                    d("WORKSPACE","COMPARAR:"+name.getPackageName()+" CON:"+packageName);
-                    if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
+                    if ((info.itemType==LauncherSettings.Favorites.ITEM_TYPE_APPLICATION||
+                            info.itemType==LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT) &&
                         Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
                         packageName.equals(name.getPackageName())) {
-                        d("WORKSPACE","ENCONTRADO, ACTUALIZANDO COUNTERS!");
                         ((BubbleTextView) view).setCounter(counter);
                         view.invalidate();
                     }
