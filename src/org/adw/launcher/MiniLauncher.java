@@ -508,15 +508,14 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
 	            // web pages.)
 	            final Intent intent = info.intent;
 	            final ComponentName name = intent.getComponent();
-	            d("WORKSPACE","COMPARAR:"+name.getPackageName()+" CON:"+packageName);
 	            if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
 	                Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
 	                packageName.equals(name.getPackageName())) {
-	                d("WORKSPACE","ENCONTRADO, ACTUALIZANDO COUNTERS!");
 	                if(view instanceof CounterImageView)
 	                    ((CounterImageView) view).setCounter(counter);
 	                //else if
 	                view.invalidate();
+	                Launcher.getModel().updateCounterDesktopItem(info, counter);
 	            }
 	        }
 	        

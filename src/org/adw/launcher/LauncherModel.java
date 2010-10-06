@@ -1648,5 +1648,10 @@ public class LauncherModel {
         }
         if(changed)mApplicationsAdapter.notifyDataSetChanged();
     }
-
+    void updateCounterDesktopItem(ItemInfo info, int counter) {
+        // TODO: write to DB; figure out if we should remove folder from folders list
+        if(mDesktopItems.get(mDesktopItems.indexOf(info)) instanceof ApplicationInfo){
+            ((ApplicationInfo)mDesktopItems.get(mDesktopItems.indexOf(info))).counter=counter;
+        }
+    }
 }
