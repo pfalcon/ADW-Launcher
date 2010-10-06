@@ -17,16 +17,13 @@
 package org.adw.launcher;
 
 
-import android.widget.TextView;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
 
@@ -35,7 +32,7 @@ import android.text.Layout;
  * because we want to make the bubble taller than the text and TextView's clip is
  * too aggressive.
  */
-public class BubbleTextView extends TextView {
+public class BubbleTextView extends CounterTextView {
     //private static final float CORNER_RADIUS = 8.0f;
     private static final float PADDING_H = 5.0f;
     private static final float PADDING_V = 1.0f;
@@ -50,12 +47,6 @@ public class BubbleTextView extends TextView {
     private float mPaddingV;
     //adw custom corner radius themable
     private float mCustomCornerRadius=8.0f;
-    //ADW custom notifier counters
-    private String mCounter=null;
-    private int mCounterSize=0;
-    private final Rect mRect2 = new Rect();
-    private Paint mStrokePaint;
-    private Paint mTextPaint;
     public BubbleTextView(Context context) {
         super(context);
         init();
@@ -112,17 +103,6 @@ public class BubbleTextView extends TextView {
         mPaddingH = PADDING_H * scale;
         //noinspection PointlessArithmeticExpression
         mPaddingV = PADDING_V * scale;
-        
-        mStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mStrokePaint.setARGB(255, 255, 0, 0);
-
-        mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setARGB(255, 255, 255, 255);
-        mTextPaint.setTextAlign(Paint.Align.CENTER);
-        mTextPaint.setTextSize(12);
-        mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        mTextPaint.setShadowLayer(2f, 1, 1, 0xFF000000);
-        
     }
 
     @Override
@@ -180,22 +160,5 @@ public class BubbleTextView extends TextView {
 	        canvas.drawRoundRect(rect, mCornerRadius, mCornerRadius, mPaint);
         }
         super.draw(canvas);
-        //OVERLAY COUNTERS
-        if(mCounter!=null){
-            canvas.save();
-            canvas.translate(getScrollX(), getScrollY());
-            canvas.drawCircle(mCounterSize+15, mCounterSize+15,mCounterSize, mStrokePaint);
-            canvas.drawText(mCounter, mCounterSize+15, mCounterSize+15+mRect2.height()/2, mTextPaint);
-            canvas.restore();
-        }
-    }
-    public void setCounter(int counter){
-        if(counter>0){
-            mCounter=String.valueOf(counter);
-            mTextPaint.getTextBounds(mCounter, 0, mCounter.length(), mRect2);
-            mCounterSize=(Math.max(mRect2.width(), mRect2.height())/2)+2;
-        }else{
-            mCounter=null;
-        }
     }
 }

@@ -113,6 +113,10 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 		// so i'd better not use it, sorry themers
 		if (mBackground != null)
 			convertView.setBackgroundDrawable(mBackground);
+		//ADW:Counters
+		if(convertView instanceof CounterTextView){
+		    ((CounterTextView)convertView).setCounter(info.counter);
+		}
 		return convertView;
 	}
 

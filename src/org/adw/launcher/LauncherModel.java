@@ -1627,5 +1627,26 @@ public class LauncherModel {
         }
         return false;
     }
+    synchronized void updateCounterForPackage(Launcher launcher, String packageName, int counter) {
+        if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
+            startApplicationsLoaderLocked(launcher, false);
+            return;
+        }
+        boolean changed=false;
+        if (packageName != null && packageName.length() > 0 && mApplicationsAdapter!=null) {
+            final int count=mApplications.size();
+            for (int i = 0; i < count; i++) {
+                final ApplicationInfo info = mApplications.get(i);
+                final Intent intent = info.intent;
+                final ComponentName name = intent.getComponent();
+                if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
+                        packageName.equals(name.getPackageName())) {
+                    info.counter=counter;
+                    changed=true;
+                }
+            }
+        }
+        if(changed)mApplicationsAdapter.notifyDataSetChanged();
+    }
 
 }
