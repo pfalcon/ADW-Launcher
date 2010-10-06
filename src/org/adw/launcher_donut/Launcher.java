@@ -4219,6 +4219,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             updateCounters(mLAB2, packageName, counter);
             updateCounters(mRAB2, packageName, counter);
             mMiniLauncher.updateCounters(packageName, counter);
+            sModel.updateCounterForPackage(this,packageName,counter);
         }
     }
 
