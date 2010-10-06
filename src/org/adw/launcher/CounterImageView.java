@@ -34,6 +34,7 @@ public class CounterImageView extends ImageView {
     private void init(){
         mStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mStrokePaint.setARGB(255, 255, 0, 0);
+        mStrokePaint.setShadowLayer(2f, 1, 1, 0x99FFFFFF);
 
         mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setARGB(255, 255, 255, 255);
@@ -60,7 +61,7 @@ public class CounterImageView extends ImageView {
         //OVERLAY COUNTERS
         if(mCounter!=null){
             canvas.save();
-            canvas.translate(getScrollX()+mCounterSize/2, getScrollY()+mCounterSize+mRect2.height());
+            canvas.translate(getScrollX()+getPaddingLeft()+mCounterSize/2, getScrollY()+getPaddingTop()+mCounterSize+mRect2.height());
             canvas.drawCircle(mRect2.width()/2, -mRect2.height()/2, mCounterSize, mStrokePaint);
             canvas.drawText(mCounter, 0, 0, mTextPaint);
             canvas.restore();
