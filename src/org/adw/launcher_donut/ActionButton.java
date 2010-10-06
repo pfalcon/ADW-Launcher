@@ -130,6 +130,7 @@ public class ActionButton extends CounterImageView implements DropTarget, DragLi
                 // Came from all apps -- make a copy
                 info = new ApplicationInfo((ApplicationInfo) info);
             }
+            setCounter(((ApplicationInfo)info).counter);
             myIcon = mLauncher.createSmallActionButtonIcon(info);
             break;
         case LauncherSettings.Favorites.ITEM_TYPE_LIVE_FOLDER:
