@@ -108,7 +108,9 @@ public class AllAppsGridView extends GridView implements
 		app = new ApplicationInfo(app);
 
 		mDragger.startDrag(view, this, app, DragController.DRAG_ACTION_COPY);
-		mLauncher.closeAllApplications();
+		if (!mLauncher.isDockBarOpen()) {
+		    mLauncher.closeAllApplications();
+		}
 
 		return true;
 	}
