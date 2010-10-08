@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.Paint.FontMetrics;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -16,7 +17,7 @@ public class CounterImageView extends ImageView {
     private final Rect mRect2 = new Rect();
     private Paint mStrokePaint;
     private Paint mTextPaint;
-
+    private FontMetrics fm;
     public CounterImageView(Context context) {
         super(context);
         init();
@@ -38,10 +39,11 @@ public class CounterImageView extends ImageView {
 
         mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setARGB(255, 255, 255, 255);
-        //mTextPaint.setTextAlign(Paint.Align.CENTER);
+        mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setTextSize(getContext().getResources().getDimensionPixelSize(R.dimen.counter_font_size));
         mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         mTextPaint.setShadowLayer(2f, 1, 1, 0xFF000000);
+        fm=mTextPaint.getFontMetrics();
         mCounterPadding=getContext().getResources().getDimensionPixelSize(R.dimen.counter_circle_padding);
     }
     public void setCounter(int counter){
@@ -56,13 +58,12 @@ public class CounterImageView extends ImageView {
 
     @Override
     public void draw(Canvas canvas) {
-        // TODO Auto-generated method stub
         super.draw(canvas);
         //OVERLAY COUNTERS
         if(mCounter!=null){
             canvas.save();
-            canvas.translate(getScrollX()+getPaddingLeft()+mCounterSize/2, getScrollY()+getPaddingTop()+mCounterSize+mRect2.height());
-            canvas.drawCircle(mRect2.width()/2, -mRect2.height()/2, mCounterSize, mStrokePaint);
+            canvas.translate(getScrollX()+getWidth()-(mCounterSize)-(mCounterPadding), getScrollY()+(mCounterSize)-(fm.top/2));
+            canvas.drawCircle(0, -mRect2.height()/2, mCounterSize, mStrokePaint);
             canvas.drawText(mCounter, 0, 0, mTextPaint);
             canvas.restore();
         }
