@@ -1212,6 +1212,11 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             view = FolderIcon.fromXml(R.layout.folder_icon, mLauncher,
                     (ViewGroup) getChildAt(mCurrentScreen), ((UserFolderInfo) info));
             break;
+        case LauncherSettings.Favorites.ITEM_TYPE_LIVE_FOLDER:
+            view = LiveFolderIcon.fromXml(
+                    R.layout.live_folder_icon, mLauncher,
+                    (ViewGroup) getChildAt(mCurrentScreen),(LiveFolderInfo) info);
+            break;
         default:
             throw new IllegalStateException("Unknown item type: " + info.itemType);
         }
@@ -1234,7 +1239,11 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
      */
     private CellLayout getCurrentDropLayout() {
         int index = mScroller.isFinished() ? mCurrentScreen : mNextScreen;
-        return (CellLayout) getChildAt(index);
+        final CellLayout layout = (CellLayout) getChildAt(index);
+        if (layout!=null)
+            return layout;
+        else
+            return (CellLayout) getChildAt(mCurrentScreen);
     }
 
     /**

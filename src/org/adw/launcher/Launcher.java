@@ -1300,6 +1300,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
+        if(intent==null)return;
         //ADW: closing drawer, removed from onpause
         if (requestCode !=REQUEST_SHOW_APP_LIST && //do not close drawer if it is for switching catalogue.
                 !CustomShirtcutActivity.ACTION_LAUNCHERACTION.equals(intent.getAction())) 
@@ -2115,10 +2116,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         }
 
         if (mSavedInstanceState != null) {
-        	//ADW: sometimes on rotating the phone, some widgets fail to restore its states.... so... damn.
-        	try{
-        		super.onRestoreInstanceState(mSavedInstanceState);
-        	}catch(IllegalArgumentException e){}
+            //ADW: sometimes on rotating the phone, some widgets fail to restore its states.... so... damn.
+            try{
+                super.onRestoreInstanceState(mSavedInstanceState);
+            }catch(Exception e){}
             mSavedInstanceState = null;
         }
 
