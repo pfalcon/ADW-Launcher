@@ -19,7 +19,7 @@ public class AppCatalogueFilter {
 		if (mCatalogue != null) {
 			final SharedPreferences prefs = mCatalogue.getPreferences();
 			if (prefs != null)
-				result = prefs.getBoolean(className, true);
+				result = prefs.getBoolean(className, false);
 		}
 		return result;
 	}
