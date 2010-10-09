@@ -36,7 +36,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 
-
 /**
  * GridView adapter to show the list of applications and shortcuts
  */
@@ -242,6 +241,10 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
 			updateDataSet();
 			notifyDataSetChanged();
 		}
+	}
+
+	public AppCatalogueFilter getCatalogueFilter() {
+		return mCatalogueFilter;
 	}
 
 

@@ -4226,8 +4226,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	}
 
 	private void navigateCatalogs(int direction){
+		final ApplicationsAdapter drawerAdapter = sModel.getApplicationsAdapter();
+		if (drawerAdapter == null)
+			return;
+
 		List<Integer> filterIndexes = AppCatalogueFilters.getInstance().getGroupsAndSpecialGroupIndexes();
-		int currentFIndex = AppCatalogueFilters.getInstance().getDrawerFilter().getCurrentFilterIndex();
+		final AppCatalogueFilter filter = drawerAdapter.getCatalogueFilter();
+		int currentFIndex = filter.getCurrentFilterIndex();
 		// Translate to index of the list
 		currentFIndex = filterIndexes.contains(currentFIndex) ?
 				filterIndexes.indexOf(currentFIndex) :
@@ -4249,9 +4254,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    	currentFIndex = 0;
 	    // Translate to "filter index"
 	    currentFIndex = filterIndexes.get(currentFIndex);
-	    AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(currentFIndex);
+	    filter.setCurrentGroupIndex(currentFIndex);
 
-	    AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, currentFIndex);
+	    if (filter == AppCatalogueFilters.getInstance().getDrawerFilter())
+	    	AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, currentFIndex);
         mAllAppsGrid.updateAppGrp();
         // Uncomment this to show a toast with the name of the new group...
 	    /*String name = currentFIndex ==  AppGroupAdapter.APP_GROUP_ALL ?
