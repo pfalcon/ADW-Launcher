@@ -766,12 +766,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         //ADW: Action Buttons (LAB/RAB)
         mLAB = (ActionButton) dragLayer.findViewById(R.id.btn_lab);
         mLAB.setLauncher(this);
-        mLAB.setSpecialIcon(getResources().getDrawable(R.drawable.btn_arrowleft));
+        mLAB.setSpecialIcon(getResources().getDrawable(R.drawable.arrow_left));
         mLAB.setSpecialAction(ACTION_CATALOG_PREV);
         dragLayer.addDragListener(mLAB);
         mRAB = (ActionButton) dragLayer.findViewById(R.id.btn_rab);
         mRAB.setLauncher(this);
-        mRAB.setSpecialIcon(getResources().getDrawable(R.drawable.btn_arrowright));
+        mRAB.setSpecialIcon(getResources().getDrawable(R.drawable.arrow_right));
         mRAB.setSpecialAction(ACTION_CATALOG_NEXT);
         dragLayer.addDragListener(mRAB);
         mLAB.setOnClickListener(this);
