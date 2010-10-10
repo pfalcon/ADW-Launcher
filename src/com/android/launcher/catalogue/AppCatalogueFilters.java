@@ -179,4 +179,8 @@ public final class AppCatalogueFilters {
 		else
 			return null;
 	}
+
+	public int getUserCatalogueCount() {
+		return mAllAppGroups.size();
+	}
 }
