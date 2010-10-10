@@ -2442,6 +2442,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	{
 		int index = AppCatalogueFilters.getInstance().getDrawerFilter().getCurrentFilterIndex();
 		AppCatalogueFilters.getInstance().dropGroup(index);
+		checkActionButtonsSpecialMode();
 		showSwitchGrp();
 	}
 	public void showSwitchGrp()
@@ -2603,11 +2604,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			//2nd is All, mapping to -1, check AppGrpUtils For detail
 		   //int dbGrp = AppGrpUtils.getGrpNumber(which-2);
 		   if (action == AppGroupAdapter.APP_GROUP_ADD) {
-			   showNewGrpDialog() ;
+			   showNewGrpDialog();
 		   } else {
 			   AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(action);
 			   AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, action);
 			   mAllAppsGrid.updateAppGrp();
+			   checkActionButtonsSpecialMode();
 		   }
 			//mDrawer.open();
 		}
@@ -2671,6 +2673,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				// Make sure we have the right folder info
 				int which=AppCatalogueFilters.getInstance().createNewGroup(name);
 				AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, which);
+				checkActionButtonsSpecialMode();
 				LauncherModel.mApplicationsAdapter.updateDataSet();
 			}
 			cleanup();
@@ -3520,16 +3523,22 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	        	sModel.getApplicationsAdapter().setCatalogueFilter(AppCatalogueFilters.getInstance().getDrawerFilter());
 	        //mDesktopLocked=true;
 	        mWorkspace.invalidate();
-	        mLAB.setSpecialMode(true);
-	        mRAB.setSpecialMode(true);
+	        checkActionButtonsSpecialMode();
             mAllAppsGrid.open(animated && allowDrawerAnimations);
 			mHandleIcon.startTransition(150);
     	    mPreviousView.setVisibility(View.GONE);
     	    mNextView.setVisibility(View.GONE);
     	    if(mDesktopIndicator!=null)mDesktopIndicator.hide();
 		}
-
     }
+
+    private void checkActionButtonsSpecialMode() {
+    	boolean showSpecialMode = allAppsOpen &&
+    		AppCatalogueFilters.getInstance().getUserCatalogueCount() > 0;
+        mLAB.setSpecialMode(showSpecialMode);
+        mRAB.setSpecialMode(showSpecialMode);
+    }
+
     private void closeAllApps(boolean animated){
 		if(allAppsOpen){
 			mHandleView.setNextFocusUpId(R.id.drag_layer);
