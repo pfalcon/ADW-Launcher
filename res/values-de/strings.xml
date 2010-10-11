@@ -333,7 +333,7 @@
     <string name="AppGroupDel">"Katalog löschen"</string>
     <string name="AppGroupDelLong">"Soll der aktuelle Katalog\nwirklich gelöscht werden?"</string>
     <string name="AppGroupChoose">"Katalog auswählen"</string>
-    <string name="AppGroupConfig">"Katalog anlegen"</string>
+    <string name="AppGroupConfig">"Katalog bearbeiten"</string>
     <string name="AppGroupRename">"Neuer Katalog"</string>
     <string name="AppGroupConfigError">"Dieser Katalog kann nicht angelegt werden"</string>
     <string name="AppGroupAddError">"Es konnte kein weiterer Katalog angelegt werden"</string>
