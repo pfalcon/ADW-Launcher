@@ -92,7 +92,7 @@
         <activity
             android:name="WallpaperChooser"
             android:label="@string/pick_wallpaper"
-            android:icon="@drawable/ic_launcher_wallpaper">
+            android:icon="@drawable/ic_launcher_home">
             <intent-filter>
                 <action android:name="android.intent.action.SET_WALLPAPER" />
                 <category android:name="android.intent.category.DEFAULT" />
