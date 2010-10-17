@@ -1,5 +1,8 @@
 package org.adw.launcher_donut;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.adw.launcher_donut.HolderLayout.OnFadingListener;
 import android.content.Context;
 import android.content.res.TypedArray;

@@ -29,6 +29,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuff;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -137,6 +138,7 @@ public class DragLayer extends FrameLayout implements DragController {
     private static final int COLOR_NORMAL=0x66FF0000;
     private static final int COLOR_TRASH=0xAAFF0000;
     private boolean mDrawModeBitmap=true;
+    private long VIBRATE_DURATION=250;
     /**
      * Used to create a new DragLayer from XML.
      *

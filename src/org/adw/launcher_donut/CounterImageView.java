@@ -1,4 +1,4 @@
-package org.adw.launcher;
+package org.adw.launcher_donut;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,9 +7,9 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.Paint.FontMetrics;
 import android.util.AttributeSet;
-import android.widget.TextView;
+import android.widget.ImageView;
 
-public class CounterTextView extends TextView {
+public class CounterImageView extends ImageView {
     //ADW custom notifier counters
     private String mCounter=null;
     private int mCounterSize=0;
@@ -18,17 +18,17 @@ public class CounterTextView extends TextView {
     private Paint mStrokePaint;
     private Paint mTextPaint;
     private FontMetrics fm;
-    public CounterTextView(Context context) {
+    public CounterImageView(Context context) {
         super(context);
         init();
     }
 
-    public CounterTextView(Context context, AttributeSet attrs) {
+    public CounterImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public CounterTextView(Context context, AttributeSet attrs, int defStyle) {
+    public CounterImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }

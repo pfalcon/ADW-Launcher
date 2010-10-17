@@ -3,8 +3,8 @@ package org.adw.launcher_donut;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.adw.launcher.catalogue.AppCatalogueFilter;
-import org.adw.launcher.catalogue.AppCatalogueFilters;
+import org.adw.launcher_donut.catalogue.AppCatalogueFilter;
+import org.adw.launcher_donut.catalogue.AppCatalogueFilters;
 
 import android.content.Intent;
 import android.database.DataSetObserver;
