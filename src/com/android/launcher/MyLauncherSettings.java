@@ -45,6 +45,7 @@ import java.util.List;
 import com.android.launcher.R;
 
 public class MyLauncherSettings extends PreferenceActivity implements OnPreferenceChangeListener {
+	private static final boolean IsDebugVersion = false;
 	private static final String ALMOSTNEXUS_PREFERENCES = "launcher.preferences.almostnexus";
     private boolean shouldRestart=false;
     private String mMsg;
