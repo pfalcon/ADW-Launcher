@@ -1,4 +1,4 @@
-package org.adw.launcher;
+package com.android.launcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
