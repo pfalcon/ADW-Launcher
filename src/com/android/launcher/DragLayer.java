@@ -29,6 +29,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuff;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,8 +91,6 @@ public class DragLayer extends FrameLayout implements DragController {
 
     private final Rect mRect = new Rect();
     private final int[] mDropCoordinates = new int[2];
-
-    private final Vibrator mVibrator = new Vibrator();
 
     // Faruq: utilize array list instead
     private ArrayList<DragListener> mListener = new ArrayList<DragListener>();
@@ -265,7 +264,8 @@ public class DragLayer extends FrameLayout implements DragController {
         mDragSource = source;
         mDragInfo = dragInfo;
 
-        mVibrator.vibrate(VIBRATE_DURATION);
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+                HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
 
         mEnteredRegion = false;
 
