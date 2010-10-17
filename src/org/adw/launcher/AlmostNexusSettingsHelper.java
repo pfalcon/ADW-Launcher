@@ -435,4 +435,14 @@ public final class AlmostNexusSettingsHelper {
 		boolean newD = sp.getBoolean("dbg_show_mem", false);
 		return newD;
 	}
+	public static boolean getDrawerCatalogsNavigation(Context context) {
+	    SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+	    boolean newD = sp.getBoolean("drawer_navigate_catalogs", context.getResources().getBoolean(R.bool.config_drawer_navigate_catalogs));
+	    return newD;
+	}
+	public static boolean getNotifReceiver(Context context) {
+	    SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+	    boolean newD = sp.getBoolean("notif_receiver", context.getResources().getBoolean(R.bool.config_notif_receiver));
+	    return newD;
+	}
 }

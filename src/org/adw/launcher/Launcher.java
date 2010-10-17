@@ -292,6 +292,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private boolean scrollableSupport=false;
 	private DesktopIndicator mDesktopIndicator;
 	private int savedOrientation;
+	private boolean useDrawerCatalogNavigation=true;
 	/**
 	 * ADW: Home/Swype down binding constants
 	 */
@@ -1294,7 +1295,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         getContentResolver().unregisterContentObserver(mWidgetObserver);
         unregisterReceiver(mApplicationsReceiver);
         unregisterReceiver(mCloseSystemDialogsReceiver);
-        unregisterReceiver(mCounterReceiver);
+        if(mCounterReceiver!=null)unregisterReceiver(mCounterReceiver);
         mWorkspace.unregisterProvider();
     }
 
@@ -1823,7 +1824,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      * wallpaper.
      */
     private void registerIntentReceivers() {
-        if(mCounterReceiver == null){
+        boolean useNotifReceiver=AlmostNexusSettingsHelper.getNotifReceiver(this);
+        if(useNotifReceiver && mCounterReceiver == null){
             mCounterReceiver=new CounterReceiver(this);
             mCounterReceiver.setCounterListener(new CounterReceiver.OnCounterChangedListener() {
                 public void onTrigger(String pname, int counter) {
@@ -3067,6 +3069,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         }
         wallpaperHack=AlmostNexusSettingsHelper.getWallpaperHack(this);
         scrollableSupport=AlmostNexusSettingsHelper.getUIScrollableWidgets(this);
+        useDrawerCatalogNavigation=AlmostNexusSettingsHelper.getDrawerCatalogsNavigation(this);
     }
     /**
      * ADW: Refresh UI status variables and elements after changing settings.
@@ -3533,7 +3536,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 
     private void checkActionButtonsSpecialMode() {
-    	boolean showSpecialMode = allAppsOpen &&
+    	boolean showSpecialMode = useDrawerCatalogNavigation && allAppsOpen &&
     		AppCatalogueFilters.getInstance().getUserCatalogueCount() > 0;
         mLAB.setSpecialMode(showSpecialMode);
         mRAB.setSpecialMode(showSpecialMode);
@@ -3675,6 +3678,22 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 					mWorkspace.unregisterProvider();
 				}
 				sModel.loadUserItems(false, Launcher.this, false, false);
+			}else if(key.equals("notif_receiver")){
+			    boolean useNotifReceiver=AlmostNexusSettingsHelper.getNotifReceiver(this);
+			    if(!useNotifReceiver){
+			        if(mCounterReceiver!=null)unregisterReceiver(mCounterReceiver);
+			        mCounterReceiver=null;
+			    }else{
+			        if(mCounterReceiver == null){
+			            mCounterReceiver=new CounterReceiver(this);
+			            mCounterReceiver.setCounterListener(new CounterReceiver.OnCounterChangedListener() {
+			                public void onTrigger(String pname, int counter) {
+			                    updateCountersForPackage(pname, counter);
+			                }
+			            });
+			        }
+			        registerReceiver(mCounterReceiver, mCounterReceiver.getFilter());
+			    }
 			}
 
 		}
