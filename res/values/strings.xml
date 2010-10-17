@@ -420,4 +420,9 @@
 	
 	<string name="need_scrollable">The widget you want to add needs \'scrollable widgets support\' which is currently disabled.\nDo you want to enable it now?</string>
 	<string name="scrollable_api_required">This widget needs an updated version of ADW.Launcher.\nPlease update or contact widget developer</string>
+    
+    <string name="pref_title_drawer_navigate_catalogs">Catalogs navigation</string>
+    <string name="pref_summary_drawer_navigate_catalogs">Show app catalogs navigation buttons</string>
+    <string name="pref_title_notif_receiver">Show notifications</string>
+    <string name="pref_summary_notif_receiver">Enable the global notification counters</string>
 </resources>
