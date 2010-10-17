@@ -12,8 +12,8 @@
 		limitations under the License. */
 	-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="org.adw.launcher" android:versionCode="27"
-	android:versionName="1.1.5 standalone" android:installLocation="internalOnly">
+	package="org.adw.launcher" android:versionCode="28"
+	android:versionName="1.2.0 standalone" android:installLocation="internalOnly">
 
 	<permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
 		android:permissionGroup="android.permission-group.SYSTEM_TOOLS"

@@ -49,7 +49,7 @@ import android.widget.Toast;
 
 public class MyLauncherSettings extends PreferenceActivity implements OnPreferenceChangeListener {
 
-	private static final boolean IsDebugVersion = true;
+	private static final boolean IsDebugVersion = false;
 	private static final String ALMOSTNEXUS_PREFERENCES = "launcher.preferences.almostnexus";
     private boolean shouldRestart=false;
     private String mMsg;
