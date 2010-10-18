@@ -168,6 +168,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     	private boolean mTouchedScrollableWidget = false;
 	private int mDesktopCacheType=AlmostNexusSettingsHelper.CACHE_LOW;
 	private boolean mWallpaperScroll=true;
+    //ADW: variable to track the proper Y position to draw the wallpaer when the wallpaper hack is enabled
+    //this is to avoid the small vertical position change from the wallpapermanager one.
+    private int mWallpaperY;
     /**
      * Used to inflate the Workspace from XML.
      *
@@ -522,8 +525,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     	if(getScrollX()>getChildAt(getChildCount() - 1).getRight() - (getRight() - getLeft())){
     		x=(getScrollX()-mWallpaperWidth+(getRight()-getLeft()));
     	}
-	if(!mWallpaperScroll || getChildCount()==1)x=x=(getScrollX()-(mWallpaperWidth/2)+(getRight()/2));
-	canvas.drawBitmap(mWallpaper, x, (getBottom() - mWallpaperHeight) / 2, mPaint);
+	if(!mWallpaperScroll || getChildCount()==1)x=(getScrollX()-(mWallpaperWidth/2)+(getRight()/2));
+    final int y=mWallpaperY;
+    canvas.drawBitmap(mWallpaper, x, y, mPaint);
         if(!mSensemode){
 			// If the all apps drawer is open and the drawing region for the workspace
 	        // is contained within the drawer's bounds, we skip the drawing. This requires
@@ -631,11 +635,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             mScroller.startScroll(0, 0, mCurrentScreen * width, 0, 0);
             mFirstLayout = false;
         }
-    	/*int max = 3;
-        int aW = getMeasuredWidth();
-        float w = aW / max;
-        maxPreviewWidth=(int) w;
-        maxPreviewHeight=(int) (getMeasuredHeight()*(w/getMeasuredWidth()));*/
     }
 
     @Override
@@ -784,8 +783,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                         // Scroll if the user moved far enough along the X axis
                         mTouchState = TOUCH_STATE_SCROLLING;
                         enableChildrenCache();
-                        
-                    } 
+                    }
                     // If yDiff > xDiff means the finger path pitch is bigger than 45deg so we assume the user want to either scroll Y or Y-axis gesture
                     else if (getOpenFolder()==null)
                     {
@@ -912,20 +910,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 // Scroll to follow the motion event
                 final int deltaX = (int) (mLastMotionX - x);
                 mLastMotionX = x;
-
-                if (deltaX < 0) {
-                    if (getScrollX() > -mScrollingBounce) {
-                        scrollBy(Math.min(deltaX,mScrollingBounce), 0);
-                        if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
-                    }
-                } else if (deltaX > 0) {
-                    final int availableToScroll = getChildAt(getChildCount() - 1).getRight() -
-                            getScrollX() - getWidth()+mScrollingBounce;
-                    if (availableToScroll > 0) {
-                        scrollBy(deltaX, 0);
-                        if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
-                    }
-                }
+                scrollBy(deltaX, 0);
+                if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
             }
             break;
         case MotionEvent.ACTION_UP:
@@ -1987,6 +1973,13 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 }
             }
         }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        // TODO Auto-generated method stub
+        super.onSizeChanged(w, h, oldw, oldh);
+        if(mLauncher!=null)mWallpaperY=h - mLauncher.getWindow().getDecorView().getHeight();
     }
 
 }

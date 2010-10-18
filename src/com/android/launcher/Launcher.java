@@ -3563,7 +3563,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	}else{
     		getWindow().setBackgroundDrawable(new ColorDrawable(0));
     	}
-
     }
     private boolean shouldRestart(){
         try {

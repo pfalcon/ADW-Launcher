@@ -18,9 +18,6 @@ package com.android.launcher;
 
 import java.util.ArrayList;
 
-import com.android.launcher.R;
-
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

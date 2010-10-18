@@ -67,21 +67,17 @@
 		android:process="android.process.acore" android:label="@string/application_name"
 		android:icon="@drawable/ic_launcher_home">
 
-        <activity
-            android:name="Launcher"
-            android:launchMode="singleTask"
-            android:clearTaskOnLaunch="true"
-            android:stateNotNeeded="true"
-            android:theme="@style/Theme"
-            android:screenOrientation="nosensor"
-            android:windowSoftInputMode="stateUnspecified|adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.HOME"/>
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.MONKEY" />
-            </intent-filter>
-        </activity>
+		<activity android:name="Launcher" android:launchMode="singleTask"
+			android:clearTaskOnLaunch="true" android:stateNotNeeded="true"
+			android:theme="@style/Theme"
+			android:screenOrientation="nosensor" android:windowSoftInputMode="stateUnspecified|adjustPan">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.HOME" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.MONKEY" />
+			</intent-filter>
+		</activity>
 		<activity android:name="MyLauncherSettings" android:label="@string/pref_label_settings" />
 		<activity android:name="ActivityPickerActivity" android:label="@string/pref_label_activities" />
 		<activity 
