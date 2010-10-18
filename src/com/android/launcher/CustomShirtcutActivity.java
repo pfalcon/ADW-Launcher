@@ -36,6 +36,7 @@ import android.widget.ListAdapter;
 public class CustomShirtcutActivity extends Activity implements OnClickListener {
 	private static final String ACTION_ADW_PICK_ICON="org.adw.launcher.icons.ACTION_PICK_ICON";
 	public static final String ACTION_LAUNCHERACTION = "org.adw.launcher.action.launcheraction";
+	public static final String EXTRA_APPLICATIONINFO = "EXTRA_APPLICATIONINFO";
 
 	private static final int PICK_CUSTOM_ICON=1;
 	private static final int PICK_STANDARD_MENU=2;
@@ -115,7 +116,55 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 		edLabel=(EditText) findViewById(R.id.shirtcut_label);
 		mPackageManager=getPackageManager();
 		mIconSize=(int) getResources().getDimension(android.R.dimen.app_icon_size);
+		loadFromAppInfo(getAppInfo());
 	}
+
+	private ApplicationInfo getAppInfo() {
+		final Intent intent = getIntent();
+		if (intent != null && intent.getAction() != null &&
+				intent.getAction().equals(Intent.ACTION_EDIT)
+				&& intent.hasExtra(EXTRA_APPLICATIONINFO)) {
+			long id = intent.getLongExtra(EXTRA_APPLICATIONINFO, 0);
+			return LauncherModel.loadApplicationInfoById(this, id);
+		}
+		return null;
+	}
+
+	private void loadFromAppInfo(ApplicationInfo info) {
+		if (info == null)
+			return;
+		edLabel.setText(info.title);
+		mIntent = info.intent;
+		btPickIcon.setImageDrawable(info.icon);
+		btPickIcon.setEnabled(true);
+		btOk.setEnabled(true);
+		ComponentName component = mIntent.getComponent();
+		if (component != null) {
+			if (component.getClassName().equals(CustomShirtcutActivity.class.getName()) &&
+				mIntent.getAction().equals(ACTION_LAUNCHERACTION)){
+			}
+			else
+			{
+		        ActivityInfo activityInfo = null;
+		        try {
+		            activityInfo = mPackageManager.getActivityInfo(component, 0);
+		        } catch (NameNotFoundException e) {
+		        }
+		        String title=null;
+		        if (activityInfo != null) {
+		            title = activityInfo.loadLabel(mPackageManager).toString();
+		            if (title == null) {
+		                title = activityInfo.name;
+		            }
+					btPickActivity.setText(title);
+		        }
+			}
+		}
+		else
+			btPickActivity.setText(info.title);
+	}
+
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
@@ -313,6 +362,14 @@ public class CustomShirtcutActivity extends Activity implements OnClickListener 
 	        Intent mReturnData = new Intent();
 	        mReturnData.putExtra(Intent.EXTRA_SHORTCUT_INTENT, mIntent);
 	        mReturnData.putExtra(Intent.EXTRA_SHORTCUT_NAME, edLabel.getText().toString());
+	        Intent intent = getIntent();
+			if (intent != null && intent.getAction() != null &&
+					intent.getAction().equals(Intent.ACTION_EDIT)
+					&& intent.hasExtra(EXTRA_APPLICATIONINFO)) {
+				long id = intent.getLongExtra(EXTRA_APPLICATIONINFO, 0);
+				mReturnData.putExtra(EXTRA_APPLICATIONINFO, id);
+			}
+
 	        if(mBitmap==null){
 				if(mIconResource!=null)mReturnData.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, mIconResource);
 	        }else{
