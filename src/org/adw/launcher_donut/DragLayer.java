@@ -18,7 +18,6 @@ package org.adw.launcher_donut;
 
 import java.util.ArrayList;
 
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -138,7 +137,7 @@ public class DragLayer extends FrameLayout implements DragController {
     private static final int COLOR_NORMAL=0x66FF0000;
     private static final int COLOR_TRASH=0xAAFF0000;
     private boolean mDrawModeBitmap=true;
-    private long VIBRATE_DURATION=250;
+    
     /**
      * Used to create a new DragLayer from XML.
      *
@@ -267,7 +266,7 @@ public class DragLayer extends FrameLayout implements DragController {
         mDragSource = source;
         mDragInfo = dragInfo;
 
-        ((Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(VIBRATE_DURATION);
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
         
         mEnteredRegion = false;
 
