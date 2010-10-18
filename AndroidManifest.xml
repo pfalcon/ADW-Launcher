@@ -52,7 +52,7 @@
 
 		<activity android:name="Launcher" android:launchMode="singleTask"
 			android:clearTaskOnLaunch="true" android:stateNotNeeded="true"
-			android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
+			android:theme="@style/Theme"
 			android:screenOrientation="nosensor" android:windowSoftInputMode="stateUnspecified|adjustPan">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />

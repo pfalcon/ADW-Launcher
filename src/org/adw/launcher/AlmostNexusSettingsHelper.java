@@ -431,9 +431,13 @@ public final class AlmostNexusSettingsHelper {
 	}
 
 	public static boolean getDebugShowMemUsage(Context context) {
-		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
-		boolean newD = sp.getBoolean("dbg_show_mem", false);
-		return newD;
+		if(MyLauncherSettings.IsDebugVersion){
+    	    SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+    		boolean newD = sp.getBoolean("dbg_show_mem", false);
+    		return newD;
+		}else{
+		    return false;
+		}
 	}
 	public static boolean getDrawerCatalogsNavigation(Context context) {
 	    SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);

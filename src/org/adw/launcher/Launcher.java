@@ -3628,11 +3628,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         if(!lwp){
             getWindow().setBackgroundDrawable(null);
             getWindow().setFormat(PixelFormat.OPAQUE);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+            //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
         }else{
             getWindow().setBackgroundDrawable(new ColorDrawable(0));
             getWindow().setFormat(PixelFormat.TRANSPARENT);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
+            //getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
         }
     }
     private boolean shouldRestart(){

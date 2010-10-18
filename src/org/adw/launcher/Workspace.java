@@ -170,10 +170,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	//And as those devices can perform pretty well without cache... let's add an option... one more...
 	private int mDesktopCacheType=AlmostNexusSettingsHelper.CACHE_LOW;
 	private boolean mWallpaperScroll=true;
-    ActivityManager activityManager;
-    int[] pids;
-    Debug.MemoryInfo[] memoryInfoArray;
-    float debugTextSize;
+    //ADW: variable to track the proper Y position to draw the wallpaer when the wallpaper hack is enabled
+    //this is to avoid the small vertical position change from the wallpapermanager one.
+    private int mWallpaperY;
     /**
      * Used to inflate the Workspace from XML.
      *
@@ -496,7 +495,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
-            if(lwpSupport)updateWallpaperOffset();
+            updateWallpaperOffset();
             if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)mScroller.getCurrX()/(float)(getChildCount()*getWidth()));
             postInvalidate();
         } else if (mNextScreen != INVALID_SCREEN) {
@@ -555,7 +554,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         	//if(getChildCount()==1)x=getScrollX();
         	//ADW lets center the wallpaper when there's only one screen...
         	if(!mWallpaperScroll || getChildCount()==1)x=(getScrollX()-(mWallpaperWidth/2)+(getRight()/2));
-    		canvas.drawBitmap(mWallpaperDrawable.getBitmap(), x, (getBottom() - mWallpaperHeight) / 2, mPaint);
+        	final int y=mWallpaperY;
+    		canvas.drawBitmap(mWallpaperDrawable.getBitmap(), x, y, mPaint);
         }
         if(!mSensemode){
 	        // If the all apps drawer is open and the drawing region for the workspace
@@ -616,21 +616,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             }
         }
         float x = getScrollX();
-        if (pids.length > 0 && AlmostNexusSettingsHelper.getDebugShowMemUsage(mLauncher)) {
-	        mPaint.setTextSize(debugTextSize);
-	        mPaint.setAntiAlias(true);
-	        mPaint.setColor(0xff000000);
-	        if (pids.length > 0)
-	        	canvas.drawRect(x, 0, x+getWidth(), 70, mPaint);
-	        mPaint.setColor(0xffffffff);
-	        memoryInfoArray= activityManager.getProcessMemoryInfo(pids);
-	        for(Debug.MemoryInfo pidMemoryInfo: memoryInfoArray)
-	        {
-	        	canvas.drawText("getTotalPrivateDirty: " + pidMemoryInfo.getTotalPrivateDirty(), x, debugTextSize, mPaint);
-	        	canvas.drawText("getTotalPss: " + pidMemoryInfo.getTotalPss(), x, debugTextSize*2, mPaint);
-	        	canvas.drawText("getTotalSharedDirty: " + pidMemoryInfo.getTotalSharedDirty(), x, debugTextSize*3, mPaint);
-	        }
-        }
         if (restore) {
             canvas.restore();
         }
@@ -671,14 +656,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         if (mFirstLayout) {
             scrollTo(mCurrentScreen * width, 0);
             mScroller.startScroll(0, 0, mCurrentScreen * width, 0, 0);
-            if(lwpSupport)updateWallpaperOffset(width * (getChildCount() - 1));
+            updateWallpaperOffset(width * (getChildCount() - 1));
             mFirstLayout = false;
         }
-    	/*int max = 3;
-        int aW = getMeasuredWidth();
-        float w = aW / max;
-        maxPreviewWidth=(int) w;
-        maxPreviewHeight=(int) (getMeasuredHeight()*(w/getMeasuredWidth()));*/
     }
 
     @Override
@@ -695,12 +675,10 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             }
         }
         //ADW:updateWallpaperoffset
-        if(lwpSupport){
-        	if(mWallpaperScroll)
-        		updateWallpaperOffset();
-        	else
-        		centerWallpaperOffset();
-        }
+    	if(mWallpaperScroll)
+    		updateWallpaperOffset();
+    	else
+    		centerWallpaperOffset();
     }
 
     @Override
@@ -831,14 +809,14 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 // In order to be flexible enough for future complex gestures, we should check here is the movement belongs to a given pattern
                 // However in order to not spend cpu time (speed) in checking this, it is preferable to leave the x scrolling as untouched and light as possible
                 if (xMoved || yMoved) {
-                    // If xDiff > yDiff means the finger path pitch is smaller than 45� so we assume the user want to scroll X axis
+                    // If xDiff > yDiff means the finger path pitch is smaller than 45deg so we assume the user want to scroll X axis
                     if (xDiff > yDiff) {
                         // Scroll if the user moved far enough along the X axis
                         mTouchState = TOUCH_STATE_SCROLLING;
                         enableChildrenCache();
 
                     }
-                    // If yDiff > xDiff means the finger path pitch is bigger than 45� so we assume the user want to either scroll Y or Y-axis gesture
+                    // If yDiff > xDiff means the finger path pitch is bigger than 45deg so we assume the user want to either scroll Y or Y-axis gesture
                     else if (getOpenFolder()==null)
                     {
                     	// As x scrolling is left untouched (more or less untouched;)), every gesture should start by dragging in Y axis. In fact I only consider useful, swipe up and down.
@@ -972,22 +950,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 // Scroll to follow the motion event
                 final int deltaX = (int) (mLastMotionX - x);
                 mLastMotionX = x;
-
-                if (deltaX < 0) {
-                    if (getScrollX() > -mScrollingBounce) {
-                        scrollBy(Math.min(deltaX,mScrollingBounce), 0);
-                        if(lwpSupport)updateWallpaperOffset();
-                        if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
-                    }
-                } else if (deltaX > 0) {
-                    final int availableToScroll = getChildAt(getChildCount() - 1).getRight() -
-                            getScrollX() - getWidth()+mScrollingBounce;
-                    if (availableToScroll > 0) {
-                        scrollBy(deltaX, 0);
-                        if(lwpSupport)updateWallpaperOffset();
-                        if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
-                    }
-                }
+                scrollBy(deltaX, 0);
+                updateWallpaperOffset();
+                if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
             }
             break;
         case MotionEvent.ACTION_UP:
@@ -1294,12 +1259,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         mLauncher = launcher;
         if(mLauncher.isScrollableAllowed())registerProvider();
         if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().setItems(mHomeScreens);
-        activityManager =(ActivityManager) mLauncher.getSystemService(Context.ACTIVITY_SERVICE);
-        if (AlmostNexusSettingsHelper.getDebugShowMemUsage(mLauncher))
-        	pids=new int[]{android.os.Process.myPid()};
-        else
-        	pids = new int[]{};
-        debugTextSize=DisplayMetrics.DENSITY_DEFAULT/10;
     }
 
     public void setDragger(DragController dragger) {
@@ -2103,6 +2062,13 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 }
             }
         }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        // TODO Auto-generated method stub
+        super.onSizeChanged(w, h, oldw, oldh);
+        if(mLauncher!=null)mWallpaperY=h - mLauncher.getWindow().getDecorView().getHeight();
     }
 
 }
