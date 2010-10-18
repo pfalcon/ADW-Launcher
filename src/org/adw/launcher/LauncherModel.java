@@ -693,6 +693,78 @@ public class LauncherModel {
         return label;
     }
 
+    static ApplicationInfo loadApplicationInfoById(Context context, long Id) {
+
+        final ContentResolver contentResolver = context.getContentResolver();
+        final PackageManager manager = context.getPackageManager();
+        final Cursor c = contentResolver.query(
+                LauncherSettings.Favorites.CONTENT_URI, null, null, null, null);
+        c.moveToFirst();
+        while(!c.isAfterLast())
+        {
+        	final int idIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites._ID);
+        	final long id = c.getLong(idIndex);
+	        if (id == Id)
+	        {
+
+	            final int intentIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.INTENT);
+	            final int titleIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.TITLE);
+	            final int iconTypeIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.ICON_TYPE);
+	            final int iconIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.ICON);
+	            final int iconPackageIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.ICON_PACKAGE);
+	            final int iconResourceIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.ICON_RESOURCE);
+	            final int containerIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.CONTAINER);
+	            final int itemTypeIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.ITEM_TYPE);
+	            final int screenIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.SCREEN);
+	            final int cellXIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.CELLX);
+	            final int cellYIndex = c.getColumnIndexOrThrow(LauncherSettings.Favorites.CELLY);
+
+	            int container;
+	            Intent intent;
+
+	            final int itemType = c.getInt(itemTypeIndex);
+	            if (itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION ||
+	            	itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT)
+	            {
+	            	String intentDescription = c.getString(intentIndex);
+	                try {
+	                    intent = Intent.parseUri(intentDescription, 0);
+	                } catch (java.net.URISyntaxException e) {
+	                    return null;
+	                }
+
+	                ApplicationInfo info;
+	                if (itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION) {
+	                    info = getApplicationInfo(manager, intent, context);
+	                } else {
+	                    info = getApplicationInfoShortcut(c, context, iconTypeIndex,
+	                            iconPackageIndex, iconResourceIndex, iconIndex);
+	                }
+
+	                if (info == null) {
+	                    info = new ApplicationInfo();
+	                    info.icon = manager.getDefaultActivityIcon();
+	                }
+
+	                if (info != null) {
+	                    info.title = c.getString(titleIndex);
+	                    info.intent = intent;
+
+	                    info.id = id;
+	                    container = c.getInt(containerIndex);
+	                    info.container = container;
+	                    info.screen = c.getInt(screenIndex);
+	                    info.cellX = c.getInt(cellXIndex);
+	                    info.cellY = c.getInt(cellYIndex);
+	                }
+	                return info;
+	            }
+	        }
+	        c.moveToNext();
+        }
+        return null;
+    }
+
     private class DesktopItemsLoader implements Runnable {
         private volatile boolean mStopped;
         private volatile boolean mFinished;
@@ -1303,7 +1375,7 @@ public class LauncherModel {
     /**
      * Make an ApplicationInfo object for a shortcut
      */
-    private ApplicationInfo getApplicationInfoShortcut(Cursor c, Context context,
+    private static ApplicationInfo getApplicationInfoShortcut(Cursor c, Context context,
             int iconTypeIndex, int iconPackageIndex, int iconResourceIndex, int iconIndex) {
 
         final ApplicationInfo info = new ApplicationInfo();

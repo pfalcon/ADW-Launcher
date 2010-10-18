@@ -149,6 +149,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private static final int REQUEST_PICK_APPWIDGET = 9;
     private static final int REQUEST_PICK_ANYCUT=10;
     private static final int REQUEST_SHOW_APP_LIST = 11;
+    private static final int REQUEST_EDIT_SHIRTCUT = 12;
 
     static final String EXTRA_SHORTCUT_DUPLICATE = "duplicate";
 
@@ -507,7 +508,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         mWaitingForResult = false;
-
         // The pattern used here is that a user PICKs a specific application,
         // which, depending on the target, might need to CREATE the actual target.
 
@@ -539,12 +539,21 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                     break;
                 case REQUEST_PICK_ANYCUT:
                 	completeAddShortcut(data,mAddItemCellInfo, !mDesktopLocked);
+                	break;
+                case REQUEST_EDIT_SHIRTCUT:
+                	completeEditShirtcut(data);
+                	break;
             }
         }
 		else if (resultCode == RESULT_OK ) {
-			if (requestCode== REQUEST_SHOW_APP_LIST) {
-				mAllAppsGrid.updateAppGrp();
-				showAllApps(true, null);
+			switch(requestCode) {
+				case REQUEST_SHOW_APP_LIST: {
+					mAllAppsGrid.updateAppGrp();
+					showAllApps(true, null);
+				} break;
+	        	case REQUEST_EDIT_SHIRTCUT:
+	        		completeEditShirtcut(data);
+	        		break;
 			}
         }
 		else if ((requestCode == REQUEST_PICK_APPWIDGET ||
@@ -1305,7 +1314,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         if(intent==null)return;
         //ADW: closing drawer, removed from onpause
         if (requestCode !=REQUEST_SHOW_APP_LIST && //do not close drawer if it is for switching catalogue.
-                !CustomShirtcutActivity.ACTION_LAUNCHERACTION.equals(intent.getAction())) 
+                !CustomShirtcutActivity.ACTION_LAUNCHERACTION.equals(intent.getAction()))
             closeDrawer(false);
         if (requestCode >= 0) mWaitingForResult = true;
         super.startActivityForResult(intent, requestCode);
@@ -3997,6 +4006,59 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 	}
+
+	void editShirtcut(ApplicationInfo info) {
+		Intent edit = new Intent(Intent.ACTION_EDIT);
+		edit.setClass(this, CustomShirtcutActivity.class);
+		edit.putExtra(CustomShirtcutActivity.EXTRA_APPLICATIONINFO, info.id);
+		startActivityForResult(edit, REQUEST_EDIT_SHIRTCUT);
+	}
+
+	private void completeEditShirtcut(Intent data) {
+		if (!data.hasExtra(CustomShirtcutActivity.EXTRA_APPLICATIONINFO))
+			return;
+		long appInfoId = data.getLongExtra(CustomShirtcutActivity.EXTRA_APPLICATIONINFO, 0);
+		ApplicationInfo info = LauncherModel.loadApplicationInfoById(this, appInfoId);
+		if (info != null) {
+			Bitmap bitmap = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON);
+
+	        Drawable icon = null;
+	        boolean customIcon = false;
+	        ShortcutIconResource iconResource = null;
+
+	        if (bitmap != null) {
+	            icon = new FastBitmapDrawable(Utilities.createBitmapThumbnail(bitmap, this));
+	            customIcon = true;
+	        } else {
+	            Parcelable extra = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE);
+	            if (extra != null && extra instanceof ShortcutIconResource) {
+	                try {
+	                    iconResource = (ShortcutIconResource) extra;
+	                    final PackageManager packageManager = getPackageManager();
+	                    Resources resources = packageManager.getResourcesForApplication(
+	                            iconResource.packageName);
+	                    final int id = resources.getIdentifier(iconResource.resourceName, null, null);
+	                    icon = resources.getDrawable(id);
+	                } catch (Exception e) {
+	                    w(LOG_TAG, "Could not load shortcut icon: " + extra);
+	                }
+	            }
+	        }
+
+	        if (icon != null) {
+		        info.icon = icon;
+		        info.customIcon = customIcon;
+		        info.iconResource = iconResource;
+		        info.itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
+	        }
+			info.title = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
+			info.intent = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
+			LauncherModel.updateItemInDatabase(this, info);
+
+			mWorkspace.updateShortcutFromApplicationInfo(info);
+		}
+	}
+
 	/**
 	 * ADW: Put the launcher in desktop edit mode
 	 * We could be able to add, remove and reorder screens

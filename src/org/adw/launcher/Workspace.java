@@ -16,8 +16,6 @@
 
 package org.adw.launcher;
 
-import static android.util.Log.d;
-
 import java.util.ArrayList;
 
 import mobi.intuitit.android.widget.WidgetSpace;
@@ -31,11 +29,9 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetHostView;
-import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -1164,9 +1160,13 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                     LauncherModel.moveItemInDatabase(mLauncher, info,
                             LauncherSettings.Favorites.CONTAINER_DESKTOP, index, lp.cellX, lp.cellY);
                 }else{
-                    //guess if it's a widget
                     if (info instanceof LauncherAppWidgetInfo) {
+                    	// resize widet
                         mLauncher.editWidget(cell);
+                    }
+                    else if (info instanceof ApplicationInfo) {
+                    	// edit shirtcut
+                    	mLauncher.editShirtcut((ApplicationInfo)info);
                     }
                 }
             }
@@ -1537,6 +1537,31 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             if (childCount > 0) {
                 layout.requestLayout();
                 layout.invalidate();
+            }
+        }
+    }
+
+    void updateShortcutFromApplicationInfo(ApplicationInfo info) {
+    	final int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final CellLayout layout = (CellLayout) getChildAt(i);
+            int childCount = layout.getChildCount();
+            for (int j = 0; j < childCount; j++) {
+                final View view = layout.getChildAt(j);
+                Object tag = view.getTag();
+                if (tag instanceof ApplicationInfo) {
+                	ApplicationInfo tagInfo = (ApplicationInfo)tag;
+                    if (tagInfo.id == info.id)
+                    {
+                    	tagInfo.assignFrom(info);
+
+                    	View newview = mLauncher.createShortcut(R.layout.application, layout, tagInfo);
+                    	layout.removeView(view);
+                    	addInScreen(newview, info.screen, info.cellX, info.cellY, info.spanX,
+                    			info.spanY, false);
+                    	break;
+                    }
+                }
             }
         }
     }
