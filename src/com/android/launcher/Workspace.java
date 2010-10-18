@@ -16,7 +16,6 @@
 
 package com.android.launcher;
 
-import static android.util.Log.d;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
@@ -1093,9 +1092,13 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                     LauncherModel.moveItemInDatabase(mLauncher, info,
                             LauncherSettings.Favorites.CONTAINER_DESKTOP, index, lp.cellX, lp.cellY);
                 }else{
-                    //guess if it's a widget
                     if (info instanceof LauncherAppWidgetInfo) {
+                    	// resize widet
                         mLauncher.editWidget(cell);
+                    }
+                    else if (info instanceof ApplicationInfo) {
+                    	// edit shirtcut
+                    	mLauncher.editShirtcut((ApplicationInfo)info);
                     }
                 }
             }
@@ -1460,6 +1463,31 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             if (childCount > 0) {
                 layout.requestLayout();
                 layout.invalidate();
+            }
+        }
+    }
+
+    void updateShortcutFromApplicationInfo(ApplicationInfo info) {
+    	final int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final CellLayout layout = (CellLayout) getChildAt(i);
+            int childCount = layout.getChildCount();
+            for (int j = 0; j < childCount; j++) {
+                final View view = layout.getChildAt(j);
+                Object tag = view.getTag();
+                if (tag instanceof ApplicationInfo) {
+                	ApplicationInfo tagInfo = (ApplicationInfo)tag;
+                    if (tagInfo.id == info.id)
+                    {
+                    	tagInfo.assignFrom(info);
+
+                    	View newview = mLauncher.createShortcut(R.layout.application, layout, tagInfo);
+                    	layout.removeView(view);
+                    	addInScreen(newview, info.screen, info.cellX, info.cellY, info.spanX,
+                    			info.spanY, false);
+                    	break;
+                    }
+                }
             }
         }
     }
