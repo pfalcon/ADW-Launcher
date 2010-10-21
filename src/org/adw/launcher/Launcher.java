@@ -3278,11 +3278,15 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    	WindowManager.LayoutParams attrs = getWindow().getAttributes();
 	    	attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
 	    	getWindow().setAttributes(attrs);
+	    	getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+	    	hideStatusBar=true;
     	}else{
 	    	// go non-full screen
 	    	WindowManager.LayoutParams attrs = getWindow().getAttributes();
 	    	attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	    	getWindow().setAttributes(attrs);
+	    	getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+	    	hideStatusBar=false;
     	}
     }
     private void hideDesktop(boolean enable){
@@ -3499,7 +3503,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	public void onWindowFocusChanged(boolean hasFocus) {
 		// TODO Auto-generated method stub
     	super.onWindowFocusChanged(hasFocus);
-		if(mShouldHideStatusbaronFocus && hideStatusBar && hasFocus){
+		if(mShouldHideStatusbaronFocus && hasFocus){
 			fullScreen(true);
 			mShouldHideStatusbaronFocus=false;
 		}
@@ -3761,13 +3765,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		case BIND_STATUSBAR:
 			WindowManager.LayoutParams attrs = getWindow().getAttributes();
 	    	if((attrs.flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == WindowManager.LayoutParams.FLAG_FULLSCREEN){
-		    	// go non-full screen
-		    	attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		    	getWindow().setAttributes(attrs);
+	    	    //go non-full screen
+	    	    fullScreen(false);
 	    	}else{
-		    	// go full screen
-		    	attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-		    	getWindow().setAttributes(attrs);
+	    	    //go full screen
+	    	    fullScreen(true);
 	    	}
 			break;
 		case BIND_NOTIFICATIONS:
