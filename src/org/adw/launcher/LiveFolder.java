@@ -69,6 +69,9 @@ public class LiveFolder extends Folder {
         		    }catch(NoSuchMethodError e){};
         		}        
                 mLauncher.startActivitySafely(intent);
+                if (mLauncher.autoCloseFolder) {
+                    mLauncher.closeFolder(this);
+                }
             }
         } else if (holder.intent != null) {
     		if (v != null) {
@@ -79,6 +82,9 @@ public class LiveFolder extends Folder {
     		    }catch(NoSuchMethodError e){};
     		}        
             mLauncher.startActivitySafely(holder.intent);
+            if (mLauncher.autoCloseFolder) {
+                mLauncher.closeFolder(this);
+            }
         }
     }
 
