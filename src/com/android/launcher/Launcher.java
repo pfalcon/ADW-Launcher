@@ -919,7 +919,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		//ADW: Custom font
 		if(themeFont!=null) favorite.setTypeface(themeFont);
 		//ADW: Counters stuff
-		favorite.setCounter(info.counter);
+		favorite.setCounter(info.counter, info.counterColor);
         return favorite;
     }
 
@@ -1848,8 +1848,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         if(useNotifReceiver && mCounterReceiver == null){
             mCounterReceiver=new CounterReceiver(this);
             mCounterReceiver.setCounterListener(new CounterReceiver.OnCounterChangedListener() {
-                public void onTrigger(String pname, int counter) {
-                    updateCountersForPackage(pname, counter);
+                public void onTrigger(String pname, int counter, int color) {
+                    updateCountersForPackage(pname, counter, color);
                 }
             });
             registerReceiver(mCounterReceiver, mCounterReceiver.getFilter());
@@ -3159,7 +3159,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         favorite.setTag(info);
         favorite.setOnClickListener(this);
         //ADW: Counters stuff
-        favorite.setCounter(info.counter);
+        favorite.setCounter(info.counter, info.counterColor);
         return favorite;
     }
     /**
@@ -3713,8 +3713,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			        if(mCounterReceiver == null){
 			            mCounterReceiver=new CounterReceiver(this);
 			            mCounterReceiver.setCounterListener(new CounterReceiver.OnCounterChangedListener() {
-			                public void onTrigger(String pname, int counter) {
-			                    updateCountersForPackage(pname, counter);
+			                public void onTrigger(String pname, int counter, int color) {
+			                    updateCountersForPackage(pname, counter, color);
 			                }
 			            });
 			        }
@@ -4384,7 +4384,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    } */
 	}
 
-	private void updateCounters(View view, String packageName, int counter){
+	private void updateCounters(View view, String packageName, int counter, int color){
         Object tag = view.getTag();
         if (tag instanceof ApplicationInfo) {
             ApplicationInfo info = (ApplicationInfo) tag;
@@ -4398,23 +4398,23 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
                 packageName.equals(name.getPackageName())) {
                 if(view instanceof CounterImageView)
-                    ((CounterImageView) view).setCounter(counter);
+                    ((CounterImageView) view).setCounter(counter, color);
                 //else if
                 view.invalidate();
-                sModel.updateCounterDesktopItem(info, counter);
+                sModel.updateCounterDesktopItem(info, counter, color);
             }
         }
 	}
-    private void updateCountersForPackage(String packageName, int counter) {
+    private void updateCountersForPackage(String packageName, int counter, int color) {
         if (packageName != null && packageName.length() > 0) {
-            mWorkspace.updateCountersForPackage(packageName, counter);
+            mWorkspace.updateCountersForPackage(packageName, counter, color);
             //ADW: Update ActionButtons icons
-            updateCounters(mLAB, packageName, counter);
-            updateCounters(mRAB, packageName, counter);
-            updateCounters(mLAB2, packageName, counter);
-            updateCounters(mRAB2, packageName, counter);
-            mMiniLauncher.updateCounters(packageName, counter);
-            sModel.updateCounterForPackage(this,packageName,counter);
+            updateCounters(mLAB, packageName, counter, color);
+            updateCounters(mRAB, packageName, counter,color);
+            updateCounters(mLAB2, packageName, counter,color);
+            updateCounters(mRAB2, packageName, counter,color);
+            mMiniLauncher.updateCounters(packageName, counter, color);
+            sModel.updateCounterForPackage(this,packageName,counter, color);
         }
     }
 
@@ -4423,7 +4423,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         // TODO Auto-generated method stub
         final ComponentName name = intent.getComponent();
         if(name!=null)
-            updateCountersForPackage(name.getPackageName(),0);
+            updateCountersForPackage(name.getPackageName(),0,0);
         super.startActivity(intent);
     }
 }

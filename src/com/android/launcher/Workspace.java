@@ -2011,7 +2011,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             }
         }
     }
-    void updateCountersForPackage(String packageName,int counter) {
+    void updateCountersForPackage(String packageName,int counter, int color) {
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {
             final CellLayout layout = (CellLayout) getChildAt(i);
@@ -2030,9 +2030,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                             info.itemType==LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT) &&
                         Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
                         packageName.equals(name.getPackageName())) {
-                        ((BubbleTextView) view).setCounter(counter);
+                        ((BubbleTextView) view).setCounter(counter, color);
                         view.invalidate();
-                        Launcher.getModel().updateCounterDesktopItem(info, counter);
+                        Launcher.getModel().updateCounterDesktopItem(info, counter, color);
                     }
                 }
             }
