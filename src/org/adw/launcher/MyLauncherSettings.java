@@ -115,6 +115,8 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
         }else{
         	orientations.setEnabled(true);
         }
+        DialogSeekBarPreference notif_size= (DialogSeekBarPreference) findPreference("notif_size");
+        notif_size.setMin(10);
         mContext=this;
         //ADW: restart and reset preferences
         Preference restart=findPreference("adw_restart");

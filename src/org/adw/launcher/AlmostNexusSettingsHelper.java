@@ -24,7 +24,7 @@ public final class AlmostNexusSettingsHelper {
 	private static final String ALMOSTNEXUS_PREFERENCES = "launcher.preferences.almostnexus";
 	private static final String[] restart_keys={"drawerNew","uiHideLabels","highlights_color",
 		"highlights_color_focus","uiNewSelectors","desktopRows","desktopColumns","autosizeIcons","uiDesktopIndicatorType",
-		"screenCache","uiDesktopIndicator","themePackageName","themeIcons"};
+		"screenCache","uiDesktopIndicator","themePackageName","themeIcons", "notif_size"};
 
 	public static boolean needsRestart(String key){
 		for(int i=0;i<restart_keys.length;i++){
@@ -448,5 +448,10 @@ public final class AlmostNexusSettingsHelper {
 	    SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
 	    boolean newD = sp.getBoolean("notif_receiver", context.getResources().getBoolean(R.bool.config_notif_receiver));
 	    return newD;
+	}
+	public static int getNotifSize(Context context) {
+	    SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+	    int def_screen = sp.getInt("notif_size", context.getResources().getInteger(R.integer.config_notif_size))+10;
+	    return def_screen;
 	}
 }

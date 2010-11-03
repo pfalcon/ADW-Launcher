@@ -1699,7 +1699,7 @@ public class LauncherModel {
         }
         return false;
     }
-    synchronized void updateCounterForPackage(Launcher launcher, String packageName, int counter) {
+    synchronized void updateCounterForPackage(Launcher launcher, String packageName, int counter, int color) {
         if (mApplicationsLoader != null && mApplicationsLoader.isRunning()) {
             startApplicationsLoaderLocked(launcher, false);
             return;
@@ -1715,16 +1715,18 @@ public class LauncherModel {
                         packageName.equals(name.getPackageName()) &&
                         info.counter!=counter) {
                     info.counter=counter;
+                    info.counterColor=color;
                     changed=true;
                 }
             }
         }
         if(changed)mApplicationsAdapter.notifyDataSetChanged();
     }
-    void updateCounterDesktopItem(ItemInfo info, int counter) {
+    void updateCounterDesktopItem(ItemInfo info, int counter, int color) {
         // TODO: write to DB; figure out if we should remove folder from folders list
         if(mDesktopItems.get(mDesktopItems.indexOf(info)) instanceof ApplicationInfo){
             ((ApplicationInfo)mDesktopItems.get(mDesktopItems.indexOf(info))).counter=counter;
+            ((ApplicationInfo)mDesktopItems.get(mDesktopItems.indexOf(info))).counterColor=color;
         }
     }
 }

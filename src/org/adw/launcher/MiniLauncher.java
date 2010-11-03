@@ -542,7 +542,7 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
 	public void setDragger(DragController dragger) {
 		mDragger=dragger;
 	}
-	public void updateCounters(String packageName, int counter){
+	public void updateCounters(String packageName, int counter, int color){
         final int count=getChildCount();
 	    for(int i=0;i<count;i++){
             final View view=getChildAt(i);
@@ -559,10 +559,10 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
 	                Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
 	                packageName.equals(name.getPackageName())) {
 	                if(view instanceof CounterImageView)
-	                    ((CounterImageView) view).setCounter(counter);
+	                    ((CounterImageView) view).setCounter(counter, color);
 	                //else if
 	                view.invalidate();
-	                Launcher.getModel().updateCounterDesktopItem(info, counter);
+	                Launcher.getModel().updateCounterDesktopItem(info, counter, color);
 	            }
 	        }
 
