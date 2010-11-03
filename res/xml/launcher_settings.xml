@@ -155,6 +155,11 @@
 		    android:defaultValue="@bool/config_notif_receiver"
 		    android:summary="@string/pref_summary_notif_receiver"
 		    android:key="notif_receiver" />
+		<org.adw.launcher.DialogSeekBarPreference
+			android:title="@string/pref_title_notif_size" android:summary="@string/pref_summary_notif_size"
+			android:dialogMessage="@string/pref_dialog_notif_size"
+			android:key="notif_size" android:defaultValue="@integer/config_notif_size"
+			android:max="14" />
 		<ListPreference
 		  android:key="homeBinding"
 		  android:title="@string/pref_title_home_button_binding"

@@ -32,6 +32,10 @@ public class ApplicationInfo extends ItemInfo {
      */
     public int counter;
     /**
+     * The "unread counter" bubble color
+     */
+    public int counterColor;
+    /**
      * The application name.
      */
     public CharSequence title;
@@ -90,6 +94,7 @@ public class ApplicationInfo extends ItemInfo {
 	        filtered = nfo.filtered;
 	        customIcon = nfo.customIcon;
 	        counter=nfo.counter;
+	        counterColor=nfo.counterColor;
     	}
     }
 
