@@ -425,4 +425,9 @@
     <string name="pref_summary_drawer_navigate_catalogs">Show app catalogs navigation buttons</string>
     <string name="pref_title_notif_receiver">Show notifications</string>
     <string name="pref_summary_notif_receiver">Enable the global notification counters</string>
+
+    <string name="pref_title_notif_size">Bubble font size</string>
+    <string name="pref_summary_notif_size">Select the font size for the notification bubbles</string>
+    <string name="pref_dialog_notif_size">Select the font size for the notification bubbles</string>
+
 </resources>

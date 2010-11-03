@@ -75,4 +75,6 @@
     <bool name="config_nagScreen">true</bool>
     <bool name="config_drawer_navigate_catalogs">true</bool>
     <bool name="config_notif_receiver">true</bool>
+    <!-- config_notif_size min is 10, so it will add 10 to whatever value you set here -->
+    <integer name="config_notif_size">4</integer>
 </resources>
