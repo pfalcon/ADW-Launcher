@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import mobi.intuitit.android.widget.WidgetSpace;
 
+import org.adw.launcher.FlingGesture.FlingListener;
 import org.metalev.multitouch.controller.MultiTouchController;
 import org.metalev.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
 import org.metalev.multitouch.controller.MultiTouchController.PointInfo;
@@ -48,7 +49,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -60,13 +60,9 @@ import android.widget.TextView;
  * screen contains a number of icons, folders or widgets the user can interact with.
  * A workspace is meant to be used with a fixed width only.
  */
-public class Workspace extends WidgetSpace implements DropTarget, DragSource, DragScroller, MultiTouchObjectCanvas<Object> {
+public class Workspace extends WidgetSpace implements DropTarget, DragSource, DragScroller,
+												MultiTouchObjectCanvas<Object>, FlingListener {
     private static final int INVALID_SCREEN = -1;
-
-    /**
-     * The velocity at which a fling gesture will cause us to snap to the next screen
-     */
-    private static final int SNAP_VELOCITY = 500;
 
     private int mDefaultScreen;
 
@@ -77,7 +73,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     //private int mCurrentScreen;
     private int mNextScreen = INVALID_SCREEN;
     private CustomScroller mScroller;
-    private VelocityTracker mVelocityTracker;
+    private final FlingGesture mFlingGesture;
 
     /**
      * CellInfo for the cell that is currently being dragged
@@ -133,7 +129,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     //int mHomeScreensLoaded = 0;
     //ADW: port from donut wallpaper drawing
     private Paint mPaint;
-    //private Bitmap mWallpaper;
     private int mWallpaperWidth;
     private int mWallpaperHeight;
     private float mWallpaperOffset;
@@ -213,7 +208,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         	CellLayout screen=(CellLayout)layoutInflter.inflate(R.layout.workspace_screen, this, false);
         	addView(screen);
         }
-
+        mFlingGesture = new FlingGesture();
+        mFlingGesture.setListener(this);
         initWorkspace();
     }
 
@@ -666,7 +662,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     		    mWallpaperLoaded = false;
 
     		    mWallpaperWidth = mWallpaperDrawable.getIntrinsicWidth();
-    		    mWallpaperHeight = mWallpaperDrawable.getIntrinsicHeight();
     		}
 
     		final int wallpaperWidth = mWallpaperWidth;
@@ -954,10 +949,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             return true;
         }
 
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        mVelocityTracker.addMovement(ev);
+        mFlingGesture.ForwardTouchEvent(ev);
 
         final int action = ev.getAction();
         final float x = ev.getX();
@@ -999,26 +991,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             }
             break;
         case MotionEvent.ACTION_UP:
-            if (mTouchState == TOUCH_STATE_SCROLLING) {
-                final VelocityTracker velocityTracker = mVelocityTracker;
-                velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-                int velocityX = (int) velocityTracker.getXVelocity();
-
-                if (velocityX > SNAP_VELOCITY && mCurrentScreen > 0) {
-                    // Fling hard enough to move left
-                    snapToScreen(mCurrentScreen - 1);
-                } else if (velocityX < -SNAP_VELOCITY && mCurrentScreen < getChildCount() - 1) {
-                    // Fling hard enough to move right
-                    snapToScreen(mCurrentScreen + 1);
-                } else {
-                    snapToDestination();
-                }
-
-                if (mVelocityTracker != null) {
-                    mVelocityTracker.recycle();
-                    mVelocityTracker = null;
-                }
-            } else if (mTouchState == TOUCH_SWIPE_DOWN_GESTURE )
+            if (mTouchState == TOUCH_SWIPE_DOWN_GESTURE )
             {
             	mLauncher.fireSwipeDownAction();
             } else if (mTouchState == TOUCH_SWIPE_UP_GESTURE )
@@ -1034,14 +1007,21 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         return true;
     }
 
+	@Override
+	public void OnFling(int Direction) {
+		if (mTouchState == TOUCH_STATE_SCROLLING) {
+			if (Direction == FlingGesture.FLING_LEFT && mCurrentScreen > 0) {
+				snapToScreen(mCurrentScreen - 1);
+	        } else if (Direction == FlingGesture.FLING_RIGHT && mCurrentScreen < getChildCount() - 1) {
+	        	snapToScreen(mCurrentScreen + 1);
+	        } else {
+				final int screenWidth = getWidth();
+				final int nextScreen = (getScrollX() + (screenWidth / 2)) / screenWidth;
+	            snapToScreen(nextScreen);
+	        }
+		}
+	}
 
-
-    private void snapToDestination() {
-        final int screenWidth = getWidth();
-        final int whichScreen = (getScrollX() + (screenWidth / 2)) / screenWidth;
-
-        snapToScreen(whichScreen);
-    }
 
     void snapToScreen(int whichScreen) {
         //if (!mScroller.isFinished()) return;
