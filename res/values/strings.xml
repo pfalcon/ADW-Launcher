@@ -149,8 +149,6 @@
     <string name="pref_summary_hide_statusbar">Hides your statusbar</string>
 
     <string name="pref_title_default_screen">Default Screen</string>
-    <string name="pref_summary_default_screen">Select the screen to set as default</string>
-    <string name="pref_dialog_default_screen">Select the screen to set as default</string>
 
     <string name="pref_title_desktop_scrolling_speed">Desktop scrolling speed</string>
     <string name="pref_summary_desktop_scrolling_speed">Set the speed used to fling desktops screens</string>
@@ -194,15 +192,8 @@
     <string name="pref_summary_drawer_rows_landscape">Select the number of drawer rows to use on landscape layout</string>
     <string name="pref_dialog_drawer_rows_landscape">Select the number of drawer rows to use on landscape layout</string>
 
-    <!-- Previews preferences -->
-    <string name="pref_title_previews_preferences">Previews Settings</string>
-    <string name="pref_summary_previews_preferences">Desktop previews preferences</string>
-
     <string name="pref_title_sense_previews">Sense previews</string>
     <string name="pref_summary_sense_previews">Use the new sense-like implementation</string>
-
-    <string name="pref_title_clean_screen_mode">Clean Screen Mode</string>
-    <string name="pref_summary_clean_screen_mode">Hide home icons/widgets when opening previews</string>
 
     <!-- Button preferences -->
     <string name="pref_title_ui_settings">UI Settings</string>
@@ -229,24 +220,9 @@
     <string name="pref_title_closing_folder">Closing folder</string>
     <string name="pref_summary_closing_folder">Auto-close folder after app-launch</string>
 
-    <string name="pref_title_lab">LAB</string>
-    <string name="pref_summary_lab">Enable/disable the customizable Left Action Button</string>
-
-    <string name="pref_title_rab">RAB</string>
-    <string name="pref_summary_rab">Enable/disable the customizable Right Action Button</string>
-
-    <string name="pref_title_ab2">Secondary ActionButtons</string>
-    <string name="pref_summary_ab2">Enable/disable the secondary Action Buttons (disable Desktop dots)</string>
-
-    <string name="pref_title_tint_ab">Tint AB</string>
-    <string name="pref_summary_tint_ab">Enable/disable icon tint effect on Action Buttons</string>
-
-    <string name="pref_title_ab_scale_factor">AB scale factor</string>
+    <string name="pref_title_ab_scale_factor">AB size</string>
     <string name="pref_summary_ab_scale_factor">Set the scaling size for the ActionButton icons</string>
     <string name="pref_dialog_ab_scale_factor">Set the scaling size for the ActionButton icons</string>
-
-    <string name="pref_title_hide_allapps_ab">Hide AllApps Bg</string>
-    <string name="pref_summary_hide_allapps_ab">Hide the background for the App-Drawer button</string>
 
     <string name="pref_title_hide_ab_bg">Hide AB Bg</string>
     <string name="pref_summary_hide_ab_bg">Hide the background for the Action Buttons</string>
@@ -356,7 +332,6 @@
 	<!-- Category titles -->
 	<string name="pref_title_system_preferences">System Preferences</string>
 	<string name="pref_summary_system_preferences">General system preferences for ADW.Launcher</string>
-	<string name="pref_title_screens_preferencecategory">Desktop screens</string>
 	<string name="pref_title_screens_layout_preferencecategory">Desktop layout</string>
 	<string name="pref_title_screens_behaviour_preferencecategory">Desktop behavior</string>
 	<string name="pref_title_drawer_preferencecategory">Applications drawer</string>
@@ -430,4 +405,11 @@
     <string name="pref_summary_notif_size">Select the font size for the notification bubbles</string>
     <string name="pref_dialog_notif_size">Select the font size for the notification bubbles</string>
 
+    <string name="pref_title_ab_preferencecategory">Main Dock</string>
+    <string name="pref_title_main_dock_style">Main Dock Style</string>
+    <string name="pref_summary_main_dock_style">Select the main dock layout</string>
+    <string name="pref_title_behaviour_preferences">General Behavior</string>
+    <string name="pref_summary_behaviour_preferences">General application behavior configuration</string>
+    <string name="pref_title_drawer_style">App Drawer style</string>
+    <string name="pref_summary_drawer_style">Switch between different drawer implementations</string>
 </resources>

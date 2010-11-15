@@ -561,7 +561,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	        // If the all apps drawer is open and the drawing region for the workspace
 	        // is contained within the drawer's bounds, we skip the drawing. This requires
 	        // the drawer to be fully opaque.
-	        if((mLauncher.isAllAppsVisible()) || mLauncher.isFullScreenPreviewing() ||mLauncher.isEditMode()){
+	        if((mLauncher.isAllAppsVisible()) || mLauncher.isEditMode()){
 	        	return;
 	        }
 	        // ViewGroup.dispatchDraw() supports many features we don't need:
@@ -645,7 +645,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     	if(!lwpSupport){
     		if (mWallpaperLoaded) {
     		    mWallpaperLoaded = false;
-
+    		    mWallpaperHeight = mWallpaperDrawable.getIntrinsicHeight();
     		    mWallpaperWidth = mWallpaperDrawable.getIntrinsicWidth();
     		}
 

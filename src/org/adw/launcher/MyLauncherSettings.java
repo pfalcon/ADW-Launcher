@@ -75,19 +75,10 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
         super.onCreate(savedInstanceState);
         getPreferenceManager().setSharedPreferencesName(ALMOSTNEXUS_PREFERENCES);
         addPreferencesFromResource(R.xml.launcher_settings);
-        CheckBoxPreference uiDots= (CheckBoxPreference) findPreference("uiDots");
-        uiDots.setOnPreferenceChangeListener(this);
-        if(uiDots.isChecked()){
-            CheckBoxPreference uiAB2= (CheckBoxPreference) findPreference("uiAB2");
-        	uiAB2.setEnabled(false);
-        }
         DialogSeekBarPreference columnsDesktop= (DialogSeekBarPreference) findPreference("desktopColumns");
         columnsDesktop.setMin(3);
         DialogSeekBarPreference rowsDesktop= (DialogSeekBarPreference) findPreference("desktopRows");
         rowsDesktop.setMin(3);
-        DialogSeekBarPreference defaultScreen= (DialogSeekBarPreference) findPreference("defaultScreen");
-        defaultScreen.setMin(1);
-        defaultScreen.setMax(AlmostNexusSettingsHelper.getDesktopScreens(this)-1);
         DialogSeekBarPreference columnsPortrait= (DialogSeekBarPreference) findPreference("drawerColumnsPortrait");
         columnsPortrait.setMin(1);
         DialogSeekBarPreference rowsPortrait= (DialogSeekBarPreference) findPreference("drawerRowsPortrait");
@@ -117,6 +108,29 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
         }
         DialogSeekBarPreference notif_size= (DialogSeekBarPreference) findPreference("notif_size");
         notif_size.setMin(10);
+        ListPreference dock_style = (ListPreference) findPreference("main_dock_style");
+        dock_style.setOnPreferenceChangeListener(this);
+        int val=Integer.valueOf(dock_style.getValue());
+        CheckBoxPreference dots=(CheckBoxPreference) findPreference("uiDots");
+        if(val==Launcher.DOCK_STYLE_5 || val==Launcher.DOCK_STYLE_NONE){
+            dots.setChecked(false);
+            dots.setEnabled(false);
+        }else{
+            dots.setEnabled(true);
+        }
+        ListPreference drawerStyle = (ListPreference) findPreference("drawer_style");
+        drawerStyle.setOnPreferenceChangeListener(this);
+        Preference margin= findPreference("pageHorizontalMargin");
+        val=Integer.valueOf(drawerStyle.getValue());
+        if(val==1){
+            rowsPortrait.setEnabled(true);
+            rowsLandscape.setEnabled(true);
+            margin.setEnabled(true);
+        }else{
+            rowsPortrait.setEnabled(false);
+            rowsLandscape.setEnabled(false);
+            margin.setEnabled(false);
+        }
         mContext=this;
         //ADW: restart and reset preferences
         Preference restart=findPreference("adw_restart");
@@ -304,16 +318,6 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
     			//e.printStackTrace();
     		}
     		if(themeResources!=null){
-    			int config_uiTintId=themeResources.getIdentifier("config_uiTint", "bool", packageName.toString());
-    			if(config_uiTintId!=0){
-    				boolean config_uiTint=themeResources.getBoolean(config_uiTintId);
-    				editor.putBoolean("uiTint", config_uiTint);
-    			}
-    			int config_uiAppsBgId=themeResources.getIdentifier("config_uiAppsBg", "bool", packageName.toString());
-    			if(config_uiAppsBgId!=0){
-    				boolean config_uiAppsBg=themeResources.getBoolean(config_uiAppsBgId);
-    				editor.putBoolean("uiAppsBg", config_uiAppsBg);
-    			}
     			int config_uiABBgId=themeResources.getIdentifier("config_uiABBg", "bool", packageName.toString());
     			if(config_uiABBgId!=0){
     				boolean config_uiABBg=themeResources.getBoolean(config_uiABBgId);
@@ -364,11 +368,11 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
     				int config_ab_scale_factor=themeResources.getInteger(config_ab_scale_factorId);
     				editor.putInt("uiScaleAB", config_ab_scale_factor);
     			}
-    			int secondary_abId=themeResources.getIdentifier("secondary_ab", "bool", packageName.toString());
-    			if(secondary_abId!=0){
-    				boolean secondary_ab=themeResources.getBoolean(secondary_abId);
-    				editor.putBoolean("uiAB2", secondary_ab);
-    				if(secondary_ab)editor.putBoolean("uiDots", false);
+    			int dock_styleId=themeResources.getIdentifier("main_dock_style", "string", packageName.toString());
+    			if(dock_styleId!=0){
+    				String dock_style=themeResources.getString(dock_styleId);
+    				editor.putString("main_dock_style", dock_style);
+    				if(Integer.valueOf(dock_style)==Launcher.DOCK_STYLE_5 || Integer.valueOf(dock_style)==Launcher.DOCK_STYLE_NONE)editor.putBoolean("uiDots", false);
     			}
     			//TODO:ADW We set the theme wallpaper. We should add this as optional...
     			int wallpaperId=themeResources.getIdentifier("theme_wallpaper", "drawable", packageName.toString());
@@ -421,15 +425,7 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
 		super.onPause();
 	}
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
-		if(preference.getKey().equals("uiDots")) {
-			CheckBoxPreference ab2=(CheckBoxPreference) findPreference("uiAB2");
-			if(newValue.equals(true)){
-				ab2.setChecked(false);
-				ab2.setEnabled(false);
-			}else{
-				ab2.setEnabled(true);
-			}
-		}else if(preference.getKey().equals("themePackageName")) {
+		if(preference.getKey().equals("themePackageName")) {
 			PreviewPreference themePreview=(PreviewPreference) findPreference("themePreview");
 			themePreview.setTheme(newValue.toString());
 			return false;
@@ -478,6 +474,29 @@ public class MyLauncherSettings extends PreferenceActivity implements OnPreferen
 			}else{
 				orientations.setEnabled(true);
 			}
+		}else if(preference.getKey().equals("main_dock_style")) {
+		    CheckBoxPreference dots=(CheckBoxPreference) findPreference("uiDots");
+		    int val=Integer.valueOf(newValue.toString());
+		    if(val==Launcher.DOCK_STYLE_5 || val==Launcher.DOCK_STYLE_NONE){
+		        dots.setChecked(false);
+		        dots.setEnabled(false);
+		    }else{
+		        dots.setEnabled(true);
+		    }
+        }else if(preference.getKey().equals("drawer_style")) {
+            Preference rowsPortrait= findPreference("drawerRowsPortrait");
+            Preference rowslandscape= findPreference("drawerRowsLandscape");
+            Preference margin= findPreference("pageHorizontalMargin");
+            int val=Integer.valueOf(newValue.toString());
+            if(val==1){
+                rowsPortrait.setEnabled(true);
+                rowslandscape.setEnabled(true);
+                margin.setEnabled(true);
+            }else{
+                rowsPortrait.setEnabled(false);
+                rowslandscape.setEnabled(false);
+                margin.setEnabled(false);
+            }
 		}
         return true;
 	}
