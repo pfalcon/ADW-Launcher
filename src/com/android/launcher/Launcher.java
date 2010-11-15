@@ -19,6 +19,11 @@ package com.android.launcher;
 import static android.util.Log.d;
 import static android.util.Log.e;
 import static android.util.Log.w;
+<<<<<<< HEAD
+=======
+
+import com.android.launcher.ActionButton.SwipeListener;
+>>>>>>> 0af5ea7... Modified the main dock, WARNING, themes will NEED to update.
 import com.android.launcher.DockBar.DockBarListener;
 import com.android.launcher.SliderView.OnTriggerListener;
 import java.io.DataInputStream;
@@ -35,7 +40,6 @@ import mobi.intuitit.android.content.LauncherIntent;
 import mobi.intuitit.android.content.LauncherMetadata;
 
 import com.android.launcher.DockBar.DockBarListener;
-import com.android.launcher.SliderView.OnTriggerListener;
 import com.android.launcher.catalogue.AppCatalogueFilter;
 import com.android.launcher.catalogue.AppCatalogueFilters;
 import com.android.launcher.catalogue.AppGroupAdapter;
@@ -77,7 +81,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -117,7 +120,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 /**
  * Default launcher application.
  */
-public final class Launcher extends Activity implements View.OnClickListener, OnLongClickListener, OnSharedPreferenceChangeListener {
+public final class Launcher extends Activity implements View.OnClickListener, OnLongClickListener, OnSharedPreferenceChangeListener, SwipeListener {
     static final String LOG_TAG = "Launcher";
     static final boolean LOGD = false;
 
@@ -224,12 +227,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private final int[] mCellCoordinates = new int[2];
     private FolderInfo mFolderInfo;
 
-    private TransitionDrawable mHandleIcon;
     /**
-     * ADW: now i use SliderView class instead imageview/HandleView
-     * To slide-to unlock functionality (mainly dockbar, but maybe future additions)
+     * ADW: now i use an ActionButton instead of a fixed app-drawer button
      */
-    private SliderView mHandleView;
+    private ActionButton mHandleView;
     /**
      * mAllAppsGrid will be "AllAppsGridView" or "AllAppsSlidingView"
      * depending on user settings, so I cast it later.
@@ -263,6 +264,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private ActionButton mRAB;
 	private ActionButton mLAB2;
 	private ActionButton mRAB2;
+	private View mDrawerToolbar;
 	/**
 	 * ADW: variables to store actual status of elements
 	 */
@@ -274,23 +276,16 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	 * ADW: A lot of properties to store the custom settings
 	 */
 	private boolean allowDrawerAnimations=true;
-	private boolean newDrawer=true;
 	private boolean newPreviews=true;
-	private boolean fullScreenPreviews=true;
 	private boolean hideStatusBar=false;
 	private boolean showDots=true;
 	private boolean showDockBar=true;
 	private boolean autoCloseDockbar;
 	protected boolean autoCloseFolder;
-	private boolean showLAB=true;
-	private boolean showRAB=true;
-	private boolean tintActionIcons=true;
-	private boolean hideAppsBg=false;
 	private boolean hideABBg=false;
 	private float uiScaleAB=0.5f;
 	private boolean uiHideLabels=false;
 	private boolean wallpaperHack=true;
-	private boolean showAB2=false;
 	private boolean scrollableSupport=false;
 	private DesktopIndicator mDesktopIndicator;
 	private int savedOrientation;
@@ -345,6 +340,16 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private final static int ACTION_CATALOG_NEXT=2;
 	//ADW: Custom counter receiver
 	private CounterReceiver mCounterReceiver;
+	/**
+	 * ADW: Different main dock styles/configurations
+	 */
+	protected static final int DOCK_STYLE_NONE=0;
+    protected static final int DOCK_STYLE_3=1;
+    protected static final int DOCK_STYLE_5=2;
+    protected static final int DOCK_STYLE_1=3;
+    private int mDockStyle=DOCK_STYLE_3;
+    //DRAWER STYLES
+    private int[]mDrawerStyles={R.layout.old_drawer, R.layout.new_drawer};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 		mMessWithPersistence=AlmostNexusSettingsHelper.getSystemPersistent(this);
@@ -372,8 +377,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         updateAlmostNexusVars();
         checkForLocaleChange();
         setWallpaperDimension();
-        //ADW: load the drawer type on boot so we can cast the proper Class later
-        newDrawer=AlmostNexusSettingsHelper.getDrawerNew(Launcher.this);
         setContentView(R.layout.launcher);
         setupViews();
 
@@ -729,16 +732,17 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         final Workspace workspace = mWorkspace;
         //ADW: The app drawer is now a ViewStub and we load the resource depending on custom settings
         ViewStub tmp=(ViewStub)dragLayer.findViewById(R.id.stub_drawer);
-        if(newDrawer){
-        	tmp.setLayoutResource(R.layout.new_drawer);
-        }else{
-        	tmp.setLayoutResource(R.layout.old_drawer);
-        }
+        int drawerStyle=AlmostNexusSettingsHelper.getDrawerStyle(this);
+        tmp.setLayoutResource(mDrawerStyles[drawerStyle]);
         mAllAppsGrid = (Drawer)tmp.inflate();
         final DeleteZone deleteZone = (DeleteZone) dragLayer.findViewById(R.id.delete_zone);
 
-        mHandleView = (SliderView) dragLayer.findViewById(R.id.all_apps);
-        mHandleView.setOnTriggerListener(new OnTriggerListener() {
+        mHandleView = (ActionButton) dragLayer.findViewById(R.id.btn_mab);
+        mHandleView.setFocusable(true);
+        mHandleView.setLauncher(this);
+        mHandleView.setOnClickListener(this);
+        dragLayer.addDragListener(mHandleView);
+        /*mHandleView.setOnTriggerListener(new OnTriggerListener() {
 			public void onTrigger(View v, int whichHandle) {
 				mDockBar.open();
 			}
@@ -751,9 +755,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	                showAllApps(true, null);
 	            }
 			}
-		});
-		mHandleView.setNextFocusUpId(R.id.drag_layer);
-		mHandleView.setNextFocusLeftId(R.id.drag_layer);
+		});*/
 		mAllAppsGrid.setTextFilterEnabled(false);
 		mAllAppsGrid.setDragger(dragLayer);
 		mAllAppsGrid.setLauncher(this);
@@ -764,7 +766,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         deleteZone.setLauncher(this);
         deleteZone.setDragController(dragLayer);
-        deleteZone.setHandle(mHandleView);
 
         dragLayer.setIgnoredDropTarget((View)mAllAppsGrid);
         dragLayer.setDragScoller(workspace);
@@ -779,12 +780,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         //ADW: Action Buttons (LAB/RAB)
         mLAB = (ActionButton) dragLayer.findViewById(R.id.btn_lab);
         mLAB.setLauncher(this);
-        mLAB.setSpecialIcon(getResources().getDrawable(R.drawable.arrow_left));
+        mLAB.setSpecialIcon(R.drawable.arrow_left);
         mLAB.setSpecialAction(ACTION_CATALOG_PREV);
         dragLayer.addDragListener(mLAB);
         mRAB = (ActionButton) dragLayer.findViewById(R.id.btn_rab);
         mRAB.setLauncher(this);
-        mRAB.setSpecialIcon(getResources().getDrawable(R.drawable.arrow_right));
+        mRAB.setSpecialIcon(R.drawable.arrow_right);
         mRAB.setSpecialAction(ACTION_CATALOG_NEXT);
         dragLayer.addDragListener(mRAB);
         mLAB.setOnClickListener(this);
@@ -803,23 +804,37 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		mNextView = (ImageView)findViewById(R.id.btn_scroll_right);
 		mPreviousView.setOnLongClickListener(this);
 		mNextView.setOnLongClickListener(this);
+        //ADW: ActionButtons swipe gestures
+		mHandleView.setSwipeListener(this);
+        mLAB.setSwipeListener(this);
+        mLAB2.setSwipeListener(this);
+        mRAB.setSwipeListener(this);
+        mRAB2.setSwipeListener(this);
 
 		//ADW linearlayout with apptray, lab and rab
-		final View drwToolbar=findViewById(R.id.drawer_toolbar);
+		mDrawerToolbar=findViewById(R.id.drawer_toolbar);
+		mHandleView.setNextFocusUpId(R.id.drag_layer);
+		mHandleView.setNextFocusLeftId(R.id.drag_layer);
+        mLAB.setNextFocusUpId(R.id.drag_layer);
+        mLAB.setNextFocusLeftId(R.id.drag_layer);
+        mRAB.setNextFocusUpId(R.id.drag_layer);
+        mRAB.setNextFocusLeftId(R.id.drag_layer);
+        mLAB2.setNextFocusUpId(R.id.drag_layer);
+        mLAB2.setNextFocusLeftId(R.id.drag_layer);
+        mRAB2.setNextFocusUpId(R.id.drag_layer);
+        mRAB2.setNextFocusLeftId(R.id.drag_layer);
 		//ADW add a listener to the dockbar to show/hide the app-drawer-button and the dots
 		mDockBar=(DockBar)findViewById(R.id.dockbar);
 		mDockBar.setDockBarListener(new DockBarListener() {
 			public void onOpen() {
-				mHandleView.setVisibility(View.GONE);
-				drwToolbar.setVisibility(View.GONE);
+			    mDrawerToolbar.setVisibility(View.GONE);
 				if(mNextView.getVisibility()==View.VISIBLE){
 					mNextView.setVisibility(View.INVISIBLE);
 					mPreviousView.setVisibility(View.INVISIBLE);
 				}
 			}
 			public void onClose() {
-				mHandleView.setVisibility(View.VISIBLE);
-				drwToolbar.setVisibility(View.VISIBLE);
+			    if(mDockStyle!=DOCK_STYLE_NONE)mDrawerToolbar.setVisibility(View.VISIBLE);
 				if(showDots && !isAllAppsVisible()){
 					mNextView.setVisibility(View.VISIBLE);
 					mPreviousView.setVisibility(View.VISIBLE);
@@ -856,10 +871,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			loadThemeResource(themeResources,themePackage,"rab_bg",mRAB,THEME_ITEM_BACKGROUND);
 			loadThemeResource(themeResources,themePackage,"lab2_bg",mLAB2,THEME_ITEM_BACKGROUND);
 			loadThemeResource(themeResources,themePackage,"rab2_bg",mRAB2,THEME_ITEM_BACKGROUND);
+			loadThemeResource(themeResources,themePackage,"mab_bg",mHandleView,THEME_ITEM_BACKGROUND);
 			//App drawer button
-			loadThemeResource(themeResources,themePackage,"handle_icon",mHandleView,THEME_ITEM_FOREGROUND);
-			View appsBg=findViewById(R.id.appsBg);
-			loadThemeResource(themeResources,themePackage,"handle",appsBg,THEME_ITEM_BACKGROUND);
+			//loadThemeResource(themeResources,themePackage,"handle_icon",mHandleView,THEME_ITEM_FOREGROUND);
+			//View appsBg=findViewById(R.id.appsBg);
+			//loadThemeResource(themeResources,themePackage,"handle",appsBg,THEME_ITEM_BACKGROUND);
 			//Deletezone
 			loadThemeResource(themeResources,themePackage,"ic_delete",deleteZone,THEME_ITEM_FOREGROUND);
 			loadThemeResource(themeResources,themePackage,"delete_zone_selector",deleteZone,THEME_ITEM_BACKGROUND);
@@ -874,8 +890,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				// TODO: handle exception
 			}
 		}
-        mHandleIcon = (TransitionDrawable) mHandleView.getDrawable();
-        mHandleIcon.setCrossFadeEnabled(true);
 		Drawable previous = mPreviousView.getDrawable();
 		Drawable next = mNextView.getDrawable();
 		mWorkspace.setIndicators(previous, next);
@@ -1499,7 +1513,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 
 	private void showAppList() {
-		final AppCatalogueFilter flt = AppCatalogueFilters.getInstance().getDrawerFilter();
+
+		final AppCatalogueFilter flt = sModel.getApplicationsAdapter().getCatalogueFilter();
         if (!flt.isUserGroup()) {
 			Toast.makeText(this, getString(R.string.AppGroupConfigError), Toast.LENGTH_SHORT).show();
 			return;
@@ -1510,7 +1525,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	}
 
     void showDeleteGrpDialog() {
-        if (!AppCatalogueFilters.getInstance().getDrawerFilter().isUserGroup()) {
+        if (!sModel.getApplicationsAdapter().getCatalogueFilter().isUserGroup()) {
             Toast.makeText(this, getString(R.string.AppGroupConfigError), Toast.LENGTH_SHORT).show();
 			return;
 		}
@@ -1545,6 +1560,16 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private void updateShortcutsForPackage(String packageName) {
         if (packageName != null && packageName.length() > 0) {
             mWorkspace.updateShortcutsForPackage(packageName);
+<<<<<<< HEAD
+=======
+            //ADW: Update ActionButtons icons
+            mLAB.reloadIcon();
+            mLAB2.reloadIcon();
+            mRAB.reloadIcon();
+            mRAB2.reloadIcon();
+            mHandleView.reloadIcon();
+            mMiniLauncher.reloadIcons();
+>>>>>>> 0af5ea7... Modified the main dock, WARNING, themes will NEED to update.
         }
     }
 
@@ -2051,6 +2076,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	            case LauncherSettings.Favorites.CONTAINER_RAB2:
 	            	mRAB2.UpdateLaunchInfo(item);
 	            	break;
+                case LauncherSettings.Favorites.CONTAINER_MAB:
+                    mHandleView.UpdateLaunchInfo(item);
+                    break;
 				case LauncherSettings.Favorites.CONTAINER_DOCKBAR:
 					miniLauncher.addItemInDockBar(item);
 					break;
@@ -2463,7 +2491,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 	public void delCurrentGrp()
 	{
-		int index = AppCatalogueFilters.getInstance().getDrawerFilter().getCurrentFilterIndex();
+		int index = sModel.getApplicationsAdapter().getCatalogueFilter().getCurrentFilterIndex();
 		AppCatalogueFilters.getInstance().dropGroup(index);
 		checkActionButtonsSpecialMode();
 		showSwitchGrp();
@@ -2629,7 +2657,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		   if (action == AppGroupAdapter.APP_GROUP_ADD) {
 			   showNewGrpDialog();
 		   } else {
-			   AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(action);
+			   sModel.getApplicationsAdapter().getCatalogueFilter().setCurrentGroupIndex(action);
 			   AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, action);
 			   mAllAppsGrid.updateAppGrp();
 			   checkActionButtonsSpecialMode();
@@ -2696,6 +2724,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				// Make sure we have the right folder info
 				int which=AppCatalogueFilters.getInstance().createNewGroup(name);
 				AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, which);
+				sModel.getApplicationsAdapter().getCatalogueFilter().setCurrentGroupIndex(which);
 				checkActionButtonsSpecialMode();
 				LauncherModel.mApplicationsAdapter.updateDataSet();
 			}
@@ -3063,16 +3092,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		mHomeBinding=AlmostNexusSettingsHelper.getHomeBinding(this);
 		mSwipedownAction=AlmostNexusSettingsHelper.getSwipeDownActions(this);
 		mSwipeupAction=AlmostNexusSettingsHelper.getSwipeUpActions(this);
-		fullScreenPreviews=AlmostNexusSettingsHelper.getFullScreenPreviews(this);
 		hideStatusBar=AlmostNexusSettingsHelper.getHideStatusbar(this);
 		showDots=AlmostNexusSettingsHelper.getUIDots(this);
+		mDockStyle=AlmostNexusSettingsHelper.getmainDockStyle(this);
 		showDockBar=AlmostNexusSettingsHelper.getUIDockbar(this);
 		autoCloseDockbar=AlmostNexusSettingsHelper.getUICloseDockbar(this);
 		autoCloseFolder=AlmostNexusSettingsHelper.getUICloseFolder(this);
-		showLAB=AlmostNexusSettingsHelper.getUILAB(this);
-		showRAB=AlmostNexusSettingsHelper.getUIRAB(this);
-		showAB2=AlmostNexusSettingsHelper.getUIAB2(this);
-		hideAppsBg=AlmostNexusSettingsHelper.getUIAppsBg(this);
 		hideABBg=AlmostNexusSettingsHelper.getUIABBg(this);
 		uiHideLabels=AlmostNexusSettingsHelper.getUIHideLabels(this);
 		if(mWorkspace!=null){
@@ -3095,32 +3120,55 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private void updateAlmostNexusUI(){
     	if(mIsEditMode || mIsWidgetEditMode)return;
     	updateAlmostNexusVars();
-		boolean tint=AlmostNexusSettingsHelper.getUITint(this);
 		float scale=AlmostNexusSettingsHelper.getuiScaleAB(this);
-		if(tint!=tintActionIcons || scale!=uiScaleAB){
-			tintActionIcons=tint;
+		if(scale!=uiScaleAB){
 			uiScaleAB=scale;
 			mRAB.updateIcon();
 			mLAB.updateIcon();
 			mRAB2.updateIcon();
 			mLAB2.updateIcon();
+			mHandleView.updateIcon();
 		}
 		if(!showDockBar){
 			mDockBar.close();
 		}
-		mHandleView.setSlidingEnabled(showDockBar);
+		//mHandleView.setSlidingEnabled(showDockBar);
     	fullScreen(hideStatusBar);
     	if(!mDockBar.isOpen() && !showingPreviews){
 	    	if(!isAllAppsVisible()){
 	    		mNextView.setVisibility(showDots?View.VISIBLE:View.GONE);
 		    	mPreviousView.setVisibility(showDots?View.VISIBLE:View.GONE);
 	    	}
-	    	mRAB.setVisibility(showRAB?View.VISIBLE:View.INVISIBLE);
-	    	mLAB.setVisibility(showLAB?View.VISIBLE:View.INVISIBLE);
-	    	mRAB2.setVisibility((showAB2 && !showDots)?View.VISIBLE:View.GONE);
-	    	mLAB2.setVisibility((showAB2 && !showDots)?View.VISIBLE:View.GONE);
-	    	View appsBg=findViewById(R.id.appsBg);
-	    	appsBg.setVisibility(hideAppsBg?View.INVISIBLE:View.VISIBLE);
+	    	switch (mDockStyle) {
+            case DOCK_STYLE_1:
+                mRAB.setVisibility(View.GONE);
+                mLAB.setVisibility(View.GONE);
+                mRAB2.setVisibility(View.GONE);
+                mLAB2.setVisibility(View.GONE);
+                mDrawerToolbar.setVisibility(View.VISIBLE);
+                break;
+            case DOCK_STYLE_3:
+                mRAB.setVisibility(View.VISIBLE);
+                mLAB.setVisibility(View.VISIBLE);
+                mRAB2.setVisibility(View.GONE);
+                mLAB2.setVisibility(View.GONE);
+                mDrawerToolbar.setVisibility(View.VISIBLE);
+                break;
+            case DOCK_STYLE_5:
+                mRAB.setVisibility(View.VISIBLE);
+                mLAB.setVisibility(View.VISIBLE);
+                mRAB2.setVisibility(View.VISIBLE);
+                mLAB2.setVisibility(View.VISIBLE);
+                mDrawerToolbar.setVisibility(View.VISIBLE);
+                break;
+            case DOCK_STYLE_NONE:
+                mDrawerToolbar.setVisibility(View.GONE);
+            default:
+                break;
+            }
+	    	//View appsBg=findViewById(R.id.appsBg);
+	    	//appsBg.setVisibility(hideAppsBg?View.INVISIBLE:View.VISIBLE);
+	    	mHandleView.hideBg(hideABBg);
 	    	mRAB.hideBg(hideABBg);
 	    	mLAB.hideBg(hideABBg);
 	    	mRAB2.hideBg(hideABBg);
@@ -3236,45 +3284,51 @@ public final class Launcher extends Activity implements View.OnClickListener, On
      */
     Drawable createSmallActionButtonIcon(ItemInfo info){
         Drawable d = null;
-    	final Resources resources = getResources();
-        if(info instanceof ApplicationInfo){
-            if (!((ApplicationInfo)info).filtered) {
-            	((ApplicationInfo)info).icon = Utilities.createIconThumbnail(((ApplicationInfo)info).icon, this);
-            	((ApplicationInfo)info).filtered = true;
-            }
-            d=((ApplicationInfo)info).icon;
-        }else if(info instanceof LiveFolderInfo){
-        	d=((LiveFolderInfo)info).icon;
-            if (d == null) {
+        final Resources resources = getResources();
+        if(info!=null){
+            if(info instanceof ApplicationInfo){
+                if (!((ApplicationInfo)info).filtered) {
+                	((ApplicationInfo)info).icon = Utilities.createIconThumbnail(((ApplicationInfo)info).icon, this);
+                	((ApplicationInfo)info).filtered = true;
+                }
+                d=((ApplicationInfo)info).icon;
+            }else if(info instanceof LiveFolderInfo){
+            	d=((LiveFolderInfo)info).icon;
+                if (d == null) {
+                	if(AlmostNexusSettingsHelper.getThemeIcons(this)){
+    	            	//d = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), this);
+    	                String packageName=AlmostNexusSettingsHelper.getThemePackageName(this, THEME_DEFAULT);
+    	                if(!packageName.equals(THEME_DEFAULT)){
+    	                	d=FolderIcon.loadFolderFromTheme(this, getPackageManager(), packageName, "ic_launcher_folder");
+    	                }
+                	}else{
+                		d = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), this);
+                	}
+                	((LiveFolderInfo)info).filtered = true;
+                }
+            }else if(info instanceof UserFolderInfo){
             	if(AlmostNexusSettingsHelper.getThemeIcons(this)){
-	            	//d = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), this);
-	                String packageName=AlmostNexusSettingsHelper.getThemePackageName(this, THEME_DEFAULT);
-	                if(!packageName.equals(THEME_DEFAULT)){
-	                	d=FolderIcon.loadFolderFromTheme(this, getPackageManager(), packageName, "ic_launcher_folder");
-	                }
+    	        	//d = resources.getDrawable(R.drawable.ic_launcher_folder);
+    	            String packageName=AlmostNexusSettingsHelper.getThemePackageName(this, THEME_DEFAULT);
+    	            if(!packageName.equals(THEME_DEFAULT)){
+    	            	d=FolderIcon.loadFolderFromTheme(this, getPackageManager(), packageName, "ic_launcher_folder");
+    	            }
             	}else{
-            		d = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), this);
+            		d = resources.getDrawable(R.drawable.ic_launcher_folder);
             	}
-            	((LiveFolderInfo)info).filtered = true;
             }
-        }else if(info instanceof UserFolderInfo){
-        	if(AlmostNexusSettingsHelper.getThemeIcons(this)){
-	        	//d = resources.getDrawable(R.drawable.ic_launcher_folder);
-	            String packageName=AlmostNexusSettingsHelper.getThemePackageName(this, THEME_DEFAULT);
-	            if(!packageName.equals(THEME_DEFAULT)){
-	            	d=FolderIcon.loadFolderFromTheme(this, getPackageManager(), packageName, "ic_launcher_folder");
-	            }
-        	}else{
-        		d = resources.getDrawable(R.drawable.ic_launcher_folder);
-        	}
         }
         if (d == null) {
         	d = Utilities.createIconThumbnail(
-            resources.getDrawable(R.drawable.ic_launcher_shortcut), this);
+            resources.getDrawable(R.drawable.ab_empty), this);
         }
-        d=Utilities.scaledDrawable(d, this,tintActionIcons,uiScaleAB);
+        d=Utilities.scaledDrawable(d, this,false,uiScaleAB);
 
     	return d;
+    }
+    Drawable createSmallActionButtonDrawable(Drawable d){
+        d=Utilities.scaledDrawable(d, this,false,uiScaleAB);
+        return d;
     }
     //ADW: Previews Functions
     public void previousScreen(View v) {
@@ -3285,9 +3339,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	}
     protected boolean isPreviewing(){
     	return showingPreviews;
-    }
-    protected boolean isFullScreenPreviewing(){
-    	return showingPreviews && fullScreenPreviews;
     }
     private void fullScreen(boolean enable){
     	if(enable){
@@ -3307,13 +3358,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	}
     }
     private void hideDesktop(boolean enable){
-    	final View drwToolbar=findViewById(R.id.drawer_toolbar);
     	if(enable){
     		if(mDesktopIndicator!=null)mDesktopIndicator.hide();
-	    	mHandleView.setVisibility(View.INVISIBLE);
 	    	mNextView.setVisibility(View.INVISIBLE);
 	    	mPreviousView.setVisibility(View.INVISIBLE);
-	    	drwToolbar.setVisibility(View.GONE);
+	    	mDrawerToolbar.setVisibility(View.GONE);
 	        if(mDockBar.isOpen()){
 	        	mDockBar.setVisibility(View.INVISIBLE);
 	        }
@@ -3322,8 +3371,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	        if(mDockBar.isOpen()){
 	        	mDockBar.setVisibility(View.VISIBLE);
 	        }else{
-	        	drwToolbar.setVisibility(View.VISIBLE);
-		    	mHandleView.setVisibility(View.VISIBLE);
+	            if(mDockStyle!=DOCK_STYLE_NONE)mDrawerToolbar.setVisibility(View.VISIBLE);
 		    	if(showDots){
 			    	mNextView.setVisibility(View.VISIBLE);
 			    	mPreviousView.setVisibility(View.VISIBLE);
@@ -3486,12 +3534,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		        anchor.setTag(p);
 		        anchor.setTag(R.id.workspace, preview);
 		        anchor.setTag(R.id.icon, bitmaps);
-		        if(fullScreenPreviews){
-			        hideDesktop(true);
-			        mWorkspace.lock();
-			        mDesktopLocked=true;
-			        mWorkspace.invalidate();
-		        }
 	        }
     	}
     }
@@ -3532,11 +3574,27 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     public void showAllApps(boolean animated, AppCatalogueFilter filter){
 		if(!allAppsOpen){
 			if(getWindow().getDecorView().getWidth()>getWindow().getDecorView().getHeight()){
-				mHandleView.setNextFocusUpId(R.id.drag_layer);
-				mHandleView.setNextFocusLeftId(R.id.all_apps_view);
+		        mHandleView.setNextFocusUpId(R.id.drag_layer);
+		        mHandleView.setNextFocusLeftId(R.id.all_apps_view);
+		        mLAB.setNextFocusUpId(R.id.drag_layer);
+		        mLAB.setNextFocusLeftId(R.id.all_apps_view);
+		        mRAB.setNextFocusUpId(R.id.drag_layer);
+		        mRAB.setNextFocusLeftId(R.id.all_apps_view);
+		        mLAB2.setNextFocusUpId(R.id.drag_layer);
+		        mLAB2.setNextFocusLeftId(R.id.all_apps_view);
+		        mRAB2.setNextFocusUpId(R.id.drag_layer);
+		        mRAB2.setNextFocusLeftId(R.id.all_apps_view);
 			}else{
-				mHandleView.setNextFocusUpId(R.id.all_apps_view);
-				mHandleView.setNextFocusLeftId(R.id.drag_layer);
+                mHandleView.setNextFocusUpId(R.id.all_apps_view);
+                mHandleView.setNextFocusLeftId(R.id.drag_layer);
+                mLAB.setNextFocusUpId(R.id.all_apps_view);
+                mLAB.setNextFocusLeftId(R.id.drag_layer);
+                mRAB.setNextFocusUpId(R.id.all_apps_view);
+                mRAB.setNextFocusLeftId(R.id.drag_layer);
+                mLAB2.setNextFocusUpId(R.id.all_apps_view);
+                mLAB2.setNextFocusLeftId(R.id.drag_layer);
+                mRAB2.setNextFocusUpId(R.id.all_apps_view);
+                mRAB2.setNextFocusLeftId(R.id.drag_layer);
 			}
 			mWorkspace.hideWallpaper(true);
 			allAppsOpen=true;
@@ -3550,11 +3608,14 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	        mWorkspace.invalidate();
 	        checkActionButtonsSpecialMode();
             mAllAppsGrid.open(animated && allowDrawerAnimations);
-			mHandleIcon.startTransition(150);
     	    mPreviousView.setVisibility(View.GONE);
     	    mNextView.setVisibility(View.GONE);
     	    if(mDesktopIndicator!=null)mDesktopIndicator.hide();
 		}
+		else if (filter != null)
+	        sModel.getApplicationsAdapter().setCatalogueFilter(filter);
+	    else
+	    	sModel.getApplicationsAdapter().setCatalogueFilter(AppCatalogueFilters.getInstance().getDrawerFilter());
     }
 
     private void checkActionButtonsSpecialMode() {
@@ -3566,8 +3627,16 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
     private void closeAllApps(boolean animated){
 		if(allAppsOpen){
-			mHandleView.setNextFocusUpId(R.id.drag_layer);
-			mHandleView.setNextFocusLeftId(R.id.drag_layer);
+            mHandleView.setNextFocusUpId(R.id.drag_layer);
+            mHandleView.setNextFocusLeftId(R.id.drag_layer);
+            mLAB.setNextFocusUpId(R.id.drag_layer);
+            mLAB.setNextFocusLeftId(R.id.drag_layer);
+            mRAB.setNextFocusUpId(R.id.drag_layer);
+            mRAB.setNextFocusLeftId(R.id.drag_layer);
+            mLAB2.setNextFocusUpId(R.id.drag_layer);
+            mLAB2.setNextFocusLeftId(R.id.drag_layer);
+            mRAB2.setNextFocusUpId(R.id.drag_layer);
+            mRAB2.setNextFocusLeftId(R.id.drag_layer);
 			mWorkspace.hideWallpaper(false);
 			allAppsOpen=false;
 	        mWorkspace.unlock();
@@ -3576,7 +3645,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mLAB.setSpecialMode(false);
             mRAB.setSpecialMode(false);
 
-			mHandleIcon.resetTransition();
 			if(!isDockBarOpen() && showDots){
 				mPreviousView.setVisibility(View.VISIBLE);
 	    	    mNextView.setVisibility(View.VISIBLE);
@@ -3602,9 +3670,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
     protected boolean isDockBarOpen(){
     	return mDockBar.isOpen();
-    }
-    protected int getTrashPadding(){
-		return mDockBar.getSize();
     }
     /**
      * ADW: wallpaper intent receiver for proper trackicng of wallpaper changes
@@ -3671,7 +3736,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			mShouldRestart=true;
 		}else{
 			//TODO: ADW Move here all the updates instead on updateAlmostNexusUI()
-			updateAlmostNexusUI();
 			if(key.equals("homeOrientation")){
 		        if(!mMessWithPersistence){
 		        	changeOrientation(AlmostNexusSettingsHelper.getDesktopOrientation(this),false);
@@ -3720,8 +3784,15 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			        }
 			        registerReceiver(mCounterReceiver, mCounterReceiver.getFilter());
 			    }
+            }else if(key.equals("main_dock_style")){
+                int dockstyle=AlmostNexusSettingsHelper.getmainDockStyle(this);
+                if(dockstyle==DOCK_STYLE_NONE){
+                    mShouldRestart=true;
+                }else if(mDockStyle==DOCK_STYLE_NONE){
+                    mShouldRestart=true;
+                }
 			}
-
+			updateAlmostNexusUI();
 		}
 	}
 	private void appwidgetReadyBroadcast(int appWidgetId, ComponentName cname, int[] widgetSpan) {
@@ -4409,6 +4480,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         if (packageName != null && packageName.length() > 0) {
             mWorkspace.updateCountersForPackage(packageName, counter, color);
             //ADW: Update ActionButtons icons
+            updateCounters(mHandleView, packageName, counter, color);
             updateCounters(mLAB, packageName, counter, color);
             updateCounters(mRAB, packageName, counter,color);
             updateCounters(mLAB2, packageName, counter,color);
@@ -4425,5 +4497,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         if(name!=null)
             updateCountersForPackage(name.getPackageName(),0,0);
         super.startActivity(intent);
+    }
+
+    @Override
+    public void onSwipe() {
+        //TODO: specify different action for each ActionButton?
+        mDockBar.open();
     }
 }
