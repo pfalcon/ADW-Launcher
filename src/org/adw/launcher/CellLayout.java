@@ -494,7 +494,7 @@ public class CellLayout extends WidgetCellLayout {
         final int vStartPadding = portrait ? mLongAxisStartPadding : mShortAxisStartPadding;
 
         result[0] = (x - hStartPadding) / (mCellWidth + mWidthGap);
-        result[1] = (y - vStartPadding) / (mCellHeight + mHeightGap);
+        result[1] = (y - vStartPadding-getTop()) / (mCellHeight + mHeightGap);
 
         final int xAxis = portrait ? mShortAxisCells : mLongAxisCells;
         final int yAxis = portrait ? mLongAxisCells : mShortAxisCells;
@@ -521,7 +521,7 @@ public class CellLayout extends WidgetCellLayout {
 
 
         result[0] = hStartPadding + cellX * (mCellWidth + mWidthGap);
-        result[1] = vStartPadding + cellY * (mCellHeight + mHeightGap);
+        result[1] = vStartPadding + cellY * (mCellHeight + mHeightGap)+getTop();
     }
 
     @Override

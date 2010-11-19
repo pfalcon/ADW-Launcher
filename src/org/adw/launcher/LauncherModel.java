@@ -444,19 +444,18 @@ public class LauncherModel {
         return false;
     }
 
-    Drawable getApplicationInfoIcon(PackageManager manager, ApplicationInfo info) {
+    Drawable getApplicationInfoIcon(PackageManager manager, ApplicationInfo info, Context context) {
         final ResolveInfo resolveInfo = manager.resolveActivity(info.intent, 0);
-        if (resolveInfo == null) {
+        if (resolveInfo == null || info.customIcon) {
             return null;
         }
-
         ComponentName componentName = new ComponentName(
                 resolveInfo.activityInfo.applicationInfo.packageName,
                 resolveInfo.activityInfo.name);
         ApplicationInfo application = mAppInfoCache.get(componentName);
-
         if (application == null) {
-            return resolveInfo.activityInfo.loadIcon(manager);
+            //return resolveInfo.activityInfo.loadIcon(manager);
+            return getIcon(manager, context, resolveInfo.activityInfo);
         }
 
         return application.icon;
