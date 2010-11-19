@@ -100,6 +100,11 @@ public final class AlmostNexusSettingsHelper {
 		boolean newD = sp.getBoolean("uiCloseDockbar", context.getResources().getBoolean(R.bool.config_uiCloseDockbar));
 		return newD;
 	}
+	public static boolean getUICloseAppsDockbar(Context context) {
+	    SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+	    boolean newD = sp.getBoolean("uiCloseAppsDockbar", context.getResources().getBoolean(R.bool.config_close_apps_dockbar));
+	    return newD;
+	}
 	public static boolean getUICloseFolder(Context context) {
 		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
 		boolean newD = sp.getBoolean("uiCloseFolder", context.getResources().getBoolean(R.bool.config_uiCloseFolder));
@@ -170,17 +175,6 @@ public final class AlmostNexusSettingsHelper {
 		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
 		boolean newD = sp.getBoolean("autosizeIcons", context.getResources().getBoolean(R.bool.config_autosizeIcons));
 		return newD;
-	}
-	public static boolean getUIScrollableWidgets(Context context) {
-		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
-		boolean newD = sp.getBoolean("uiScrollableWidgets", context.getResources().getBoolean(R.bool.config_uiScrollableWidgets));
-		return newD;
-	}
-	public static void setUIScrollableWidgets(Context context, boolean value) {
-		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
-	    SharedPreferences.Editor editor = sp.edit();
-		editor.putBoolean("uiScrollableWidgets", value);
-	    editor.commit();
 	}
 	public static boolean getDrawerLabels(Context context) {
 		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
@@ -416,6 +410,11 @@ public final class AlmostNexusSettingsHelper {
     public static int getDrawerStyle(Context context) {
         SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
         int newD = Integer.valueOf(sp.getString("drawer_style", context.getResources().getString(R.string.config_drawer_style)));
+        return newD;
+    }
+    public static int getDeletezoneStyle(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+        int newD = Integer.valueOf(sp.getString("deletezone_style", context.getResources().getString(R.string.config_deletezone_style)));
         return newD;
     }
     public static boolean getUIABTint(Context context) {

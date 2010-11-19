@@ -84,6 +84,8 @@
     <skip />
     <!-- Verb, menu item used to add an item on the desktop -->
     <string name="menu_add">Add</string>
+    <string name="menu_delete">Remove</string>
+    <string name="menu_uninstall">Uninstall</string>
     <!-- Noun, menu item used to set the desktop's wallpaper -->
     <string name="menu_wallpaper">Wallpaper</string>
     <!-- Verb, menu item used to initiate global search -->
@@ -392,4 +394,9 @@
     <string name="pref_summary_ab_tint">Perform graphic tinting to the dock icons</string>
     <string name="pref_title_ab_tint_color">Tint Color</string>
     <string name="pref_summary_ab_tint_color">Change the tinting color</string>
+    <string name="pref_title_deletezone_preferencecategory">Trash Can</string>
+    <string name="pref_title_deletezone_style">Trash Can Position</string>
+    <string name="pref_summary_deletezone_style">Change the position of the Trash Can</string>
+    <string name="pref_title_close_apps_dockbar">Close the app drawer</string>
+    <string name="pref_summary_close_apps_dockbar">Close the app drawer when longpressing items when the dockbar is visible</string>
 </resources>

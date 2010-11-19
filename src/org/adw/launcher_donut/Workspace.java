@@ -615,8 +615,10 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         if (heightMode != MeasureSpec.EXACTLY) {
             throw new IllegalStateException("Workspace can only be used in EXACTLY mode.");
         }
-
         // The children are given the same width and height as the workspace
+        int heightSpecSize =  MeasureSpec.getSize(heightMeasureSpec);
+        heightSpecSize-=getPaddingTop()+getPaddingBottom();
+        heightMeasureSpec=MeasureSpec.makeMeasureSpec(heightSpecSize, MeasureSpec.EXACTLY);
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {
             getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);
@@ -650,13 +652,14 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         int childLeft = 0;
-
+        final int mTop=getPaddingTop();
+        final int mBottom=getPaddingBottom();
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
             if (child.getVisibility() != View.GONE) {
                 final int childWidth = child.getMeasuredWidth();
-                child.layout(childLeft, 0, childLeft + childWidth, child.getMeasuredHeight());
+                child.layout(childLeft, mTop, childLeft + childWidth, mTop+child.getMeasuredHeight()-mBottom);
                 childLeft += childWidth;
             }
         }
@@ -1013,6 +1016,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         mDragInfo.screen = mCurrentScreen;
         
         CellLayout current = ((CellLayout) getChildAt(mCurrentScreen));
+        final ItemInfo info = (ItemInfo)child.getTag();
+        mLauncher.showActions(info, child);
 
         current.onDragChild(child);
         mDragger.startDrag(child, this, child.getTag(), DragController.DRAG_ACTION_MOVE);
@@ -1079,15 +1084,8 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                     CellLayout.LayoutParams lp = (CellLayout.LayoutParams) cell.getLayoutParams();
                     LauncherModel.moveItemInDatabase(mLauncher, info,
                             LauncherSettings.Favorites.CONTAINER_DESKTOP, index, lp.cellX, lp.cellY);
-                }else{
-                    if (info instanceof LauncherAppWidgetInfo) {
-                    	// resize widet
-                        mLauncher.editWidget(cell);
-                    }
-                    else if (info instanceof ApplicationInfo) {
-                    	// edit shirtcut
-                    	mLauncher.editShirtcut((ApplicationInfo)info);
-                    }
+                //}else{
+                    //mLauncher.showActions(info, cell);
                 }
             }
         }
@@ -1232,7 +1230,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
     
     void setLauncher(Launcher launcher) {
         mLauncher = launcher;
-        if(mLauncher.isScrollableAllowed())registerProvider();
+        registerProvider();
         if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().setItems(mHomeScreens);
     }
 
@@ -1495,18 +1493,48 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                     // web pages.)
                     final Intent intent = info.intent;
                     final ComponentName name = intent.getComponent();
-                    if (info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION &&
+                    if ((info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION ||
+                            info.itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT)&&
                             Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
                             packageName.equals(name.getPackageName())) {
 
                         final Drawable icon = Launcher.getModel().getApplicationInfoIcon(
-                                mLauncher.getPackageManager(), info);
+                                mLauncher.getPackageManager(), info, mLauncher);
                         if (icon != null && icon != info.icon) {
                             info.icon.setCallback(null);
                             info.icon = Utilities.createIconThumbnail(icon, mLauncher);
                             info.filtered = true;
                             ((TextView) view).setCompoundDrawablesWithIntrinsicBounds(null,
                                     info.icon, null, null);
+                        }
+                    }
+                }else if (tag instanceof UserFolderInfo){
+                	//TODO: ADW: Maybe there are icons inside folders.... need to update them too
+                    final UserFolderInfo info = (UserFolderInfo) tag;
+                    final ArrayList<ApplicationInfo> contents = info.contents;
+                    final int contentsCount = contents.size();
+                    for (int k = 0; k < contentsCount; k++) {
+                        final ApplicationInfo appInfo = contents.get(k);
+                        final Intent intent = appInfo.intent;
+                        final ComponentName name = intent.getComponent();
+                        if ((appInfo.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION ||
+                                info.itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT)&&
+                                Intent.ACTION_MAIN.equals(intent.getAction()) && name != null &&
+                                packageName.equals(name.getPackageName())) {
+
+                            final Drawable icon = Launcher.getModel().getApplicationInfoIcon(
+                                    mLauncher.getPackageManager(), appInfo, mLauncher);
+                            boolean folderUpdated=false;
+                            if (icon != null && icon != appInfo.icon) {
+                            	appInfo.icon.setCallback(null);
+                            	appInfo.icon = Utilities.createIconThumbnail(icon, mLauncher);
+                            	appInfo.filtered = true;
+                            	folderUpdated=true;
+                            }
+                            if(folderUpdated){
+                                final Folder folder = getOpenFolder();
+                                if (folder != null) folder.notifyDataSetChanged();
+                            }
                         }
                     }
                 }

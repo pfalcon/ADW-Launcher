@@ -18,6 +18,8 @@ package org.adw.launcher_donut;
 
 import java.util.ArrayList;
 
+import com.devoteam.quickaction.QuickActionWindow;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -41,6 +43,7 @@ import android.widget.FrameLayout;
 /**
  * A ViewGroup that coordinated dragging across its dscendants
  */
+
 public class DragLayer extends FrameLayout implements DragController {
     private static final int SCROLL_DELAY = 600;
     private static final int SCROLL_ZONE = 20;
@@ -137,7 +140,10 @@ public class DragLayer extends FrameLayout implements DragController {
     private static final int COLOR_NORMAL=0x66FF0000;
     private static final int COLOR_TRASH=0xAAFF0000;
     private boolean mDrawModeBitmap=true;
-    
+    private Object mTagPopup;
+    private float mOriginalX;
+    private float mOriginalY;
+
     /**
      * Used to create a new DragLayer from XML.
      *
@@ -164,6 +170,7 @@ public class DragLayer extends FrameLayout implements DragController {
         if (PROFILE_DRAWING_DURING_DRAG) {
             android.os.Debug.startMethodTracing("Launcher");
         }
+        mTagPopup=v.getTag(R.id.TAG_PREVIEW);
 
         // Hide soft keyboard, if visible
         if (mInputMethodManager == null) {
@@ -178,6 +185,8 @@ public class DragLayer extends FrameLayout implements DragController {
         }
         Rect r = mDragRect;
         r.set(v.getScrollX(), v.getScrollY(), 0, 0);
+        mOriginalX=mLastMotionX;
+        mOriginalY=mLastMotionY;
 
         offsetDescendantRectToMyCoords(v, r);
         mTouchOffsetX = mLastMotionX - r.left;
@@ -467,7 +476,13 @@ public class DragLayer extends FrameLayout implements DragController {
             invalidate(rect);
 
             mLastDropTarget = dropTarget;
-
+            if(mTagPopup!=null){
+                if(Math.abs(mOriginalX-mLastMotionX)>SCROLL_ZONE || Math.abs(mOriginalY-mLastMotionY)>SCROLL_ZONE){
+                    final QuickActionWindow qa=(QuickActionWindow) mTagPopup;
+                    qa.dismiss();
+                    mTagPopup=null;
+                }
+            }
             boolean inDragRegion = false;
             if (mDragRegion != null) {
                 final RectF region = mDragRegion;

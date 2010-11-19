@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.util.Log;
 import mobi.intuitit.android.content.LauncherIntent;
 import mobi.intuitit.android.content.LauncherMetadata;
 
@@ -61,6 +62,7 @@ import android.content.Intent.ShortcutIconResource;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -72,6 +74,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -95,6 +98,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -102,10 +106,14 @@ import android.widget.EditText;
 import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
+
+import com.devoteam.quickaction.QuickActionWindow;
+
 
 /**
  * Default launcher application.
@@ -278,7 +286,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private boolean uiABTint=false;
 	private int uiABTintColor=0xffffffff;
 	private boolean uiHideLabels=false;
-	private boolean scrollableSupport=false;
 	private DesktopIndicator mDesktopIndicator;
 	private int savedOrientation;
 	private boolean useDrawerCatalogNavigation=true;
@@ -818,6 +825,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         mRAB.setSwipeListener(this);
         mRAB2.setSwipeListener(this);
 
+        mHandleView.setDragger(dragLayer);
+        mLAB.setDragger(dragLayer);
+        mRAB.setDragger(dragLayer);
+        mRAB2.setDragger(dragLayer);
+        mLAB2.setDragger(dragLayer);
+
 		//ADW linearlayout with apptray, lab and rab
 		mDrawerToolbar=findViewById(R.id.drawer_toolbar);
 		mHandleView.setNextFocusUpId(R.id.drag_layer);
@@ -1329,7 +1342,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         unregisterReceiver(mApplicationsReceiver);
         unregisterReceiver(mCloseSystemDialogsReceiver);
         if(mCounterReceiver!=null)unregisterReceiver(mCounterReceiver);
-        if(scrollableSupport)mWorkspace.unregisterProvider();
+        mWorkspace.unregisterProvider();
     }
 
     @Override
@@ -1553,6 +1566,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private void updateShortcutsForPackage(String packageName) {
         if (packageName != null && packageName.length() > 0) {
             mWorkspace.updateShortcutsForPackage(packageName);
+            //ADW: Update ActionButtons icons
+            mLAB.reloadIcon(packageName);
+            mLAB2.reloadIcon(packageName);
+            mRAB.reloadIcon(packageName);
+            mRAB2.reloadIcon(packageName);
+            mHandleView.reloadIcon(packageName);
+            mMiniLauncher.reloadIcons(packageName);
         }
     }
 
@@ -1590,32 +1610,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	            					.create().show();
 	            				return;
 	            			}
-	            	}
-	    			// If there are Settings for scrollable or animations test them here too!
-	            	if (metadata.containsKey(LauncherMetadata.Requirements.Scrollable))
-	            	{
-	            		boolean requiresScrolling = metadata.getBoolean(LauncherMetadata.Requirements.Scrollable);
-	            		if (!isScrollableAllowed() && requiresScrolling) {
-	            			// ask the user what to do
-	            			AlertDialog.Builder dlg = new AlertDialog.Builder(this);
-	            			dlg.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
-
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									AlmostNexusSettingsHelper.setUIScrollableWidgets(Launcher.this, true);
-									configureOrAddAppWidget(data);
-								}
-							});
-	            			dlg.setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									onActivityResult(REQUEST_CREATE_APPWIDGET, Activity.RESULT_CANCELED, data);
-								}
-							});
-	            			dlg.setMessage(getString(R.string.need_scrollable));
-	            			dlg.create().show();
-	            			return;
-	            		}
 	            	}
             	}
             }
@@ -2798,6 +2792,28 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 	startActivityForResult(anycutIntent, REQUEST_PICK_ANYCUT);
                     break;
                 }
+                case AddAdapter.ITEM_LAUNCHER_ACTION: {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Launcher.this);
+                    builder.setTitle(getString(R.string.launcher_actions));
+                    final ListAdapter adapter = LauncherActions.getInstance().getSelectActionAdapter();
+                    builder.setAdapter(adapter, new Dialog.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    LauncherActions.Action action = (LauncherActions.Action)adapter.getItem(which);
+                                    Intent result = new Intent();
+                                    result.putExtra(Intent.EXTRA_SHORTCUT_NAME, action.getName());
+                                    result.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
+                                            LauncherActions.getInstance().getIntentForAction(action));
+                                    ShortcutIconResource iconResource = new ShortcutIconResource();
+                                    iconResource.packageName = Launcher.this.getPackageName();
+                                    iconResource.resourceName = getResources().getResourceName(action.getIconResourceId());
+                                    result.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
+                                    onActivityResult(REQUEST_CREATE_SHORTCUT, RESULT_OK, result);
+                                }
+                            });
+                    builder.create().show();
+                    break;
+                }
             }
         }
 
@@ -3021,7 +3037,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         if(mAllAppsGrid!=null){
         	mAllAppsGrid.setAnimationSpeed(animationSpeed);
         }
-        scrollableSupport=AlmostNexusSettingsHelper.getUIScrollableWidgets(this);
         useDrawerCatalogNavigation=AlmostNexusSettingsHelper.getDrawerCatalogsNavigation(this);
     }
     /**
@@ -3044,7 +3059,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			mHandleView.updateIcon();
 		}
 		if(!showDockBar){
-			mDockBar.close();
+			if(mDockBar.isOpen())mDockBar.close();
 		}
     	fullScreen(hideStatusBar);
     	if(!mDockBar.isOpen() && !showingPreviews){
@@ -3208,7 +3223,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	                String packageName=AlmostNexusSettingsHelper.getThemePackageName(this, THEME_DEFAULT);
     	                if(!packageName.equals(THEME_DEFAULT)){
     	                	d=FolderIcon.loadFolderFromTheme(this, getPackageManager(), packageName, "ic_launcher_folder");
-    	                }
+    	                }else{
+                            d = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), this);
+                        }
                 	}else{
                 		d = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), this);
                 	}
@@ -3220,7 +3237,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	            String packageName=AlmostNexusSettingsHelper.getThemePackageName(this, THEME_DEFAULT);
     	            if(!packageName.equals(THEME_DEFAULT)){
     	            	d=FolderIcon.loadFolderFromTheme(this, getPackageManager(), packageName, "ic_launcher_folder");
-    	            }
+    	            }else{
+                        d = resources.getDrawable(R.drawable.ic_launcher_folder);
+                    }
             	}else{
             		d = resources.getDrawable(R.drawable.ic_launcher_folder);
             	}
@@ -3677,15 +3696,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 					setPersistent(false);
 	        		changeOrientation(AlmostNexusSettingsHelper.getDesktopOrientation(this),false);
 				}
-			}else if(key.equals("uiScrollableWidgets")){
-				boolean scroll=AlmostNexusSettingsHelper.getUIScrollableWidgets(this);
-				scrollableSupport=scroll;
-				if(scroll){
-					mWorkspace.registerProvider();
-				}else{
-					mWorkspace.unregisterProvider();
-				}
-				sModel.loadUserItems(false, Launcher.this, false, false);
 			}else if(key.equals("notif_receiver")){
 			    boolean useNotifReceiver=AlmostNexusSettingsHelper.getNotifReceiver(this);
 			    if(!useNotifReceiver){
@@ -3709,6 +3719,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 }else if(mDockStyle==DOCK_STYLE_NONE){
                     mShouldRestart=true;
                 }
+            }else if(key.equals("deletezone_style")){
+                int dz=AlmostNexusSettingsHelper.getDeletezoneStyle(this);
+                final DeleteZone deleteZone = (DeleteZone) mDragLayer.findViewById(R.id.delete_zone);
+                deleteZone.setPosition(dz);
 			}
 			updateAlmostNexusUI();
 		}
@@ -3723,14 +3737,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		motosize.putExtra("com.motorola.blur.home.EXTRA_NEW_WIDGET", true);
 		sendBroadcast(motosize);
 
-		if(isScrollableAllowed()){
-			Intent ready = new Intent(LauncherIntent.Action.ACTION_READY).putExtra(
-					LauncherIntent.Extra.EXTRA_APPWIDGET_ID, appWidgetId).putExtra(
-					AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId).putExtra(
-					LauncherIntent.Extra.EXTRA_API_VERSION, LauncherMetadata.CurrentAPIVersion).
-					setComponent(cname);
-			sendBroadcast(ready);
-		}
+		Intent ready = new Intent(LauncherIntent.Action.ACTION_READY).putExtra(
+				LauncherIntent.Extra.EXTRA_APPWIDGET_ID, appWidgetId).putExtra(
+				AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId).putExtra(
+				LauncherIntent.Extra.EXTRA_API_VERSION, LauncherMetadata.CurrentAPIVersion).
+				setComponent(cname);
+		sendBroadcast(ready);
 	}
 	/**
 	 * ADW: Home binding actions
@@ -3859,9 +3871,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		fireHomeBinding(mSwipeupAction,2);
 	}
 
-	public boolean isScrollableAllowed(){
-		return scrollableSupport;
-	}
 	private void realAddWidget(AppWidgetProviderInfo appWidgetInfo,CellLayout.CellInfo cellInfo, int[]spans,int appWidgetId,boolean insertAtFirst){
         // Try finding open space on Launcher screen
         final int[] xy = mCellCoordinates;
@@ -4045,11 +4054,22 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		        info.icon = icon;
 		        info.customIcon = customIcon;
 		        info.iconResource = iconResource;
-		        info.itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
 	        }
+            info.itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
 			info.title = data.getStringExtra(Intent.EXTRA_SHORTCUT_NAME);
 			info.intent = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
 			LauncherModel.updateItemInDatabase(this, info);
+
+			if (info.container == LauncherSettings.Favorites.CONTAINER_MAB)
+				mHandleView.UpdateLaunchInfo(info);
+			else if (info.container == LauncherSettings.Favorites.CONTAINER_LAB)
+				mLAB.UpdateLaunchInfo(info);
+			else if (info.container == LauncherSettings.Favorites.CONTAINER_LAB2)
+				mLAB2.UpdateLaunchInfo(info);
+			else if (info.container == LauncherSettings.Favorites.CONTAINER_RAB)
+				mRAB.UpdateLaunchInfo(info);
+			else if (info.container == LauncherSettings.Favorites.CONTAINER_RAB2)
+				mRAB2.UpdateLaunchInfo(info);
 
 			mWorkspace.updateShortcutFromApplicationInfo(info);
 		}
@@ -4231,7 +4251,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 int width = (mlauncherAppWidgetInfo.spanX*minw);
                 int height = (mlauncherAppWidgetInfo.spanY*minh);
 
-                final Rect screenRect = new Rect(screen.getLeftPadding(), screen.getTopPadding(), screen.getWidth()-screen.getLeftPadding()-screen.getRightPadding(), screen.getHeight()-screen.getTopPadding()-screen.getBottomPadding());
+                final Rect screenRect = new Rect(0, 0, mWorkspace.getWidth()-screen.getRightPadding(), mWorkspace.getHeight()-screen.getBottomPadding());
                 final int x=mlauncherAppWidgetInfo.cellX*minw;
                 final int y=mlauncherAppWidgetInfo.cellY*minh;
                 final int[]spans=new int[]{1,1};
@@ -4415,10 +4435,118 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                     "or use the exported attribute for this activity.", e);
         }
     }
+    public void showActions(final ItemInfo info, final View view){
+        int[] xy = new int[2];
+        //fills the array with the computed coordinates
+        view.getLocationInWindow(xy);
+        //rectangle holding the clicked view area
+        Rect rect = new Rect(xy[0], xy[1], xy[0]+view.getWidth(), xy[1]+view.getHeight());
 
+        //a new QuickActionWindow object
+        final QuickActionWindow qa = new QuickActionWindow(this, view, rect);
+        view.setTag(R.id.TAG_PREVIEW, qa);
+
+        //adds an item to the badge and defines the quick action to be triggered
+        //when the item is clicked on
+        qa.addItem(getResources().getDrawable(android.R.drawable.ic_menu_delete), R.string.menu_delete, new OnClickListener() {
+            public void onClick(View v) {
+                final LauncherModel model = Launcher.getModel();
+                if (info.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
+                    if (info instanceof LauncherAppWidgetInfo) {
+                        model.removeDesktopAppWidget((LauncherAppWidgetInfo) info);
+                    } else {
+                        model.removeDesktopItem(info);
+                    }
+                } else {
+                    //in a folder?
+                    FolderInfo source=sModel.getFolderById(Launcher.this, info.container);
+                    if (source instanceof UserFolderInfo) {
+                        final UserFolderInfo userFolderInfo = (UserFolderInfo) source;
+                        model.removeUserFolderItem(userFolderInfo, info);
+                    }
+                }
+                if (info instanceof UserFolderInfo) {
+                    final UserFolderInfo userFolderInfo = (UserFolderInfo)info;
+                    LauncherModel.deleteUserFolderContentsFromDatabase(Launcher.this, userFolderInfo);
+                    model.removeUserFolder(userFolderInfo);
+                } else if (info instanceof LauncherAppWidgetInfo) {
+                    final LauncherAppWidgetInfo launcherAppWidgetInfo = (LauncherAppWidgetInfo) info;
+                    final LauncherAppWidgetHost appWidgetHost = Launcher.this.getAppWidgetHost();
+                    Launcher.this.getWorkspace().unbindWidgetScrollableId(launcherAppWidgetInfo.appWidgetId);
+                    if (appWidgetHost != null) {
+                        appWidgetHost.deleteAppWidgetId(launcherAppWidgetInfo.appWidgetId);
+                    }
+                }
+                LauncherModel.deleteItemFromDatabase(Launcher.this, info);
+                if (view instanceof ActionButton)
+                	((ActionButton)view).UpdateLaunchInfo(null);
+                else
+                	((ViewGroup) view.getParent()).removeView(view);
+
+                qa.dismiss();
+            }
+        });
+
+        if(info instanceof ApplicationInfo){
+            qa.addItem(getResources().getDrawable(android.R.drawable.ic_menu_edit), R.string.menu_edit, new OnClickListener() {
+                public void onClick(View v) {
+                    editShirtcut((ApplicationInfo)info);
+                    qa.dismiss();
+                }
+            });
+        }else if(info instanceof LauncherAppWidgetInfo){
+            qa.addItem(getResources().getDrawable(android.R.drawable.ic_menu_edit), R.string.menu_edit, new OnClickListener() {
+                public void onClick(View v) {
+                    editWidget(view);
+                    qa.dismiss();
+                }
+            });
+        }
+        if(info instanceof ApplicationInfo|| info instanceof LauncherAppWidgetInfo){
+            qa.addItem(getResources().getDrawable(android.R.drawable.ic_menu_manage), R.string.menu_uninstall, new OnClickListener() {
+                public void onClick(View v) {
+                    String UninstallPkg=null;
+                    if(info instanceof ApplicationInfo){
+                        try{
+                            final ApplicationInfo appInfo=(ApplicationInfo) info;
+                            if(appInfo.iconResource != null)
+                                UninstallPkg = appInfo.iconResource.packageName;
+                            else
+                            {
+                                PackageManager mgr = Launcher.this.getPackageManager();
+                                ResolveInfo res = mgr.resolveActivity(appInfo.intent, 0);
+                                UninstallPkg = res.activityInfo.packageName;
+                            }
+                            // Dont uninstall ADW ;-)
+                            if (this.getClass().getPackage().getName().equals(UninstallPkg))
+                                UninstallPkg = null;
+                        }catch (Exception e) {
+                            Log.w(LOG_TAG, "Could not load shortcut icon: " + info);
+                            UninstallPkg=null;
+                        }
+                    }else if(info instanceof LauncherAppWidgetInfo){
+                        LauncherAppWidgetInfo appwidget=(LauncherAppWidgetInfo) info;
+                        final AppWidgetProviderInfo aw=AppWidgetManager.getInstance(Launcher.this).getAppWidgetInfo(appwidget.appWidgetId);
+                        if(aw!=null)UninstallPkg=aw.provider.getPackageName();
+                    }
+                    if(UninstallPkg!=null){
+                        Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, Uri.parse("package:"+UninstallPkg));
+                        Launcher.this.startActivity(uninstallIntent);
+                    }
+                    qa.dismiss();
+                }
+            });
+        }
+        //shows the quick action window on the screen
+        qa.show();
+    }
     @Override
     public void onSwipe() {
         //TODO: specify different action for each ActionButton?
         if(showDockBar)mDockBar.open();
+    }
+    public void setDockPadding(int pad){
+        mDrawerToolbar.setPadding(0, 0,0,pad);
+        mDockBar.setPadding(0, 0, 0, pad);
     }
 }

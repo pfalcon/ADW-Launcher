@@ -398,7 +398,8 @@ public abstract class WidgetSpace extends ViewGroup {
 						Log.e(TAG, "couldn't find widget id:"+widgetId);
 					}
                 }
-                if(remoteContext!=null)remoteContext=getContext();
+                if(remoteContext==null)
+                	remoteContext=getContext();
         		if(item.lv!=null){
         			Log.d(TAG, "Trying to KILL the ListView...");
                 	if(item.lvAdapter!=null){
