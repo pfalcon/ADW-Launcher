@@ -202,17 +202,17 @@ public class LauncherActions {
 		public int getIconResourceId() {
 			switch(mBindingValue) {
 				case Launcher.BIND_DEFAULT:
-					return R.drawable.ic_launcher_home;
+					return R.drawable.movetodefault_button;
 				case Launcher.BIND_PREVIEWS:
-					return R.drawable.ic_launcher_home;
+					return R.drawable.showpreviews_button;
 				case Launcher.BIND_APPS:
 					return R.drawable.all_apps_button;
 				case Launcher.BIND_STATUSBAR:
-					return R.drawable.ic_launcher_home;
-				case Launcher.BIND_HOME_NOTIFICATIONS:
-					return R.drawable.ic_launcher_home;
+					return R.drawable.showhidestatusbar_button;
+				case Launcher.BIND_NOTIFICATIONS:
+					return R.drawable.openclosenotifications_button;
 				case Launcher.BIND_DOCKBAR:
-					return R.drawable.ic_launcher_home;
+					return R.drawable.openclosedockbar_button;
 				default:
 					return R.drawable.ic_launcher_home;
 			}

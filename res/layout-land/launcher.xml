@@ -133,7 +133,7 @@
             android:id="@+id/mini_content"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            launcher:cellWidth="65dip"
+            launcher:cellWidth="55dip"
             launcher:cellHeight="48dip"
             launcher:cells="6"
             launcher:orientation="vertical"

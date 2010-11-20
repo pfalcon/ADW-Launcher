@@ -337,7 +337,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     protected static final int DOCK_STYLE_1=3;
     private int mDockStyle=DOCK_STYLE_3;
     //DRAWER STYLES
-    private int[]mDrawerStyles={R.layout.old_drawer, R.layout.new_drawer};
+    private final int[]mDrawerStyles={R.layout.old_drawer, R.layout.new_drawer};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 		mMessWithPersistence=AlmostNexusSettingsHelper.getSystemPersistent(this);
@@ -1327,7 +1327,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         unregisterReceiver(mApplicationsReceiver);
         unregisterReceiver(mCloseSystemDialogsReceiver);
         if(mCounterReceiver!=null)unregisterReceiver(mCounterReceiver);
-        mWorkspace.unregisterProvider();
+        if(scrollableSupport)mWorkspace.unregisterProvider();
     }
 
     @Override
@@ -2215,7 +2215,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             return;
         }
         //TODO:ADW Check whether to display a toast if clicked mLAB or mRAB withount binding
-        if(tag instanceof ItemInfo && tag==null && v instanceof ActionButton){
+        if(tag==null && v instanceof ActionButton){
     		Toast t=Toast.makeText(this, R.string.toast_no_application_def, Toast.LENGTH_SHORT);
     		t.show();
     		return;
@@ -3040,7 +3040,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		if(!showDockBar){
 			mDockBar.close();
 		}
-		//mHandleView.setSlidingEnabled(showDockBar);
     	fullScreen(hideStatusBar);
     	if(!mDockBar.isOpen() && !showingPreviews){
 	    	if(!isAllAppsVisible()){
@@ -3303,7 +3302,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	}
     }
     private void dismissPreview(final View v) {
-    	final PopupWindow window = (PopupWindow) v.getTag();
+    	final PopupWindow window = (PopupWindow) v.getTag(R.id.TAG_PREVIEW);
         if (window != null) {
             hideDesktop(false);
             window.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -3327,7 +3326,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mWorkspace.invalidate();
             mDesktopLocked=false;
         }
-        v.setTag(null);
+        v.setTag(R.id.TAG_PREVIEW, null);
     }
 
     private void showPreviousPreview(View anchor) {
@@ -3362,7 +3361,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    	mWorkspace.openSense(true);
     	}else{
 	        //check first if it's already open
-	        final PopupWindow window = (PopupWindow) anchor.getTag();
+	        final PopupWindow window = (PopupWindow) anchor.getTag(R.id.TAG_PREVIEW);
 	        if (window != null) return;
 	    	Resources resources = getResources();
 
@@ -3440,7 +3439,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		                dismissPreview(anchor);
 		            }
 		        });
-		        anchor.setTag(p);
+		        anchor.setTag(R.id.TAG_PREVIEW, p);
 		        anchor.setTag(R.id.workspace, preview);
 		        anchor.setTag(R.id.icon, bitmaps);
 	        }
@@ -4393,6 +4392,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     @Override
     public void onSwipe() {
         //TODO: specify different action for each ActionButton?
-        mDockBar.open();
+        if(showDockBar)mDockBar.open();
     }
 }
