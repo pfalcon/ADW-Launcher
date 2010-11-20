@@ -65,6 +65,12 @@ public class CounterTextView extends TextView {
             mCounterSize=(Math.max(mRect2.width(), mRect2.height())/2)+mCounterPadding;
             RadialGradient shader = new RadialGradient(0, -mCounterSize, mCounterSize*1.5f, mBubbleColor,mBubbleColor2, TileMode.MIRROR);
             mStrokePaint.setShader(shader);
+        }else if(counter==-1){
+            mCounter="?";
+            mTextPaint.getTextBounds(mCounter, 0, mCounter.length(), mRect2);
+            mCounterSize=(Math.max(mRect2.width(), mRect2.height())/2)+mCounterPadding;
+            RadialGradient shader = new RadialGradient(0, -mCounterSize, mCounterSize*1.5f, mBubbleColor,mBubbleColor2, TileMode.MIRROR);
+            mStrokePaint.setShader(shader);
         }else{
             mCounter=null;
         }

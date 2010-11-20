@@ -132,7 +132,7 @@
 	    	android:layout_width="fill_parent"
 	    	android:layout_height="fill_parent"
 	    	launcher:cellWidth="50dip"
-	    	launcher:cellHeight="65dip"
+	    	launcher:cellHeight="55dip"
 	    	launcher:cells="6"
 	    	launcher:orientation="horizontal"
 	    	android:padding="0dip"

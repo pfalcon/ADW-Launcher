@@ -18,6 +18,7 @@ package org.adw.launcher;
 
 
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -135,7 +136,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
     	//ADW: show uninstall message
     	final ItemInfo item = (ItemInfo) dragInfo;
         mTransition.reverseTransition(TRANSITION_DURATION);
-    	if (item instanceof ApplicationInfo){
+    	if (item instanceof ApplicationInfo || item instanceof LauncherAppWidgetInfo){
 	    	mUninstallTarget = true;
 	        mHandler.removeCallbacks(mShowUninstaller);
 	        mHandler.postDelayed(mShowUninstaller, 1000);
@@ -160,6 +161,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
 
     public void onDragStart(View v, DragSource source, Object info, int dragAction) {
         final ItemInfo item = (ItemInfo) info;
+        UninstallPkg=null;
         if (item != null) {
             mTrashMode = true;
             createAnimations();
@@ -200,7 +202,8 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
 				}
 			}else if(item instanceof LauncherAppWidgetInfo){
 			    LauncherAppWidgetInfo appwidget=(LauncherAppWidgetInfo) item;
-			    UninstallPkg=AppWidgetManager.getInstance(mLauncher).getAppWidgetInfo(appwidget.appWidgetId).provider.getPackageName();
+			    final AppWidgetProviderInfo aw=AppWidgetManager.getInstance(mLauncher).getAppWidgetInfo(appwidget.appWidgetId);
+			    if(aw!=null)UninstallPkg=aw.provider.getPackageName();
 			}
         }
     }
