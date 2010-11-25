@@ -16,8 +16,7 @@
 
 package org.adw.launcher_donut;
 
-import org.adw.launcher.FlingGesture;
-import org.adw.launcher.FlingGesture.FlingListener;
+import org.adw.launcher_donut.FlingGesture.FlingListener;
 
 import android.content.ComponentName;
 import android.content.Context;

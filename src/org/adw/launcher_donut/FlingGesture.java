@@ -1,4 +1,4 @@
-package org.adw.launcher;
+package org.adw.launcher_donut;
 
 import android.view.MotionEvent;
 import android.view.VelocityTracker;

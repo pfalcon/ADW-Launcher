@@ -20,8 +20,7 @@ import java.util.ArrayList;
 
 import mobi.intuitit.android.widget.WidgetSpace;
 
-import org.adw.launcher.FlingGesture;
-import org.adw.launcher.FlingGesture.FlingListener;
+import org.adw.launcher_donut.FlingGesture.FlingListener;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
@@ -31,7 +30,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -48,13 +46,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.animation.BounceInterpolator;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
-import mobi.intuitit.android.widget.WidgetCellLayout;
-import mobi.intuitit.android.widget.WidgetSpace;
 
 import org.metalev.multitouch.controller.MultiTouchController;
 import org.metalev.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
