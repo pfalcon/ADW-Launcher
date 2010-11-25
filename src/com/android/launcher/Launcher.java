@@ -19,11 +19,8 @@ package com.android.launcher;
 import static android.util.Log.d;
 import static android.util.Log.e;
 import static android.util.Log.w;
-<<<<<<< HEAD
-=======
 
 import com.android.launcher.ActionButton.SwipeListener;
->>>>>>> 0af5ea7... Modified the main dock, WARNING, themes will NEED to update.
 import com.android.launcher.DockBar.DockBarListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -1559,16 +1556,6 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private void updateShortcutsForPackage(String packageName) {
         if (packageName != null && packageName.length() > 0) {
             mWorkspace.updateShortcutsForPackage(packageName);
-<<<<<<< HEAD
-=======
-            //ADW: Update ActionButtons icons
-            mLAB.reloadIcon();
-            mLAB2.reloadIcon();
-            mRAB.reloadIcon();
-            mRAB2.reloadIcon();
-            mHandleView.reloadIcon();
-            mMiniLauncher.reloadIcons();
->>>>>>> 0af5ea7... Modified the main dock, WARNING, themes will NEED to update.
         }
     }
 
