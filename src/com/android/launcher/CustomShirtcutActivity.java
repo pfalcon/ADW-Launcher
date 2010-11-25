@@ -36,7 +36,7 @@ import android.widget.ListAdapter;
 
 public class CustomShirtcutActivity extends Activity implements OnClickListener {
 	private static final String ACTION_ADW_PICK_ICON="org.adw.launcher.icons.ACTION_PICK_ICON";
-	public static final String ACTION_LAUNCHERACTION = "org.adw.launcher.action.launcheraction";
+	public static final String ACTION_LAUNCHERACTION = "com.android.launcher.action.launcheraction";
 	public static final String EXTRA_APPLICATIONINFO = "EXTRA_APPLICATIONINFO";
 
 	private static final int PICK_CUSTOM_ICON=1;
