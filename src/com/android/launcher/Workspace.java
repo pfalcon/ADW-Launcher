@@ -17,8 +17,8 @@
 package com.android.launcher;
 
 
-import org.adw.launcher.FlingGesture;
-import org.adw.launcher.FlingGesture.FlingListener;
+
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
@@ -46,14 +46,14 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import mobi.intuitit.android.widget.WidgetSpace;
 
 import org.metalev.multitouch.controller.MultiTouchController;
 import org.metalev.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
 import org.metalev.multitouch.controller.MultiTouchController.PointInfo;
 import org.metalev.multitouch.controller.MultiTouchController.PositionAndScale;
+
+import com.android.launcher.FlingGesture.FlingListener;
 
 
 
