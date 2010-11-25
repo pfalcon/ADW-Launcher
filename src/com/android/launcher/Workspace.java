@@ -20,11 +20,12 @@ import java.util.ArrayList;
 
 import mobi.intuitit.android.widget.WidgetSpace;
 
-import org.adw.launcher.FlingGesture.FlingListener;
 import org.metalev.multitouch.controller.MultiTouchController;
 import org.metalev.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
 import org.metalev.multitouch.controller.MultiTouchController.PointInfo;
 import org.metalev.multitouch.controller.MultiTouchController.PositionAndScale;
+
+import com.android.launcher.FlingGesture.FlingListener;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -939,28 +940,9 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 // Scroll to follow the motion event
                 final int deltaX = (int) (mLastMotionX - x);
                 mLastMotionX = x;
-<<<<<<< HEAD:src/com/android/launcher/Workspace.java
-
-                if (deltaX < 0) {
-                    if (mScrollX > -mScrollingBounce) {
-                        scrollBy(Math.min(deltaX,mScrollingBounce), 0);
-                        if(lwpSupport)updateWallpaperOffset();
-                        if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
-                    }
-                } else if (deltaX > 0) {
-                    final int availableToScroll = getChildAt(getChildCount() - 1).getRight() -
-                            mScrollX - getWidth()+mScrollingBounce;
-                    if (availableToScroll > 0) {
-                        scrollBy(deltaX, 0);
-                        if(lwpSupport)updateWallpaperOffset();
-                        if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
-                    }
-                }
-=======
                 scrollBy(deltaX, 0);
                 updateWallpaperOffset();
                 if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)getScrollX()/(float)(getChildCount()*getWidth()));
->>>>>>> f172f7c... Fix LiveFolders autoclose option not working:src/org/adw/launcher/Workspace.java
             }
             break;
         case MotionEvent.ACTION_UP:

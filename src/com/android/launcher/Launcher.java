@@ -25,7 +25,6 @@ import static android.util.Log.w;
 import com.android.launcher.ActionButton.SwipeListener;
 >>>>>>> 0af5ea7... Modified the main dock, WARNING, themes will NEED to update.
 import com.android.launcher.DockBar.DockBarListener;
-import com.android.launcher.SliderView.OnTriggerListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;

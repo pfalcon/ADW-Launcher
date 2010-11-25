@@ -16,7 +16,7 @@
 
 package com.android.launcher;
 
-import org.adw.launcher.FlingGesture.FlingListener;
+import com.android.launcher.FlingGesture.FlingListener;
 
 import android.content.ComponentName;
 import android.content.Context;
