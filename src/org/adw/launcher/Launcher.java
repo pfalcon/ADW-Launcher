@@ -3638,11 +3638,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		}
     }
     boolean isAllAppsVisible() {
-    	//return allAppsOpen;
-    	if(mAllAppsGrid!=null)
+    	return allAppsOpen;
+    	/*if(mAllAppsGrid!=null)
     		return mAllAppsGrid.getVisibility()==View.VISIBLE;
     	else
-    		return false;
+    		return false;*/
     }
     boolean isAllAppsOpaque() {
     	return mAllAppsGrid.isOpaque() && !allAppsAnimating;
