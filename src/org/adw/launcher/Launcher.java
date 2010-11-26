@@ -4020,7 +4020,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		if(themeResources!=null){
 			int resource_id=themeResources.getIdentifier (item_name, "drawable", themePackage);
 			if(resource_id!=0){
-				d=themeResources.getDrawable(resource_id);
+			    try{
+			        d=themeResources.getDrawable(resource_id);
+			    }catch (Resources.NotFoundException e) {
+			        return;
+                }
 				if(themeType==THEME_ITEM_FOREGROUND && item instanceof ImageView){
 					//ADW remove the old drawable
 					Drawable tmp=((ImageView)item).getDrawable();
