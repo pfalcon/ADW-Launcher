@@ -240,7 +240,7 @@
 				android:key="uiABBg" />
 		</PreferenceCategory>
 		<PreferenceCategory
-			android:title="Hidden DockBar">
+			android:title="@string/pref_title_dockbar_preferencecategory">
 			<CheckBoxPreference android:title="@string/pref_title_dockbar"
 				android:defaultValue="true"
 				android:summary="@string/pref_summary_dockbar"

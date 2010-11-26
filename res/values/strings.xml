@@ -387,4 +387,5 @@
     <string name="pref_summary_behaviour_preferences">General application behavior configuration</string>
     <string name="pref_title_drawer_style">App Drawer style</string>
     <string name="pref_summary_drawer_style">Switch between different drawer implementations</string>
+    <string name="pref_title_dockbar_preferencecategory">Hidden Dockbar</string>
 </resources>
