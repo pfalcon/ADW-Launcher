@@ -948,7 +948,13 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         case MotionEvent.ACTION_MOVE:
             if (mTouchState == TOUCH_STATE_SCROLLING) {
                 // Scroll to follow the motion event
-                final int deltaX = (int) (mLastMotionX - x);
+                int deltaX = (int) (mLastMotionX - x);
+                if(mScrollingBounce==0){
+                    final int endLimit = getChildAt(getChildCount() - 1).getRight() - getWidth();
+                    final int scrollpos=getScrollX();
+                    if(scrollpos+deltaX<0)deltaX=-scrollpos;
+                    if(scrollpos+deltaX>endLimit)deltaX=endLimit-scrollpos;
+                }
                 mLastMotionX = x;
                 scrollBy(deltaX, 0);
                 updateWallpaperOffset();
