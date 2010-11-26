@@ -16,6 +16,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="application_name" msgid="5865630159700533006">"ADW主界面"</string>
+    <string name="uid_name" msgid="3371120195364560632">"Android核心程序"</string>
     <string name="folder_name" msgid="4588446541914685904">"文件夹"</string>
     <string name="chooser_wallpaper" msgid="5988031014201479733">"选择壁纸"</string>
     <string name="wallpaper_instructions" msgid="4215640646180727542">"设置壁纸"</string>
@@ -171,32 +172,32 @@
 
     <string name="pref_title_import_export">备份与恢复</string>
     <string name="pref_title_xml">ADW 设置</string>
-    <string name="pref_title_xml_import">恢复 ADW 设置</string>
-    <string name="pref_summary_xml_import">从文件 /sdcard/adw_settings.xml 中恢复 ADW 设置</string>
-    <string name="pref_title_xml_export">备份 ADW 设置</string>
-    <string name="pref_summary_xml_export">将 ADW 设置备份到文件 /sdcard/adw_settings.xml</string>
+    <string name="pref_title_xml_import">恢复ADW设置</string>
+    <string name="pref_summary_xml_import">从文件/sdcard/adw_settings.xml中恢复 ADW 设置</string>
+    <string name="pref_title_xml_export">备份ADW设置</string>
+    <string name="pref_summary_xml_export">将ADW设置备份到文件/sdcard/adw_settings.xml</string>
 
     <string name="pref_title_db">桌面设置</string>
     <string name="pref_title_db_import">恢复桌面设置</string>
-    <string name="pref_summary_db_import">从文件 /sdcard/adw_launcher.db 中恢复桌面设置</string>
+    <string name="pref_summary_db_import">从文件/sdcard/adw_launcher.db中恢复桌面设置</string>
     <string name="pref_title_db_export">备份桌面设置</string>
-    <string name="pref_summary_db_export">将桌面设置备份到文件 /sdcard/adw_launcher.db</string>
+    <string name="pref_summary_db_export">将桌面设置备份到文件/sdcard/adw_launcher.db</string>
 
     <string name="title_dialog_xml">ADW设置</string>
     <string name="import_export_sdcard_unmounted">未找到SD卡</string>
 
     <!-- XML Import/Export strings -->
-    <string name="message_dialog_export">原有文件将被覆盖！确认备份 ADW 设置？</string>
-    <string name="xml_export_dialog">正在备份 ADW 设置...</string>
+    <string name="message_dialog_export">原有文件将被覆盖！确认备份ADW设置？</string>
+    <string name="xml_export_dialog">正在备份ADW设置...</string>
     <string name="xml_export_success">ADW 设置备份成功！</string>
-    <string name="xml_export_error">备份 ADW 设置时出现错误！</string>
+    <string name="xml_export_error">备份ADW设置时出现错误！</string>
 
     <string name="message_dialog_import">ADW将会重启！确认恢复 ADW 设置？</string>
-    <string name="xml_import_dialog">正在恢复 ADW 设置...</string>
-    <string name="xml_file_not_found">未找到 ADW 设置备份文件！</string>
-    <string name="xml_not_readable">ADW 设置备份文件存在，但无法读取！</string>
-    <string name="xml_import_success">ADW 设置恢复成功！</string>
-    <string name="xml_import_error">恢复 ADW 设置时出现错误！</string>
+    <string name="xml_import_dialog">正在恢复ADW设置...</string>
+    <string name="xml_file_not_found">未找到ADW设置备份文件！</string>
+    <string name="xml_not_readable">ADW设置备份文件存在，但无法读取！</string>
+    <string name="xml_import_success">ADW设置恢复成功！</string>
+    <string name="xml_import_error">恢复ADW设置时出现错误！</string>
 
     <!-- Config Import/Export strings -->
     <string name="message_dialog_export_config">原有文件将被覆盖！确认备份桌面设置？</string>
