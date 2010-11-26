@@ -158,6 +158,7 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
     private final int mScrollingBounce=50;
     //ADW:Bg color
     private int mBgColor=0xFF000000;
+    private int mStatus=HolderLayout.OnFadingListener.CLOSE;
 	public AllAppsSlidingView(Context context) {
 		super(context);
 		initWorkspace();
@@ -401,7 +402,10 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
         holder.setOnFadingListener(mFadingListener);
         addViewInLayout(holder, getChildCount(), holderParams, true);
         if(pageNum==mCurrentScreen && isAnimating){
-        	holder.open(isAnimating, mAnimationDuration);
+            if(mStatus==HolderLayout.OnFadingListener.OPEN)
+                holder.open(isAnimating, mAnimationDuration);
+            else
+                holder.close(isAnimating, mAnimationDuration);
         }
     }
     private void addRemovePages(int current, int next){
@@ -1704,6 +1708,7 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
             }
             mBlockLayouts=false;
             requestLayout();
+
         }
 
         @Override
@@ -1818,6 +1823,7 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
 		}
 	}
 	public void open(boolean animate) {
+	    mStatus=HolderLayout.OnFadingListener.OPEN;
 		mBgColor=AlmostNexusSettingsHelper.getDrawerColor(mLauncher);
 		mTargetAlpha=Color.alpha(mBgColor);
 		for(int i=0;i<getChildCount();i++){
@@ -1855,6 +1861,7 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
 		}
 	}
 	public void close(boolean animate){
+	    mStatus=HolderLayout.OnFadingListener.CLOSE;
 		setPressed(false);
 		mPager.setVisibility(INVISIBLE);
         if(getAdapter()==null)
@@ -1865,8 +1872,10 @@ public class AllAppsSlidingView extends AdapterView<ApplicationsAdapter> impleme
     		findCurrentHolder();
     		HolderLayout holder=(HolderLayout) getChildAt(mCurrentHolder);
     		if(holder!=null){
+    		    isAnimating=true;
     			holder.close(animate, mAnimationDuration);
     		}else{
+    		    isAnimating=false;
     			mLauncher.getWorkspace().clearChildrenCache();
     			setVisibility(View.GONE);
     		}
