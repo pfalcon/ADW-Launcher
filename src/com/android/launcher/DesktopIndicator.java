@@ -235,7 +235,7 @@ public class DesktopIndicator extends ViewGroup implements AnimationListener {
 	public void show() {
 		// TODO Auto-generated method stub
 		if(mVisibleTime<0){
-		    mIndicator.setVisibility(View.INVISIBLE);
+		    mIndicator.setVisibility(View.VISIBLE);
 			setVisibility(View.VISIBLE);
 		}
 	}
