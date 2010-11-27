@@ -12,7 +12,7 @@
 		limitations under the License. */
 	-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="org.adw.launcher" android:versionCode="30"
+	package="org.adw.launcher" android:versionCode="31"
 	android:versionName="@string/adw_version" android:installLocation="internalOnly">
 
 	<permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
