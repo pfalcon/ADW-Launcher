@@ -337,7 +337,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         indicatorLevels(mCurrentScreen);
         if(mLauncher.getDesktopIndicator()!=null){
         	mLauncher.getDesktopIndicator().fullIndicate(mCurrentScreen);
-        	if(mLauncher.isEditMode()){
+        	if(mLauncher.isEditMode() || mLauncher.isAllAppsVisible()){
         		mLauncher.getDesktopIndicator().hide();
         	}
         }
@@ -496,7 +496,12 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         if (mScroller.computeScrollOffset()) {
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
             updateWallpaperOffset();
-            if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().indicate((float)mScroller.getCurrX()/(float)(getChildCount()*getWidth()));
+            if(mLauncher.getDesktopIndicator()!=null){
+                mLauncher.getDesktopIndicator().indicate((float)mScroller.getCurrX()/(float)(getChildCount()*getWidth()));
+                if(mLauncher.isEditMode() || mLauncher.isAllAppsVisible()){
+                    mLauncher.getDesktopIndicator().hide();
+                }
+            }
             postInvalidate();
         } else if (mNextScreen != INVALID_SCREEN) {
         	int lastScreen = mCurrentScreen;
@@ -506,7 +511,12 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             Launcher.setScreen(mCurrentScreen);
             mNextScreen = INVALID_SCREEN;
             clearChildrenCache();
-            if(mLauncher.getDesktopIndicator()!=null)mLauncher.getDesktopIndicator().fullIndicate(mCurrentScreen);
+            if(mLauncher.getDesktopIndicator()!=null){
+                mLauncher.getDesktopIndicator().fullIndicate(mCurrentScreen);
+                if(mLauncher.isEditMode() || mLauncher.isAllAppsVisible()){
+                    mLauncher.getDesktopIndicator().hide();
+                }
+            }
             //ADW: Revert back the interpolator when needed
             if(mRevertInterpolatorOnScrollFinish)setBounceAmount(mScrollingBounce);
 			//ADW: use intuit code to allow extended widgets
