@@ -4469,7 +4469,16 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         final ComponentName name = intent.getComponent();
         if(name!=null)
             updateCountersForPackage(name.getPackageName(),0,0);
-        super.startActivity(intent);
+        try{
+            super.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+        } catch (SecurityException e) {
+            Toast.makeText(this, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+            e(LOG_TAG, "Launcher does not have the permission to launch " + intent +
+                    ". Make sure to create a MAIN intent-filter for the corresponding activity " +
+                    "or use the exported attribute for this activity.", e);
+        }
     }
 
     @Override

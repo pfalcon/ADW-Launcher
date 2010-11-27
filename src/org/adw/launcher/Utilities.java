@@ -171,7 +171,7 @@ final class Utilities {
                     width = (int) (height * ratio);
                 }
     
-                final Bitmap.Config c = (width == sIconWidth && height == sIconHeight) ?
+                final Bitmap.Config c = (width == sIconWidth && height == sIconHeight && bitmap.getConfig()!=null) ?
                         bitmap.getConfig() : Bitmap.Config.ARGB_8888;
                 final Bitmap thumb = Bitmap.createBitmap(sIconWidth, sIconHeight, c);
                 final Canvas canvas = sCanvas;

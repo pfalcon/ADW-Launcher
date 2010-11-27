@@ -280,6 +280,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
      */
     Folder getOpenFolder() {
         CellLayout currentScreen = (CellLayout) getChildAt(mCurrentScreen);
+        if(currentScreen==null)return null;
         int count = currentScreen.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = currentScreen.getChildAt(i);
