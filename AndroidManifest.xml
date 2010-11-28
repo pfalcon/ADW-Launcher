@@ -20,7 +20,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.adw.launcher_donut"
-    android:versionCode="31" android:versionName="@string/adw_version">
+    android:versionCode="32" android:versionName="@string/adw_version">
 
     <permission
         android:name="com.android.launcher.permission.INSTALL_SHORTCUT"
