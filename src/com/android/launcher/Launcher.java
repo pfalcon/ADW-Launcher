@@ -276,6 +276,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	protected boolean autoCloseFolder;
 	private boolean hideABBg=false;
 	private float uiScaleAB=0.5f;
+	private boolean uiABTint=false;
+	private int uiABTintColor=0xffffffff;
 	private boolean uiHideLabels=false;
 	private boolean scrollableSupport=false;
 	private DesktopIndicator mDesktopIndicator;
@@ -3029,8 +3031,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     	if(mIsEditMode || mIsWidgetEditMode)return;
     	updateAlmostNexusVars();
 		float scale=AlmostNexusSettingsHelper.getuiScaleAB(this);
-		if(scale!=uiScaleAB){
+		boolean tint=AlmostNexusSettingsHelper.getUIABTint(this);
+		int tintcolor=AlmostNexusSettingsHelper.getUIABTintColor(this);
+		if(scale!=uiScaleAB || tint!=uiABTint|| tintcolor!=uiABTintColor){
 			uiScaleAB=scale;
+			uiABTint=tint;
+			uiABTintColor=tintcolor;
 			mRAB.updateIcon();
 			mLAB.updateIcon();
 			mRAB2.updateIcon();
@@ -3226,12 +3232,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         	d = Utilities.createIconThumbnail(
             resources.getDrawable(R.drawable.ab_empty), this);
         }
-        d=Utilities.scaledDrawable(d, this,false,uiScaleAB);
+        d=Utilities.scaledDrawable(d, this,uiABTint,uiScaleAB,uiABTintColor);
 
     	return d;
     }
     Drawable createSmallActionButtonDrawable(Drawable d){
-        d=Utilities.scaledDrawable(d, this,false,uiScaleAB);
+        d=Utilities.scaledDrawable(d, this,uiABTint,uiScaleAB,uiABTintColor);
         return d;
     }
     //ADW: Previews Functions
