@@ -426,4 +426,14 @@ public final class AlmostNexusSettingsHelper {
         int newD = Integer.valueOf(sp.getString("drawer_style", context.getResources().getString(R.string.config_drawer_style)));
         return newD;
     }
+    public static boolean getUIABTint(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+        boolean newD = sp.getBoolean("uiABTint", context.getResources().getBoolean(R.bool.config_ab_tint));
+        return newD;
+    }
+    public static int getUIABTintColor(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
+        int newD = sp.getInt("uiABTintColor", context.getResources().getInteger(R.integer.config_ab_tint_color));
+        return newD;
+    }
 }
