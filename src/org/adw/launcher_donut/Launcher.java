@@ -282,6 +282,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private DesktopIndicator mDesktopIndicator;
 	private int savedOrientation;
 	private boolean useDrawerCatalogNavigation=true;
+	private int appDrawerPadding=-1;
 	/**
 	 * ADW: Home binding constants
 	 */
@@ -3051,41 +3052,39 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    		mNextView.setVisibility(showDots?View.VISIBLE:View.GONE);
 		    	mPreviousView.setVisibility(showDots?View.VISIBLE:View.GONE);
 	    	}
-	    	switch (mDockStyle) {
-            case DOCK_STYLE_1:
-                mRAB.setVisibility(View.GONE);
-                mLAB.setVisibility(View.GONE);
-                mRAB2.setVisibility(View.GONE);
-                mLAB2.setVisibility(View.GONE);
-                mDrawerToolbar.setVisibility(View.VISIBLE);
-                break;
-            case DOCK_STYLE_3:
-                mRAB.setVisibility(View.VISIBLE);
-                mLAB.setVisibility(View.VISIBLE);
-                mRAB2.setVisibility(View.GONE);
-                mLAB2.setVisibility(View.GONE);
-                mDrawerToolbar.setVisibility(View.VISIBLE);
-                break;
-            case DOCK_STYLE_5:
-                mRAB.setVisibility(View.VISIBLE);
-                mLAB.setVisibility(View.VISIBLE);
-                mRAB2.setVisibility(View.VISIBLE);
-                mLAB2.setVisibility(View.VISIBLE);
-                mDrawerToolbar.setVisibility(View.VISIBLE);
-                break;
-            case DOCK_STYLE_NONE:
-                mDrawerToolbar.setVisibility(View.GONE);
-            default:
-                break;
-            }
-	    	//View appsBg=findViewById(R.id.appsBg);
-	    	//appsBg.setVisibility(hideAppsBg?View.INVISIBLE:View.VISIBLE);
-	    	mHandleView.hideBg(hideABBg);
-	    	mRAB.hideBg(hideABBg);
-	    	mLAB.hideBg(hideABBg);
-	    	mRAB2.hideBg(hideABBg);
-	    	mLAB2.hideBg(hideABBg);
     	}
+    	switch (mDockStyle) {
+        case DOCK_STYLE_1:
+            mRAB.setVisibility(View.GONE);
+            mLAB.setVisibility(View.GONE);
+            mRAB2.setVisibility(View.GONE);
+            mLAB2.setVisibility(View.GONE);
+            mDrawerToolbar.setVisibility(View.VISIBLE);
+            break;
+        case DOCK_STYLE_3:
+            mRAB.setVisibility(View.VISIBLE);
+            mLAB.setVisibility(View.VISIBLE);
+            mRAB2.setVisibility(View.GONE);
+            mLAB2.setVisibility(View.GONE);
+            mDrawerToolbar.setVisibility(View.VISIBLE);
+            break;
+        case DOCK_STYLE_5:
+            mRAB.setVisibility(View.VISIBLE);
+            mLAB.setVisibility(View.VISIBLE);
+            mRAB2.setVisibility(View.VISIBLE);
+            mLAB2.setVisibility(View.VISIBLE);
+            mDrawerToolbar.setVisibility(View.VISIBLE);
+            break;
+        case DOCK_STYLE_NONE:
+            mDrawerToolbar.setVisibility(View.GONE);
+        default:
+            break;
+        }
+    	mHandleView.hideBg(hideABBg);
+    	mRAB.hideBg(hideABBg);
+    	mLAB.hideBg(hideABBg);
+    	mRAB2.hideBg(hideABBg);
+    	mLAB2.hideBg(hideABBg);
     	if(mDesktopIndicator!=null){
     		mDesktopIndicator.setType(AlmostNexusSettingsHelper.getDesktopIndicatorType(this));
     		mDesktopIndicator.setAutoHide(AlmostNexusSettingsHelper.getDesktopIndicatorAutohide(this));
@@ -3487,6 +3486,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     public void showAllApps(boolean animated, AppCatalogueFilter filter){
 		if(!allAppsOpen){
 			if(getWindow().getDecorView().getWidth()>getWindow().getDecorView().getHeight()){
+			    int dockSize=(mDockStyle!=DOCK_STYLE_NONE)?mDrawerToolbar.getMeasuredWidth():0;
+			    if(dockSize!=appDrawerPadding){
+			        appDrawerPadding=dockSize;
+			        mAllAppsGrid.setPadding(0, 0, appDrawerPadding, 0);
+			    }
 		        mHandleView.setNextFocusUpId(R.id.drag_layer);
 		        mHandleView.setNextFocusLeftId(R.id.all_apps_view);
 		        mLAB.setNextFocusUpId(R.id.drag_layer);
@@ -3498,6 +3502,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		        mRAB2.setNextFocusUpId(R.id.drag_layer);
 		        mRAB2.setNextFocusLeftId(R.id.all_apps_view);
 			}else{
+			    int dockSize=(mDockStyle!=DOCK_STYLE_NONE)?mDrawerToolbar.getMeasuredHeight():0;
+                if(dockSize!=appDrawerPadding){
+                    appDrawerPadding=dockSize;
+                    mAllAppsGrid.setPadding(0, 0, 0, appDrawerPadding);
+                }
                 mHandleView.setNextFocusUpId(R.id.all_apps_view);
                 mHandleView.setNextFocusLeftId(R.id.drag_layer);
                 mLAB.setNextFocusUpId(R.id.all_apps_view);
