@@ -108,7 +108,7 @@
 				android:title="@string/pref_title_zoom_effect_speed"
 				android:summary="@string/pref_summary_zoom_effect_speed"
 				android:dialogMessage="@string/pref_dialog_zoom_effect_speed"
-				android:key="zoomSpeed" android:defaultValue="@integer/zoomSpeed"
+				android:key="zoomSpeed" android:defaultValue="@integer/config_zoomSpeed"
 				android:max="1700" />
 			<CheckBoxPreference android:title="@string/pref_title_drawer_labels"
 				android:defaultValue="@bool/config_drawerLabels"
