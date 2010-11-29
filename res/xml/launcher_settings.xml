@@ -12,7 +12,7 @@
 			android:summary="@string/pref_summary_hide_statusbar"
 			android:key="hideStatusbar" />
 		<CheckBoxPreference android:title="@string/pref_title_wallpaper_scrolling"
-			android:defaultValue="true"
+			android:defaultValue="@bool/config_wallpaper_scroll"
 			android:summary="@string/pref_summary_wallpaper_scrolling"
 			android:key="wallpaper_scrolling" />
 		<PreferenceCategory
@@ -108,7 +108,7 @@
 				android:title="@string/pref_title_zoom_effect_speed"
 				android:summary="@string/pref_summary_zoom_effect_speed"
 				android:dialogMessage="@string/pref_dialog_zoom_effect_speed"
-				android:key="zoomSpeed" android:defaultValue="400"
+				android:key="zoomSpeed" android:defaultValue="@integer/zoomSpeed"
 				android:max="1700" />
 			<CheckBoxPreference android:title="@string/pref_title_drawer_labels"
 				android:defaultValue="@bool/config_drawerLabels"
