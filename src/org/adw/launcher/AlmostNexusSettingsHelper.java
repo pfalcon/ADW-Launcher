@@ -313,7 +313,7 @@ public final class AlmostNexusSettingsHelper {
 	}
 	public static boolean getWallpaperScrolling(Context context) {
 		SharedPreferences sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);
-		boolean newD = sp.getBoolean("wallpaper_scrolling", true);
+		boolean newD = sp.getBoolean("wallpaper_scrolling", context.getResources().getBoolean(R.bool.config_wallpaer_scroll));
 		return newD;
 	}
 	public static void setDesktopScreens(Context context,int screens) {
