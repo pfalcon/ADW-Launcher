@@ -3132,21 +3132,21 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             mLAB.setVisibility(View.GONE);
             mRAB2.setVisibility(View.GONE);
             mLAB2.setVisibility(View.GONE);
-            mDrawerToolbar.setVisibility(View.VISIBLE);
+            if(!mDockBar.isOpen() && !showingPreviews)mDrawerToolbar.setVisibility(View.VISIBLE);
             break;
         case DOCK_STYLE_3:
             mRAB.setVisibility(View.VISIBLE);
             mLAB.setVisibility(View.VISIBLE);
             mRAB2.setVisibility(View.GONE);
             mLAB2.setVisibility(View.GONE);
-            mDrawerToolbar.setVisibility(View.VISIBLE);
+            if(!mDockBar.isOpen() && !showingPreviews)mDrawerToolbar.setVisibility(View.VISIBLE);
             break;
         case DOCK_STYLE_5:
             mRAB.setVisibility(View.VISIBLE);
             mLAB.setVisibility(View.VISIBLE);
             mRAB2.setVisibility(View.VISIBLE);
             mLAB2.setVisibility(View.VISIBLE);
-            mDrawerToolbar.setVisibility(View.VISIBLE);
+            if(!mDockBar.isOpen() && !showingPreviews)mDrawerToolbar.setVisibility(View.VISIBLE);
             break;
         case DOCK_STYLE_NONE:
             mDrawerToolbar.setVisibility(View.GONE);
