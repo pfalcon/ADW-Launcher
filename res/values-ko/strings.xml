@@ -161,9 +161,6 @@
     <string name="pref_title_animated_drawer">메뉴 에니메이션</string>
     <string name="pref_summary_animated_drawer">메뉴에 에니메이션을 적용할 여부를 설정합니다. </string>
 
-    <string name="pref_title_animated_drawer">메뉴 에니메이션</string>
-    <string name="pref_summary_animated_drawer">메뉴의 에니메이션 여부를 설정합니다.</string>
-
     <string name="pref_title_drawer_columns_portrait">세로모드 열의 수</string>
     <string name="pref_summary_drawer_columns_portrait">세로모드에서 사용할 열의 개수를 설정합니다.</string>
     <string name="pref_dialog_drawer_columns_portrait">세로모드에서 사용할 열의 개수를 설정합니다.</string>
