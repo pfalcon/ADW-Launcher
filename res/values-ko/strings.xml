@@ -117,8 +117,6 @@
 
     <!-- Text to show user in place of a gadget when we can't display it properly -->
     <string name="gadget_error_text">위젯을 로드하는 중 문제가 발생했습니다</string>
-    <!-- ADW Version Information -->
-    <string name="adw_version">버전 1.2.0</string>
     <!-- ADW Settings -->
     <string name="pref_label_settings">ADW 런처 설정</string>
     <!-- Screen preferences -->
