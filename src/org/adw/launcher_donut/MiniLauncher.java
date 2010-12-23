@@ -263,7 +263,7 @@ public class MiniLauncher extends ViewGroup implements View.OnLongClickListener,
     }
 
 	public boolean onLongClick(View v) {
-        if (!v.isInTouchMode()) {
+        if (!v.isInTouchMode() || mLauncher.isDesktopBlocked()) {
             return false;
         }
 		//ADW Delete the item and reposition the remaining ones

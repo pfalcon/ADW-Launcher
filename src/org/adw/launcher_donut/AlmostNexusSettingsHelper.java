@@ -427,4 +427,15 @@ public final class AlmostNexusSettingsHelper {
         int newD = sp.getInt("uiABTintColor", context.getResources().getInteger(R.integer.config_ab_tint_color));
         return newD;
     }
+    public static boolean getDesktopBlocked(Context context) {
+        SharedPreferences sp = sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);;
+        boolean newD = sp.getBoolean("desktopBlocked", false);
+        return newD;
+    }
+    public static void setDesktopBlocked(Context context,boolean block) {
+        SharedPreferences sp = sp = context.getSharedPreferences(ALMOSTNEXUS_PREFERENCES, Context.MODE_PRIVATE);;
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean("desktopBlocked", block);
+        editor.commit();
+    }
 }
