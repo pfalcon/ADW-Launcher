@@ -1258,18 +1258,18 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         super.onSaveInstanceState(outState);
 
         outState.putInt(RUNTIME_STATE_CURRENT_SCREEN, mWorkspace.getCurrentScreen());
-
-        final ArrayList<Folder> folders = mWorkspace.getOpenFolders();
-        if (folders.size() > 0) {
-            final int count = folders.size();
-            long[] ids = new long[count];
-            for (int i = 0; i < count; i++) {
-                final FolderInfo info = folders.get(i).getInfo();
-                ids[i] = info.id;
+        if(mWorkspace!=null){
+            final ArrayList<Folder> folders = mWorkspace.getOpenFolders();
+            if (folders.size() > 0) {
+                final int count = folders.size();
+                long[] ids = new long[count];
+                for (int i = 0; i < count; i++) {
+                    final FolderInfo info = folders.get(i).getInfo();
+                    ids[i] = info.id;
+                }
+                outState.putLongArray(RUNTIME_STATE_USER_FOLDERS, ids);
             }
-            outState.putLongArray(RUNTIME_STATE_USER_FOLDERS, ids);
         }
-
         final boolean isConfigurationChange = getChangingConfigurations() != 0;
 
         // When the drawer is opened and we are saving the state because of a
@@ -1277,7 +1277,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         if (allAppsOpen && isConfigurationChange) {
             outState.putBoolean(RUNTIME_STATE_ALL_APPS_FOLDER, true);
         }
-        if(mDockBar.isOpen()){
+        if(mDockBar!=null && mDockBar.isOpen()){
         	outState.putBoolean(RUNTIME_STATE_DOCKBAR, true);
         }
         if (mAddItemCellInfo != null && mAddItemCellInfo.valid && mWaitingForResult) {
@@ -2568,7 +2568,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         private void cleanup() {
             mWorkspace.unlock();
-            dismissDialog(DIALOG_RENAME_FOLDER);
+            try{
+                dismissDialog(DIALOG_RENAME_FOLDER);
+            }catch (Exception e){
+                //Restarted while dialog or whatever causes IllegalStateException???
+            }
             mWaitingForResult = false;
             mFolderInfo = null;
         }
@@ -2608,7 +2612,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         private void cleanup() {
             mWorkspace.unlock();
-            dismissDialog(DIALOG_CHOOSE_GROUP);
+            try{
+                dismissDialog(DIALOG_CHOOSE_GROUP);
+            }catch (Exception e){
+                //Restarted while dialog or whatever causes IllegalStateException???
+            }
         }
 
 		public void onClick(DialogInterface dialog, int which) {
@@ -2698,7 +2706,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         private void cleanup() {
             mWorkspace.unlock();
-            dismissDialog(DIALOG_NEW_GROUP);
+            try{
+                dismissDialog(DIALOG_NEW_GROUP);
+            }catch (Exception e){
+                //Restarted while dialog or whatever causes IllegalStateException???
+            }
             mWaitingForResult = false;
             mFolderInfo = null;
         }
@@ -2743,7 +2755,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         private void cleanup() {
             mWorkspace.unlock();
-            dismissDialog(DIALOG_CREATE_SHORTCUT);
+            try{
+                dismissDialog(DIALOG_CREATE_SHORTCUT);
+            }catch (Exception e){
+                //Restarted while dialog or whatever causes IllegalStateException???
+            }
         }
 
         /**
@@ -3420,6 +3436,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 
     private void showPreviousPreview(View anchor) {
+        if(mWorkspace==null) return;
         int current = mWorkspace.getCurrentScreen();
         if(newPreviews){
 	        if (current <= 0) return;
@@ -3430,6 +3447,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 
     private void showNextPreview(View anchor) {
+        if(mWorkspace==null)return;
         int current = mWorkspace.getCurrentScreen();
         if(newPreviews){
 	        if (current >= mWorkspace.getChildCount() - 1) return;
@@ -3440,96 +3458,98 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 
     public void showPreviews(final View anchor, int start, int end) {
-    	if(newPreviews){
-	    	showingPreviews=true;
-	    	hideDesktop(true);
-	        mWorkspace.lock();
-	    	mWorkspace.openSense(true);
-    	}else{
-	        //check first if it's already open
-	        final PopupWindow window = (PopupWindow) anchor.getTag(R.id.TAG_PREVIEW);
-	        if (window != null) return;
-	    	Resources resources = getResources();
+        if(mWorkspace!=null && mWorkspace.getChildCount()>0){
+            if(newPreviews){
+                showingPreviews=true;
+                hideDesktop(true);
+                mWorkspace.lock();
+                mWorkspace.openSense(true);
+            }else{
+                //check first if it's already open
+                final PopupWindow window = (PopupWindow) anchor.getTag(R.id.TAG_PREVIEW);
+                if (window != null) return;
+                Resources resources = getResources();
 
-	        Workspace workspace = mWorkspace;
-	        CellLayout cell = ((CellLayout) workspace.getChildAt(start));
-	        float max;
-	        ViewGroup preview;
-        	max = workspace.getChildCount();
-            preview = new LinearLayout(this);
+                Workspace workspace = mWorkspace;
+                CellLayout cell = ((CellLayout) workspace.getChildAt(start));
+                float max;
+                ViewGroup preview;
+                max = workspace.getChildCount();
+                preview = new LinearLayout(this);
 
-	        Rect r = new Rect();
-	        //ADW: seems sometimes this throws an out of memory error.... so...
-	        try{
-	        	resources.getDrawable(R.drawable.preview_background).getPadding(r);
-	        }catch(OutOfMemoryError e){}
-	        int extraW = (int) ((r.left + r.right) * max);
-	        int extraH = r.top + r.bottom;
+                Rect r = new Rect();
+                //ADW: seems sometimes this throws an out of memory error.... so...
+                try{
+                    resources.getDrawable(R.drawable.preview_background).getPadding(r);
+                }catch(OutOfMemoryError e){}
+                int extraW = (int) ((r.left + r.right) * max);
+                int extraH = r.top + r.bottom;
 
-	        int aW = cell.getWidth() - extraW;
-	        float w = aW / max;
+                int aW = cell.getWidth() - extraW;
+                float w = aW / max;
 
-	        int width = cell.getWidth();
-	        int height = cell.getHeight();
-	        //width -= (x + cell.getRightPadding());
-	        //height -= (y + cell.getBottomPadding());
-	        if(width!=0 && height!=0){
-	            showingPreviews=true;
-		        float scale = w / width;
+                int width = cell.getWidth();
+                int height = cell.getHeight();
+                //width -= (x + cell.getRightPadding());
+                //height -= (y + cell.getBottomPadding());
+                if(width!=0 && height!=0){
+                    showingPreviews=true;
+                    float scale = w / width;
 
-		        int count = end - start;
+                    int count = end - start;
 
-		        final float sWidth = width * scale;
-		        float sHeight = height * scale;
+                    final float sWidth = width * scale;
+                    float sHeight = height * scale;
 
 
-		        PreviewTouchHandler handler = new PreviewTouchHandler(anchor);
-		        ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>(count);
+                    PreviewTouchHandler handler = new PreviewTouchHandler(anchor);
+                    ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>(count);
 
-		        for (int i = start; i < end; i++) {
-		            ImageView image = new ImageView(this);
-		            cell = (CellLayout) workspace.getChildAt(i);
-		            Bitmap bitmap = Bitmap.createBitmap((int) sWidth, (int) sHeight,
-		                    Bitmap.Config.ARGB_8888);
-		            cell.setDrawingCacheEnabled(false);
-		            Canvas c = new Canvas(bitmap);
-		            c.scale(scale, scale);
-		            c.translate(-cell.getLeftPadding(), -cell.getTopPadding());
-		            cell.dispatchDraw(c);
+                    for (int i = start; i < end; i++) {
+                        ImageView image = new ImageView(this);
+                        cell = (CellLayout) workspace.getChildAt(i);
+                        Bitmap bitmap = Bitmap.createBitmap((int) sWidth, (int) sHeight,
+                                Bitmap.Config.ARGB_8888);
+                        cell.setDrawingCacheEnabled(false);
+                        Canvas c = new Canvas(bitmap);
+                        c.scale(scale, scale);
+                        c.translate(-cell.getLeftPadding(), -cell.getTopPadding());
+                        cell.dispatchDraw(c);
 
-		            image.setBackgroundDrawable(resources.getDrawable(R.drawable.preview_background));
-		            image.setImageBitmap(bitmap);
-		            image.setTag(i);
-		            image.setOnClickListener(handler);
-		            image.setOnFocusChangeListener(handler);
-		            image.setFocusable(true);
-		            if (i == mWorkspace.getCurrentScreen()) image.requestFocus();
+                        image.setBackgroundDrawable(resources.getDrawable(R.drawable.preview_background));
+                        image.setImageBitmap(bitmap);
+                        image.setTag(i);
+                        image.setOnClickListener(handler);
+                        image.setOnFocusChangeListener(handler);
+                        image.setFocusable(true);
+                        if (i == mWorkspace.getCurrentScreen()) image.requestFocus();
 
-		            preview.addView(image,
-		                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        preview.addView(image,
+                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-		            bitmaps.add(bitmap);
-		        }
+                        bitmaps.add(bitmap);
+                    }
 
-		        PopupWindow p = new PopupWindow(this);
-		        p.setContentView(preview);
-	        	p.setWidth((int) (sWidth * count + extraW));
-	        	p.setHeight((int) (sHeight + extraH));
-	            p.setAnimationStyle(R.style.AnimationPreview);
-		        p.setOutsideTouchable(true);
-		        p.setFocusable(true);
-		        p.setBackgroundDrawable(new ColorDrawable(0));
-	        	p.showAsDropDown(anchor, 0, 0);
-		        p.setOnDismissListener(new PopupWindow.OnDismissListener() {
-		            public void onDismiss() {
-		                dismissPreview(anchor);
-		            }
-		        });
-		        anchor.setTag(R.id.TAG_PREVIEW, p);
-		        anchor.setTag(R.id.workspace, preview);
-		        anchor.setTag(R.id.icon, bitmaps);
-	        }
-    	}
+                    PopupWindow p = new PopupWindow(this);
+                    p.setContentView(preview);
+                    p.setWidth((int) (sWidth * count + extraW));
+                    p.setHeight((int) (sHeight + extraH));
+                    p.setAnimationStyle(R.style.AnimationPreview);
+                    p.setOutsideTouchable(true);
+                    p.setFocusable(true);
+                    p.setBackgroundDrawable(new ColorDrawable(0));
+                    p.showAsDropDown(anchor, 0, 0);
+                    p.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                        public void onDismiss() {
+                            dismissPreview(anchor);
+                        }
+                    });
+                    anchor.setTag(R.id.TAG_PREVIEW, p);
+                    anchor.setTag(R.id.workspace, preview);
+                    anchor.setTag(R.id.icon, bitmaps);
+                }
+            }
+        }
     }
     class PreviewTouchHandler implements View.OnClickListener, Runnable, View.OnFocusChangeListener {
         private final View mAnchor;
@@ -3566,7 +3586,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	 * ADW: Functions to handle Apps Grid
 	 */
     public void showAllApps(boolean animated, AppCatalogueFilter filter){
-		if(!allAppsOpen){
+		if(!allAppsOpen && mAllAppsGrid!=null){
 			if(getWindow().getDecorView().getWidth()>getWindow().getDecorView().getHeight()){
 			    int dockSize=(mDockStyle!=DOCK_STYLE_NONE)?mDrawerToolbar.getMeasuredWidth():0;
 			    if(dockSize!=appDrawerPadding){
@@ -3630,7 +3650,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 
     private void closeAllApps(boolean animated){
-		if(allAppsOpen){
+		if(allAppsOpen && mAllAppsGrid!=null){
             mHandleView.setNextFocusUpId(R.id.drag_layer);
             mHandleView.setNextFocusLeftId(R.id.drag_layer);
             mLAB.setNextFocusUpId(R.id.drag_layer);
@@ -3788,7 +3808,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 }
             }else if(key.equals("deletezone_style")){
                 int dz=AlmostNexusSettingsHelper.getDeletezoneStyle(this);
-                final DeleteZone deleteZone = (DeleteZone) mDragLayer.findViewById(R.id.delete_zone);
+                final DeleteZone deleteZone = (DeleteZone) findViewById(R.id.delete_zone);
                 deleteZone.setPosition(dz);
 			}
 			updateAlmostNexusUI();
@@ -4333,12 +4353,14 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
 					@Override
 					public void onTrigger(RectF r) {
-						final float left = Math.round(r.left/minw) * minw;
-						final float top = Math.round(r.top/minh) * minh;
-						final float right = left + (Math.max(Math.round(r.width()/(minw)),1) * minw);
-						final float bottom = top + (Math.max(Math.round(r.height()/(minh)),1) * minh);
+                        if(r!=null){
+                            final float left = Math.round(r.left/minw) * minw;
+                            final float top = Math.round(r.top/minh) * minh;
+                            final float right = left + (Math.max(Math.round(r.width()/(minw)),1) * minw);
+                            final float bottom = top + (Math.max(Math.round(r.height()/(minh)),1) * minh);
 
-						r.set(left, top, right, bottom);
+                            r.set(left, top, right, bottom);
+                        }
 					}
 				});
                 final Rect checkRect=new Rect();
