@@ -144,6 +144,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     private static final int MENU_APP_GRP_RENAME = MENU_SETTINGS + 3;
     private static final int MENU_APP_SWITCH_GRP = MENU_SETTINGS + 4;
     private static final int MENU_APP_DELETE_GRP = MENU_SETTINGS + 5;
+    private static final int MENU_LOCK_DESKTOP = MENU_SETTINGS + 6;
 
     private static final int REQUEST_CREATE_SHORTCUT = 1;
     private static final int REQUEST_CREATE_LIVE_FOLDER = 4;
@@ -295,6 +296,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private int savedOrientation;
 	private boolean useDrawerCatalogNavigation=true;
 	private int appDrawerPadding=-1;
+
+    public boolean isDesktopBlocked() {
+        return mBlockDesktop;
+    }
+
+    private boolean mBlockDesktop=true;
 	/**
 	 * ADW: Home/Swype down binding constants
 	 */
@@ -363,6 +370,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			setPersistent(false);
 	        changeOrientation(AlmostNexusSettingsHelper.getDesktopOrientation(this),false);
 		}
+        mBlockDesktop=AlmostNexusSettingsHelper.getDesktopBlocked(this);
     	super.onCreate(savedInstanceState);
         mInflater = getLayoutInflater();
 
@@ -1456,6 +1464,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			.setIcon(android.R.drawable.ic_menu_manage);
    		menu.add(MENU_GROUP_CATALOGUE, MENU_APP_DELETE_GRP, 0, R.string.AppGroupDel)
 			.setIcon(android.R.drawable.ic_menu_delete);
+        menu.add(MENU_GROUP_NORMAL, MENU_LOCK_DESKTOP, 0, R.string.menu_lock)
+            .setIcon(android.R.drawable.ic_menu_preferences)
+            .setAlphabeticShortcut('X');
      return true;
     }
 
@@ -1469,7 +1480,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		menu.setGroupVisible(MENU_GROUP_ADD, mMenuAddInfo != null && mMenuAddInfo.valid && (!allAppsOpen) );
 		menu.setGroupVisible(MENU_GROUP_NORMAL, !allAppsOpen);
 		menu.setGroupVisible(MENU_GROUP_CATALOGUE, allAppsOpen);
-
+        if(mBlockDesktop){
+            menu.findItem(MENU_LOCK_DESKTOP).setTitle(R.string.menu_unlock);
+        }else{
+            menu.findItem(MENU_LOCK_DESKTOP).setTitle(R.string.menu_lock);
+        }
        return true;
     }
 
@@ -1505,6 +1520,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 return true;
             case MENU_APP_DELETE_GRP:
 				showDeleteGrpDialog();
+            case MENU_LOCK_DESKTOP:
+				mBlockDesktop=!mBlockDesktop;
+                AlmostNexusSettingsHelper.setDesktopBlocked(this,mBlockDesktop);
             return true;
         }
 
@@ -2364,7 +2382,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             return true;
         }
 
-        if (mWorkspace.allowLongPress()) {
+        if (mWorkspace.allowLongPress() && !mBlockDesktop) {
             if (cellInfo.cell == null) {
                 if (cellInfo.valid) {
                     // User long pressed on empty space

@@ -399,4 +399,6 @@
     <string name="pref_summary_deletezone_style">Change the position of the Trash Can</string>
     <string name="pref_title_close_apps_dockbar">Close the app drawer</string>
     <string name="pref_summary_close_apps_dockbar">Close the app drawer when longpressing items when the dockbar is visible</string>
+    <string name="menu_lock">Lock Desktop</string>
+    <string name="menu_unlock">Unlock Desktop</string>
 </resources>

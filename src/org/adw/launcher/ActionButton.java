@@ -331,7 +331,7 @@ public class ActionButton extends CounterImageView implements DropTarget, DragLi
 
 	@Override
 	public boolean onLongClick(View v) {
-        if (mDragger == null || !v.isInTouchMode() || mCurrentInfo == null || specialMode) {
+        if (mDragger == null || !v.isInTouchMode() || mCurrentInfo == null || specialMode || mLauncher.isDesktopBlocked()) {
             return false;
         }
         // Close Drawer if it is open...
