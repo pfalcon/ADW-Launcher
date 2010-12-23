@@ -638,7 +638,6 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 	    mWallpaperWidth = mWallpaper.getWidth();
 	    mWallpaperHeight = mWallpaper.getHeight();
 	}
-
 	final int wallpaperWidth = mWallpaperWidth;
 	mWallpaperOffset = wallpaperWidth > width ? (count * width - wallpaperWidth) /
 	        ((count - 1) * (float) width) : 1.0f;
@@ -679,7 +678,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 
     @Override
     protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
-        if(!mLauncher.isAllAppsVisible()){
+        if(!mLauncher.isAllAppsVisible() && getChildCount()>0){
             final Folder openFolder = getOpenFolder();
             if (openFolder != null) {
                 return openFolder.requestFocus(direction, previouslyFocusedRect);
@@ -690,6 +689,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 } else {
                     focusableScreen = mCurrentScreen;
                 }
+                if(focusableScreen>getChildCount()-1)focusableScreen=getChildCount()-1;
                 getChildAt(focusableScreen).requestFocus(direction, previouslyFocusedRect);
             }
         }
@@ -717,15 +717,19 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
         if (!mLauncher.isAllAppsVisible()) {
             final Folder openFolder = getOpenFolder();
             if (openFolder == null) {
-                getChildAt(mCurrentScreen).addFocusables(views, direction);
-                if (direction == View.FOCUS_LEFT) {
-                    if (mCurrentScreen > 0) {
-                        getChildAt(mCurrentScreen - 1).addFocusables(views, direction);
+                try{
+                    getChildAt(mCurrentScreen).addFocusables(views, direction);
+                    if (direction == View.FOCUS_LEFT) {
+                        if (mCurrentScreen > 0) {
+                            getChildAt(mCurrentScreen - 1).addFocusables(views, direction);
+                        }
+                    } else if (direction == View.FOCUS_RIGHT){
+                        if (mCurrentScreen < getChildCount() - 1) {
+                            getChildAt(mCurrentScreen + 1).addFocusables(views, direction);
+                        }
                     }
-                } else if (direction == View.FOCUS_RIGHT){
-                    if (mCurrentScreen < getChildCount() - 1) {
-                        getChildAt(mCurrentScreen + 1).addFocusables(views, direction);
-                    }
+                }catch (Exception e){
+                    //Adding focusables with screens not ready...
                 }
             } else {
                 openFolder.addFocusables(views, direction);
@@ -1711,7 +1715,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
 				child.draw(canvas);
 			}
 		}else{
-			super.drawChild(canvas, child, drawingTime);
+			if(child!=null)super.drawChild(canvas, child, drawingTime);
 		}
 		canvas.restoreToCount(saveCount);
 		return true;
@@ -1899,18 +1903,18 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             Object tag = view.getTag();
             //DELETE ALL ITEMS FROM SCREEN
             final ItemInfo item = (ItemInfo) tag;
-            if (item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
+            if (item!=null && item.container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
                 if (item instanceof LauncherAppWidgetInfo) {
                     model.removeDesktopAppWidget((LauncherAppWidgetInfo) item);
                 } else {
                     model.removeDesktopItem(item);
                 }
             }
-            if (item instanceof UserFolderInfo) {
+            if (item!=null && item instanceof UserFolderInfo) {
                 final UserFolderInfo userFolderInfo = (UserFolderInfo)item;
                 LauncherModel.deleteUserFolderContentsFromDatabase(mLauncher, userFolderInfo);
                 model.removeUserFolder(userFolderInfo);
-            } else if (item instanceof LauncherAppWidgetInfo) {
+            } else if (item!=null && item instanceof LauncherAppWidgetInfo) {
                 final LauncherAppWidgetInfo launcherAppWidgetInfo = (LauncherAppWidgetInfo) item;
                 final LauncherAppWidgetHost appWidgetHost = mLauncher.getAppWidgetHost();
                 if (appWidgetHost != null) {
@@ -1953,7 +1957,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             final View view = layout.getChildAt(j);
             Object tag = view.getTag();
             final ItemInfo item = (ItemInfo) tag;
-            if(item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
+            if(item!=null && item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
                 LauncherModel.moveItemInDatabase(mLauncher, item, item.container, screen_b, item.cellX, item.cellY);
             }
         }
@@ -1964,7 +1968,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
             final View view = layout.getChildAt(j);
             Object tag = view.getTag();
             final ItemInfo item = (ItemInfo) tag;
-            if(item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
+            if(item!=null && item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
                 LauncherModel.moveItemInDatabase(mLauncher, item, item.container, screen_a, item.cellX, item.cellY);
             }
         }
@@ -1985,7 +1989,7 @@ public class Workspace extends WidgetSpace implements DropTarget, DragSource, Dr
                 final View view = layout.getChildAt(j);
                 Object tag = view.getTag();
                 final ItemInfo item = (ItemInfo) tag;
-                if(item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
+                if(item!=null && item.container==LauncherSettings.Favorites.CONTAINER_DESKTOP){
 	                LauncherModel.moveItemInDatabase(mLauncher, item, item.container, item.screen+diff, item.cellX, item.cellY);
                 }
             }

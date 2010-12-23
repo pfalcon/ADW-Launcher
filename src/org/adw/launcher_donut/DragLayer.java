@@ -225,6 +225,9 @@ public class DragLayer extends FrameLayout implements DragController {
 	        mAnimationType = ANIMATION_TYPE_SCALE;
             try {
     	        mDragBitmap = Bitmap.createBitmap(viewBitmap, 0, 0, width, height, scale, true);
+                final Bitmap dragBitmap = mDragBitmap;
+                mBitmapOffsetX = (dragBitmap.getWidth() - width) / 2;
+                mBitmapOffsetY = (dragBitmap.getHeight() - height) / 2;
             } catch (OutOfMemoryError e) {
                 mDrawModeBitmap=false;
                 width = v.getWidth();
@@ -240,14 +243,10 @@ public class DragLayer extends FrameLayout implements DragController {
                 mAnimationType = ANIMATION_TYPE_SCALE;
                 mBitmapOffsetX = (mDrawWidth-width) / 2;
                 mBitmapOffsetY = (mDrawHeight-height) / 2;
-            }            
+            }
 	        v.destroyDrawingCache();
 	        v.setWillNotCacheDrawing(willNotCache);
 	        v.setDrawingCacheBackgroundColor(color);
-	
-	        final Bitmap dragBitmap = mDragBitmap;
-	        mBitmapOffsetX = (dragBitmap.getWidth() - width) / 2;
-	        mBitmapOffsetY = (dragBitmap.getHeight() - height) / 2;
         }else{
         	mDrawModeBitmap=false;
             int width = v.getWidth();

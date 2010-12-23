@@ -1167,10 +1167,12 @@ public class LauncherModel {
      * @return A UserFolderInfo if the folder exists or null otherwise.
      */
     FolderInfo findFolderById(long id) {
+        if(mFolders==null)return null;
         return mFolders.get(id);
     }
 
     void addFolder(FolderInfo info) {
+        if(mFolders==null)return;
         mFolders.put(info.id, info);
     }
 
@@ -1727,10 +1729,13 @@ public class LauncherModel {
         if(changed)mApplicationsAdapter.notifyDataSetChanged();
     }
     void updateCounterDesktopItem(ItemInfo info, int counter, int color) {
-        // TODO: write to DB; figure out if we should remove folder from folders list
-        if(mDesktopItems.get(mDesktopItems.indexOf(info)) instanceof ApplicationInfo){
-            ((ApplicationInfo)mDesktopItems.get(mDesktopItems.indexOf(info))).counter=counter;
-            ((ApplicationInfo)mDesktopItems.get(mDesktopItems.indexOf(info))).counterColor=color;
+        try{
+            if(mDesktopItems.get(mDesktopItems.indexOf(info)) instanceof ApplicationInfo){
+                ((ApplicationInfo)mDesktopItems.get(mDesktopItems.indexOf(info))).counter=counter;
+                ((ApplicationInfo)mDesktopItems.get(mDesktopItems.indexOf(info))).counterColor=color;
+            }
+        }catch (Exception e){
+            //Sync issue........
         }
     }
 }
