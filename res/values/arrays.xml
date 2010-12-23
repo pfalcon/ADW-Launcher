@@ -38,7 +38,7 @@
                 <item>Top</item>
                 <item>Bottom</item>
                 <item>Top (Shrink desktop)</item>
-                <item>Bottom (Shink desktop)</item>
+                <item>Bottom (Shrink desktop)</item>
        </string-array>
        <string-array name="app_drawer_style_entries">
                 <item>Vertical plain</item>
