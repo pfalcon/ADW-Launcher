@@ -264,6 +264,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private ActionButton mLAB2;
 	private ActionButton mRAB2;
 	private View mDrawerToolbar;
+    private DeleteZone mDeleteZone;
 	/**
 	 * ADW: variables to store actual status of elements
 	 */
@@ -749,7 +750,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         int drawerStyle=AlmostNexusSettingsHelper.getDrawerStyle(this);
         tmp.setLayoutResource(mDrawerStyles[drawerStyle]);
         mAllAppsGrid = (Drawer)tmp.inflate();
-        final DeleteZone deleteZone = (DeleteZone) dragLayer.findViewById(R.id.delete_zone);
+        mDeleteZone = (DeleteZone) dragLayer.findViewById(R.id.delete_zone);
 
         mHandleView = (ActionButton) dragLayer.findViewById(R.id.btn_mab);
         mHandleView.setFocusable(true);
@@ -778,12 +779,12 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         workspace.setDragger(dragLayer);
         workspace.setLauncher(this);
 
-        deleteZone.setLauncher(this);
-        deleteZone.setDragController(dragLayer);
+        mDeleteZone.setLauncher(this);
+        mDeleteZone.setDragController(dragLayer);
 
         dragLayer.setIgnoredDropTarget((View)mAllAppsGrid);
         dragLayer.setDragScoller(workspace);
-        dragLayer.addDragListener(deleteZone);
+        dragLayer.addDragListener(mDeleteZone);
         //ADW: Dockbar inner icon viewgroup (MiniLauncher.java)
         mMiniLauncher = (MiniLauncher) dragLayer.findViewById(R.id.mini_content);
         mMiniLauncher.setLauncher(this);
@@ -897,8 +898,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			//View appsBg=findViewById(R.id.appsBg);
 			//loadThemeResource(themeResources,themePackage,"handle",appsBg,THEME_ITEM_BACKGROUND);
 			//Deletezone
-			loadThemeResource(themeResources,themePackage,"ic_delete",deleteZone,THEME_ITEM_FOREGROUND);
-			loadThemeResource(themeResources,themePackage,"delete_zone_selector",deleteZone,THEME_ITEM_BACKGROUND);
+			loadThemeResource(themeResources,themePackage,"ic_delete",mDeleteZone,THEME_ITEM_FOREGROUND);
+			loadThemeResource(themeResources,themePackage,"delete_zone_selector",mDeleteZone,THEME_ITEM_BACKGROUND);
 			//Desktop dots
 			loadThemeResource(themeResources,themePackage,"home_arrows_left",mPreviousView,THEME_ITEM_FOREGROUND);
 			loadThemeResource(themeResources,themePackage,"home_arrows_right",mNextView,THEME_ITEM_FOREGROUND);
@@ -1353,7 +1354,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 !CustomShirtcutActivity.ACTION_LAUNCHERACTION.equals(intent.getAction()))
             closeDrawer(false);
         if (requestCode >= 0) mWaitingForResult = true;
-        super.startActivityForResult(intent, requestCode);
+        try{
+            super.startActivityForResult(intent, requestCode);
+        }catch (Exception e){
+            Toast.makeText(this,R.string.activity_not_found,Toast.LENGTH_SHORT);
+        }
     }
 
     @Override
@@ -3741,8 +3746,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 }
             }else if(key.equals("deletezone_style")){
                 int dz=AlmostNexusSettingsHelper.getDeletezoneStyle(this);
-                final DeleteZone deleteZone = (DeleteZone) findViewById(R.id.delete_zone);
-                deleteZone.setPosition(dz);
+                if(mDeleteZone!=null)mDeleteZone.setPosition(dz);
 			}
 			updateAlmostNexusUI();
 		}
