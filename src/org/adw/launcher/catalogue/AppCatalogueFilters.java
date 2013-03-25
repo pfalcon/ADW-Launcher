@@ -87,6 +87,8 @@ public final class AppCatalogueFilters {
 	}
 
 	public String getGroupTitle(int index) {
+        if (index == AppGroupAdapter.APP_GROUP_ALL)
+            return mContext.getString(R.string.AppGroupAll);
 		if (!mAllAppGroups.containsKey(index))
 			return null;
 

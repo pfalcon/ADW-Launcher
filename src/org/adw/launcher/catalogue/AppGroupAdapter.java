@@ -70,7 +70,7 @@ public class AppGroupAdapter extends BaseAdapter {
 		}
 	}
 
-    public AppGroupAdapter(Launcher launcher) {
+    public AppGroupAdapter(Launcher launcher, boolean withNew) {
         super();
 
         mInflater = (LayoutInflater) launcher.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -78,7 +78,9 @@ public class AppGroupAdapter extends BaseAdapter {
         // Create default actions
         Resources res = launcher.getResources();
 
-        mItems.add(new ListItem(res, R.string.AppGroupAdd, APP_GROUP_ADD));
+        if (withNew) {
+            mItems.add(new ListItem(res, R.string.AppGroupAdd, APP_GROUP_ADD));
+        }
 		mItems.add(new ListItem(res, R.string.AppGroupAll, APP_GROUP_ALL));
 
 		for(AppCatalogueFilters.Catalogue itm : AppCatalogueFilters.getInstance().getAllGroups()) {

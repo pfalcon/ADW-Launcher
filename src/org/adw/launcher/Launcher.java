@@ -173,6 +173,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     static final int DIALOG_CHOOSE_GROUP = 3;
     static final int DIALOG_NEW_GROUP = 4;
     static final int DIALOG_DELETE_GROUP_CONFIRM = 5;
+    // Like DIALOG_CHOOSE_GROUP, but without choice to create new group -
+    // to save number of lines in a dialog.
+    static final int DIALOG_CHOOSE_EXISTING_GROUP = 6;
 
     private static final String PREFERENCES = "launcher.preferences";
 
@@ -268,6 +271,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	private ActionButton mLAB2;
 	private ActionButton mRAB2;
 	private View mDrawerToolbar;
+	private View mGroupToolbar;
+	private TextView mAppGroupLabel;
     private DeleteZone mDeleteZone;
 	/**
 	 * ADW: variables to store actual status of elements
@@ -564,6 +569,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		else if (resultCode == RESULT_OK ) {
 			switch(requestCode) {
 				case REQUEST_SHOW_APP_LIST: {
+					updateAppGroupLabel(null);
 					mAllAppsGrid.updateAppGrp();
 					showAllApps(true, null);
 				} break;
@@ -827,6 +833,24 @@ public final class Launcher extends Activity implements View.OnClickListener, On
         mRAB.setDragger(dragLayer);
         mRAB2.setDragger(dragLayer);
         mLAB2.setDragger(dragLayer);
+
+        mAppGroupLabel=(TextView)findViewById(R.id.app_group_label);
+        // Click will show dialog to change current group
+        mAppGroupLabel.setOnClickListener(this);
+
+        mGroupToolbar=findViewById(R.id.group_toolbar);
+        ActionButton ab = (ActionButton) dragLayer.findViewById(R.id.btn_prev_group);
+        ab.setLauncher(this);
+        ab.setSpecialIcon(R.drawable.arrow_left);
+        ab.setSpecialAction(ACTION_CATALOG_PREV);
+        ab.setSpecialMode(true);
+        ab.setOnClickListener(this);
+        ab = (ActionButton) dragLayer.findViewById(R.id.btn_next_group);
+        ab.setLauncher(this);
+        ab.setSpecialIcon(R.drawable.arrow_right);
+        ab.setSpecialAction(ACTION_CATALOG_NEXT);
+        ab.setSpecialMode(true);
+        ab.setOnClickListener(this);
 
 		//ADW linearlayout with apptray, lab and rab
 		mDrawerToolbar=findViewById(R.id.drawer_toolbar);
@@ -1516,7 +1540,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 				showNewGrpDialog();
                 return true;
             case MENU_APP_SWITCH_GRP:
-				showSwitchGrp();
+				showSwitchGrp(true);
                 return true;
             case MENU_APP_DELETE_GRP:
 				showDeleteGrpDialog();
@@ -2183,6 +2207,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             ApplicationsAdapter drawerAdapter) {
         int currCatalog=AlmostNexusSettingsHelper.getCurrentAppCatalog(this);
         AppCatalogueFilters.getInstance().getDrawerFilter().setCurrentGroupIndex(currCatalog);
+        updateAppGroupLabel(null);
         drawerAdapter.buildViewCache((ViewGroup)mAllAppsGrid);
         mAllAppsGrid.setAdapter(drawerAdapter);
         mAllAppsGrid.updateAppGrp();
@@ -2240,6 +2265,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             navigateCatalogs(Integer.parseInt(tag.toString()));
             return;
         }
+        if("app_group_label".equals(tag)){
+            showSwitchGrp(false);
+            return;
+        }
+
         //TODO:ADW Check whether to display a toast if clicked mLAB or mRAB withount binding
         if(tag==null && v instanceof ActionButton){
     		Toast t=Toast.makeText(this, R.string.toast_no_application_def, Toast.LENGTH_SHORT);
@@ -2441,7 +2471,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
             case DIALOG_RENAME_FOLDER:
                 return new RenameFolder().createDialog();
 			case DIALOG_CHOOSE_GROUP:
-				return new CreateGrpDialog().createDialog();
+				return new CreateGrpDialog().createDialog(true);
+			case DIALOG_CHOOSE_EXISTING_GROUP:
+				return new CreateGrpDialog().createDialog(false);
 			case DIALOG_NEW_GROUP:
 				return new NewGrpTitle().createDialog();
    			case DIALOG_DELETE_GROUP_CONFIRM:
@@ -2483,12 +2515,16 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		int index = sModel.getApplicationsAdapter().getCatalogueFilter().getCurrentFilterIndex();
 		AppCatalogueFilters.getInstance().dropGroup(index);
 		checkActionButtonsSpecialMode();
-		showSwitchGrp();
+		showSwitchGrp(true);
 	}
-	public void showSwitchGrp()
+	public void showSwitchGrp(boolean withNew)
 	{
 		removeDialog(DIALOG_CHOOSE_GROUP);
-		showDialog(DIALOG_CHOOSE_GROUP);
+		if (withNew) {
+		    showDialog(DIALOG_CHOOSE_GROUP);
+		} else {
+		    showDialog(DIALOG_CHOOSE_EXISTING_GROUP);
+		}
 	}
     void showRenameDialog(FolderInfo info) {
         mFolderInfo = info;
@@ -2607,10 +2643,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 
         private AppGroupAdapter mAdapter;
 
-        Dialog createDialog() {
+        Dialog createDialog(boolean withNew) {
             mWaitingForResult = true;
 
-            mAdapter = new AppGroupAdapter(Launcher.this);
+            mAdapter = new AppGroupAdapter(Launcher.this, withNew);
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(Launcher.this);
             builder.setTitle(getString(R.string.AppGroupChoose));
@@ -2655,7 +2691,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			   showNewGrpDialog();
 		   } else {
 			   sModel.getApplicationsAdapter().getCatalogueFilter().setCurrentGroupIndex(action);
-			   AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, action);
+			   updateAppGroupLabel(null);
+// See comment below
+//			   AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, action);
 			   mAllAppsGrid.updateAppGrp();
 			   checkActionButtonsSpecialMode();
 		   }
@@ -2720,8 +2758,10 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 			if (!TextUtils.isEmpty(name)) {
 				// Make sure we have the right folder info
 				int which=AppCatalogueFilters.getInstance().createNewGroup(name);
-				AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, which);
+// See comment below
+//				AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, which);
 				sModel.getApplicationsAdapter().getCatalogueFilter().setCurrentGroupIndex(which);
+				updateAppGroupLabel(null);
 				checkActionButtonsSpecialMode();
 				LauncherModel.mApplicationsAdapter.updateDataSet();
 			}
@@ -3606,13 +3646,22 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		}
 	}
 
+    private void updateAppGroupLabel(AppCatalogueFilter filter) {
+	    if (filter == null)
+	        filter = AppCatalogueFilters.getInstance().getDrawerFilter();
+	    String title = AppCatalogueFilters.getInstance().getGroupTitle(filter.getCurrentFilterIndex());
+	    mAppGroupLabel.setText(title);
+    }
 	/************************************************
 	 * ADW: Functions to handle Apps Grid
 	 */
     public void showAllApps(boolean animated, AppCatalogueFilter filter){
+		mDrawerToolbar.setVisibility(View.GONE);
+		mGroupToolbar.setVisibility(View.VISIBLE);
+		updateAppGroupLabel(filter);
 		if(!allAppsOpen && mAllAppsGrid!=null){
 			if(getWindow().getDecorView().getWidth()>getWindow().getDecorView().getHeight()){
-			    int dockSize=(mDockStyle!=DOCK_STYLE_NONE)?mDrawerToolbar.getMeasuredWidth():0;
+			    int dockSize=(mDockStyle!=DOCK_STYLE_NONE)?mGroupToolbar.getMeasuredWidth():0;
 			    if(dockSize!=appDrawerPadding){
 			        appDrawerPadding=dockSize;
 			        mAllAppsGrid.setPadding(0, 0, appDrawerPadding, 0);
@@ -3628,7 +3677,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 		        mRAB2.setNextFocusUpId(R.id.drag_layer);
 		        mRAB2.setNextFocusLeftId(R.id.all_apps_view);
 			}else{
-			    int dockSize=(mDockStyle!=DOCK_STYLE_NONE)?mDrawerToolbar.getMeasuredHeight():0;
+			    int dockSize=(mDockStyle!=DOCK_STYLE_NONE)?mGroupToolbar.getMeasuredHeight():0;
                 if(dockSize!=appDrawerPadding){
                     appDrawerPadding=dockSize;
                     mAllAppsGrid.setPadding(0, 0, 0, appDrawerPadding);
@@ -3674,6 +3723,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
     }
 
     private void closeAllApps(boolean animated){
+		mGroupToolbar.setVisibility(View.GONE);
+		mDrawerToolbar.setVisibility(View.VISIBLE);
 		if(allAppsOpen && mAllAppsGrid!=null){
             mHandleView.setNextFocusUpId(R.id.drag_layer);
             mHandleView.setNextFocusLeftId(R.id.drag_layer);
@@ -4483,9 +4534,13 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	    // Translate to "filter index"
 	    currentFIndex = filterIndexes.get(currentFIndex);
 	    filter.setCurrentGroupIndex(currentFIndex);
+	    updateAppGroupLabel(null);
 
-	    if (filter == AppCatalogueFilters.getInstance().getDrawerFilter())
-	    	AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, currentFIndex);
+// Don't save current app group in prefs in such case - doing so will
+// lead to cascade of UI elements updates and mDrawerToolbar popping up
+// on the screen. It's not a big loss not to save it here.
+//	    if (filter == AppCatalogueFilters.getInstance().getDrawerFilter())
+//	    	AlmostNexusSettingsHelper.setCurrentAppCatalog(Launcher.this, currentFIndex);
         mAllAppsGrid.updateAppGrp();
         // Uncomment this to show a toast with the name of the new group...
 	    /*String name = currentFIndex ==  AppGroupAdapter.APP_GROUP_ALL ?

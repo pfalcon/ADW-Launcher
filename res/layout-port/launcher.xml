@@ -36,6 +36,50 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	/> 
+
+<!-- Toolbar for App Group selection, shown in applist -->
+	<LinearLayout
+		android:id="@+id/group_toolbar"
+		android:visibility="invisible"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical|center_horizontal"
+		android:layout_gravity="bottom|center_horizontal">
+	    <org.adw.launcher.ActionButton
+			android:src="@drawable/arrow_left"
+			android:background="@drawable/lab_bg"
+			android:scaleType="center"
+			android:layout_height="wrap_content"
+			android:id="@+id/btn_prev_group"
+			launcher:ident="LAB"
+			android:layout_width="64dip"
+			launcher:direction="horizontal" 
+			/>
+
+        <TextView
+            android:id="@+id/app_group_label"
+            android:tag="app_group_label"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="@string/rename_folder_label"
+            android:gravity="center_horizontal|center_vertical"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	    <org.adw.launcher.ActionButton
+			android:src="@drawable/arrow_right"
+			android:background="@drawable/rab_bg"
+			android:scaleType="center"
+			android:layout_height="wrap_content"
+			android:id="@+id/btn_next_group"
+			launcher:ident="RAB"
+			android:layout_width="64dip" 
+            launcher:direction="horizontal" 
+			/>
+	</LinearLayout>
+
+<!-- "Drawer" Toolbar, shown on desktop screens -->
 	<LinearLayout
 		android:id="@+id/drawer_toolbar"
 		android:layout_width="fill_parent"
