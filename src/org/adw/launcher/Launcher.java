@@ -1520,6 +1520,7 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 return true;
             case MENU_APP_DELETE_GRP:
 				showDeleteGrpDialog();
+                return true;
             case MENU_LOCK_DESKTOP:
 				mBlockDesktop=!mBlockDesktop;
                 AlmostNexusSettingsHelper.setDesktopBlocked(this,mBlockDesktop);
