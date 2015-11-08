@@ -30,13 +30,13 @@
 				android:summary="@string/pref_summary_desktop_columns"
 				android:dialogMessage="@string/pref_dialog_desktop_columns"
 				android:key="desktopColumns" android:defaultValue="@integer/config_desktopColumns"
-				android:max="5" />
+				android:max="9" />
 			<org.adw.launcher.DialogSeekBarPreference
 				android:title="@string/pref_title_desktop_rows"
 				android:summary="@string/pref_summary_desktop_rows"
 				android:dialogMessage="@string/pref_dialog_desktop_rows"
 				android:key="desktopRows" android:defaultValue="@integer/config_desktopRows"
-				android:max="5" />
+				android:max="9" />
 		</PreferenceCategory>
 		<PreferenceCategory
             android:title="@string/pref_title_screens_behaviour_preferencecategory">
