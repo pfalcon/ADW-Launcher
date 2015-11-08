@@ -213,6 +213,8 @@ public class LauncherActions {
 					return R.drawable.openclosenotifications_button;
 				case Launcher.BIND_DOCKBAR:
 					return R.drawable.openclosedockbar_button;
+				case Launcher.BIND_PREFS:
+					return R.drawable.ic_launcher_appwidget;
 				default:
 					return R.drawable.ic_launcher_home;
 			}

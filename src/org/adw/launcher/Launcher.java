@@ -314,7 +314,8 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 	protected static final int BIND_NOTIFICATIONS=6;
 	protected static final int BIND_HOME_NOTIFICATIONS=7;
 	protected static final int BIND_DOCKBAR=8;
-	protected static final int BIND_APP_LAUNCHER=9;
+	protected static final int BIND_PREFS=9;
+	protected static final int BIND_APP_LAUNCHER=10;
 
 	private int mHomeBinding=BIND_PREVIEWS;
 
@@ -3925,6 +3926,9 @@ public final class Launcher extends Activity implements View.OnClickListener, On
 					mDockBar.open();
 				}
 			}
+			break;
+		case BIND_PREFS:
+			showCustomConfig();
 			break;
 		case BIND_APP_LAUNCHER:
 			// Launch or bring to front selected app
