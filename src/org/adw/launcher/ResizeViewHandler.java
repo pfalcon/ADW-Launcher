@@ -442,6 +442,8 @@ class ResizeViewHandler extends View {
                             ? ModifyMode.Move
                             : ModifyMode.Grow);
                     break;
+                } else {
+                    dispatchTriggerEvent(null);
                 }
                 break;
             case MotionEvent.ACTION_UP:

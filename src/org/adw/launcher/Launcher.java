@@ -4389,6 +4389,11 @@ public final class Launcher extends Activity implements View.OnClickListener, On
                 ((ResizeViewHandler)mScreensEditor).setOnSizeChangedListener(new ResizeViewHandler.OnSizeChangedListener() {
                     @Override
                     public void onTrigger(RectF r) {
+                        if (r == null) {
+                            stopWidgetEdit();
+                            return;
+                        }
+
                         int[]tmpspans={
                                 Math.max(Math.round(r.width()/(minw)),1),
                                 Math.max(Math.round(r.height()/(minh)),1)
